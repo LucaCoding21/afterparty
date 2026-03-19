@@ -1,0 +1,34 @@
+.home-nav-btn {
+  display: block;
+  width: 100px;
+  position: relative;
+  text-decoration: none;
+}
+
+.home-nav-btn-base,
+.home-nav-btn-hover {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.home-nav-btn-hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: none;
+}
+
+.home-nav-btn:hover {
+  transform: translateY(-4px);
+}
+
+.home-nav-btn:hover .home-nav-btn-base {
+  opacity: 0;
+}
+
+.home-nav-btn:hover .home-nav-btn-hover {
+  opacity: 1;
+}
+
