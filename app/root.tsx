@@ -56,16 +56,11 @@ export function links() {
   return [
     {
       rel: 'preconnect',
-      href: 'https://fonts.googleapis.com',
-    },
-    {
-      rel: 'preconnect',
-      href: 'https://fonts.gstatic.com',
-      crossOrigin: 'anonymous' as const,
+      href: 'https://rsms.me',
     },
     {
       rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=EB+Garamond:wght@400;500&family=Walter+Turncoat&display=swap',
+      href: 'https://rsms.me/inter/inter.css',
     },
     {
       rel: 'preconnect',

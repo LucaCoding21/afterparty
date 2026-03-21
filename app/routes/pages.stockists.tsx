@@ -82,16 +82,8 @@ export default function LocationsPage() {
       <div className="locations-flagship">
         <div className="locations-flagship-label">Our Space</div>
         <h2 className="locations-flagship-name">Afterparty HQ</h2>
-        <div className="locations-flagship-address">
-          98 Phùng Khắc Khoan, Ho Chi Minh City, Vietnam
-        </div>
-        <div className="locations-flagship-hours">
-          <span>10 AM – 6 PM</span>
-          <span>Monday – Sunday</span>
-        </div>
-        <div className="locations-flagship-desc">
-          Visit our private space — shop the full collection, book a fitting, or just hang out.
-        </div>
+        <div className="locations-flagship-address">98 Phùng Khắc Khoan, Ho Chi Minh City, Vietnam</div>
+        <div className="locations-flagship-meta">Monday – Sunday &nbsp;·&nbsp; 10 AM – 6 PM</div>
         <a
           href="https://www.google.com/maps/search/?api=1&query=98+Phung+Khac+Khoan+Ho+Chi+Minh+City"
           target="_blank"
@@ -102,8 +94,6 @@ export default function LocationsPage() {
         </a>
       </div>
 
-      <h3 className="locations-sub-heading">Locations</h3>
-
       <div className="locations-grid">
         {LOCATIONS.map((location) => (
           <div key={location.city} className="locations-city-block">
@@ -112,10 +102,7 @@ export default function LocationsPage() {
               <div key={store.name} className="locations-store">
                 <div className="locations-store-name">{store.name}</div>
                 <div className="locations-store-address">{store.address}</div>
-                <div className="locations-store-hours">
-                  <span>{store.hours}</span>
-                  <span>{store.days}</span>
-                </div>
+                <div className="locations-store-meta">{store.days} &nbsp;·&nbsp; {store.hours}</div>
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${store.query}`}
                   target="_blank"

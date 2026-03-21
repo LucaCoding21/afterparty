@@ -1,4 +1,4 @@
-import {Suspense} from 'react';
+import {Suspense, useState, useRef, useEffect} from 'react';
 import {Await, NavLink, useAsyncValue} from 'react-router';
 import {
   type CartViewPayload,
@@ -7,6 +7,7 @@ import {
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import {SEARCH_ENDPOINT} from '~/components/SearchFormPredictive';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -29,7 +30,11 @@ export function Header({
       {/* Main nav row */}
       <header className="header">
         <nav className="header-nav-left">
-          <NavLink to="/collections" className="header-nav-link" prefetch="intent">
+          <NavLink
+            to="/collections/all"
+            className={() => 'header-nav-link'}
+            prefetch="intent"
+          >
             Shop All
           </NavLink>
           <NavLink to="/blogs" className="header-nav-link" prefetch="intent">
@@ -48,7 +53,7 @@ export function Header({
         </NavLink>
 
         <nav className="header-nav-right">
-          <SearchToggle />
+          <HeaderSearch />
           <NavLink to="/pages/support" className="header-nav-link" prefetch="intent">
             Support <span aria-hidden="true">&rsaquo;</span>
           </NavLink>
@@ -81,7 +86,7 @@ export function HeaderMenu({
       <NavLink end onClick={close} prefetch="intent" className="header-mobile-item" to="/">
         Home
       </NavLink>
-      <NavLink onClick={close} prefetch="intent" className="header-mobile-item" to="/collections">
+      <NavLink onClick={close} prefetch="intent" className="header-mobile-item" to="/collections/all">
         Shop All
       </NavLink>
       <NavLink onClick={close} prefetch="intent" className="header-mobile-item" to="/blogs">
@@ -135,16 +140,56 @@ function HeaderMenuMobileToggle() {
   );
 }
 
-function SearchToggle() {
-  const {open} = useAside();
+function HeaderSearch() {
+  const [open, setOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (open) inputRef.current?.focus();
+  }, [open]);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function handleEsc(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
+
   return (
-    <button className="header-nav-link header-search-btn reset" onClick={() => open('search')} aria-label="Search">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
-      <span>Search</span>
-    </button>
+    <div ref={containerRef} className="header-search-container">
+      <button
+        className="header-nav-link header-search-link reset"
+        aria-label="Search"
+        onClick={() => setOpen((v) => !v)}
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      </button>
+      {open && (
+        <form action={SEARCH_ENDPOINT} method="get" className="header-search-form">
+          <input
+            ref={inputRef}
+            name="q"
+            type="search"
+            placeholder="search"
+            className="header-search-input"
+          />
+        </form>
+      )}
+    </div>
   );
 }
 

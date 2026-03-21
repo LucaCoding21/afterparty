@@ -1,129 +1,66 @@
-import {Suspense} from 'react';
-import {Await, NavLink} from 'react-router';
-import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
+import {Link} from 'react-router';
+import {useState} from 'react';
 
-interface FooterProps {
-  footer: Promise<FooterQuery | null>;
-  header: HeaderQuery;
-  publicStoreDomain: string;
-}
+export function Footer() {
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
-export function Footer({
-  footer: footerPromise,
-  header,
-  publicStoreDomain,
-}: FooterProps) {
+  function handleSubscribe(e: React.FormEvent) {
+    e.preventDefault();
+    if (email) setSubmitted(true);
+  }
+
   return (
-    <Suspense>
-      <Await resolve={footerPromise}>
-        {(footer) => (
-          <footer className="footer">
-            {footer?.menu && header.shop.primaryDomain?.url && (
-              <FooterMenu
-                menu={footer.menu}
-                primaryDomainUrl={header.shop.primaryDomain.url}
-                publicStoreDomain={publicStoreDomain}
-              />
+    <footer className="site-footer">
+      <div className="site-footer-inner">
+
+        {/* Top: logo + newsletter */}
+        <div className="footer-top">
+          <Link to="/" className="footer-logo-link">
+            <img src="/logo.png" alt="Afterparty" className="footer-logo-img" />
+          </Link>
+
+          <div className="footer-newsletter">
+            {submitted ? (
+              <p className="footer-newsletter-thanks">You're on the list.</p>
+            ) : (
+              <>
+                <p className="footer-newsletter-label">Join the list</p>
+                <form className="footer-newsletter-form" onSubmit={handleSubscribe}>
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="footer-newsletter-input"
+                  />
+                  <button type="submit" className="footer-newsletter-btn">
+                    Subscribe
+                  </button>
+                </form>
+              </>
             )}
-          </footer>
-        )}
-      </Await>
-    </Suspense>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <hr className="footer-divider" />
+
+        {/* Bottom: links left, copyright right */}
+        <div className="footer-bottom">
+          <nav className="footer-links-row">
+            <Link to="/pages/faq" className="footer-link">FAQ</Link>
+            <Link to="/pages/shipping-and-payment" className="footer-link">Shipping</Link>
+            <Link to="/policies/privacy-policy" className="footer-link">Privacy</Link>
+            <Link to="/policies/terms-of-service" className="footer-link">Terms</Link>
+            <a href="https://instagram.com/afterparty" target="_blank" rel="noopener noreferrer" className="footer-link">Instagram</a>
+            <a href="https://facebook.com/afterparty" target="_blank" rel="noopener noreferrer" className="footer-link">Facebook</a>
+          </nav>
+          <p className="footer-legal">&copy; {new Date().getFullYear()} Afterparty</p>
+        </div>
+
+      </div>
+    </footer>
   );
-}
-
-function FooterMenu({
-  menu,
-  primaryDomainUrl,
-  publicStoreDomain,
-}: {
-  menu: FooterQuery['menu'];
-  primaryDomainUrl: FooterProps['header']['shop']['primaryDomain']['url'];
-  publicStoreDomain: string;
-}) {
-  return (
-    <nav className="footer-menu" role="navigation">
-      {(menu || FALLBACK_FOOTER_MENU).items.map((item) => {
-        if (!item.url) return null;
-        // if the url is internal, we strip the domain
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        const isExternal = !url.startsWith('/');
-        return isExternal ? (
-          <a href={url} key={item.id} rel="noopener noreferrer" target="_blank">
-            {item.title}
-          </a>
-        ) : (
-          <NavLink
-            end
-            key={item.id}
-            prefetch="intent"
-            style={activeLinkStyle}
-            to={url}
-          >
-            {item.title}
-          </NavLink>
-        );
-      })}
-    </nav>
-  );
-}
-
-const FALLBACK_FOOTER_MENU = {
-  id: 'gid://shopify/Menu/199655620664',
-  items: [
-    {
-      id: 'gid://shopify/MenuItem/461633060920',
-      resourceId: 'gid://shopify/ShopPolicy/23358046264',
-      tags: [],
-      title: 'Privacy Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/privacy-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633093688',
-      resourceId: 'gid://shopify/ShopPolicy/23358013496',
-      tags: [],
-      title: 'Refund Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/refund-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633126456',
-      resourceId: 'gid://shopify/ShopPolicy/23358111800',
-      tags: [],
-      title: 'Shipping Policy',
-      type: 'SHOP_POLICY',
-      url: '/policies/shipping-policy',
-      items: [],
-    },
-    {
-      id: 'gid://shopify/MenuItem/461633159224',
-      resourceId: 'gid://shopify/ShopPolicy/23358079032',
-      tags: [],
-      title: 'Terms of Service',
-      type: 'SHOP_POLICY',
-      url: '/policies/terms-of-service',
-      items: [],
-    },
-  ],
-};
-
-function activeLinkStyle({
-  isActive,
-  isPending,
-}: {
-  isActive: boolean;
-  isPending: boolean;
-}) {
-  return {
-    fontWeight: isActive ? 'bold' : undefined,
-    color: isPending ? 'grey' : 'white',
-  };
 }
