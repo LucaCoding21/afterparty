@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import {
   useLoaderData,
   Link,
@@ -69,7 +69,16 @@ async function loadCriticalData({
   // Fall back to static product catalog
   const staticProduct = STATIC_PRODUCTS_MAP[handle] ?? null;
   if (staticProduct) {
-    return {product: null, staticProduct};
+    let sizeGuideSvg: string | null = null;
+    if (staticProduct.sizeGuide) {
+      try {
+        const {readFileSync} = await import('node:fs');
+        const {join} = await import('node:path');
+        const svgPath = join(process.cwd(), 'public', staticProduct.sizeGuide);
+        sizeGuideSvg = readFileSync(svgPath, 'utf-8');
+      } catch {}
+    }
+    return {product: null, staticProduct, sizeGuideSvg};
   }
 
   throw new Response(null, {status: 404});
@@ -83,7 +92,7 @@ export default function Product() {
   const data = useLoaderData<typeof loader>();
 
   if (data.staticProduct) {
-    return <StaticProductPage product={data.staticProduct} />;
+    return <StaticProductPage product={data.staticProduct} sizeGuideSvg={(data as any).sizeGuideSvg ?? null} />;
   }
 
   return <DynamicProductPage product={data.product!} />;
@@ -164,6 +173,23 @@ function Breadcrumb({title}: {title: string}) {
   );
 }
 
+function ProductNav({currentHandle}: {currentHandle: string}) {
+  const currentIndex = STATIC_PRODUCTS.findIndex((p) => p.handle === currentHandle);
+  const nextProduct =
+    currentIndex >= 0
+      ? STATIC_PRODUCTS[(currentIndex + 1) % STATIC_PRODUCTS.length]
+      : null;
+
+  return (
+    <nav className="product-nav" aria-label="Product navigation">
+      <Link to="/collections/all" className="product-nav-btn">Back to All</Link>
+      {nextProduct && (
+        <Link to={`/products/${nextProduct.handle}`} className="product-nav-btn">Next Product</Link>
+      )}
+    </nav>
+  );
+}
+
 function DynamicProductPage({product}: {product: NonNullable<any>}) {
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
@@ -184,6 +210,7 @@ function DynamicProductPage({product}: {product: NonNullable<any>}) {
   return (
     <div className="product-page">
       <Breadcrumb title={title} />
+      <ProductNav currentHandle={product.handle} />
 
       <div className="product">
         <ProductImage image={selectedVariant?.image} />
@@ -232,7 +259,74 @@ function DynamicProductPage({product}: {product: NonNullable<any>}) {
 
 const SIZES = ['S', 'M', 'L'];
 
-function StaticProductPage({product}: {product: StaticProduct}) {
+function ImageCarousel({images, alt}: {images: string[]; alt: string}) {
+  const [index, setIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+
+  useEffect(() => {
+    setIndex(0);
+  }, [images[0]]);
+
+  const prev = () => setIndex((i) => (i - 1 + images.length) % images.length);
+  const next = () => setIndex((i) => (i + 1) % images.length);
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      diff > 0 ? next() : prev();
+    }
+    touchStartX.current = null;
+  }
+
+  return (
+    <div className="product-image-carousel">
+      <div
+        className="carousel-main"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div className="product-image">
+          <img src={images[index]} alt={alt} key={images[index]} />
+        </div>
+        {images.length > 1 && (
+          <>
+            <button className="carousel-arrow carousel-arrow-left" onClick={prev} aria-label="Previous image">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M13 4l-6 6 6 6" />
+              </svg>
+            </button>
+            <button className="carousel-arrow carousel-arrow-right" onClick={next} aria-label="Next image">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M7 4l6 6-6 6" />
+              </svg>
+            </button>
+          </>
+        )}
+      </div>
+      {images.length > 1 && (
+        <div className="carousel-thumbs">
+          {images.map((src, i) => (
+            <button
+              key={i}
+              className={`carousel-thumb${i === index ? ' active' : ''}`}
+              onClick={() => setIndex(i)}
+              aria-label={`Image ${i + 1}`}
+            >
+              <img src={src} alt={`${alt} ${i + 1}`} />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StaticProductPage({product, sizeGuideSvg}: {product: StaticProduct; sizeGuideSvg?: string | null}) {
   const [searchParams, setSearchParams] = useSearchParams();
   const colorKey = searchParams.get('color');
   const selectedColor: ColorVariant =
@@ -240,6 +334,11 @@ function StaticProductPage({product}: {product: StaticProduct}) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const recentlyViewedItems = useRecentlyViewed(product.handle);
   const recentlyViewedHandles = recentlyViewedItems.map((p) => p.handle);
+
+  const images = [
+    selectedColor.image,
+    ...(selectedColor.modelImage ? [selectedColor.modelImage] : []),
+  ];
 
   function selectColor(color: ColorVariant) {
     if (product.colors.length > 1) {
@@ -250,27 +349,13 @@ function StaticProductPage({product}: {product: StaticProduct}) {
   return (
     <div className="product-page">
       <Breadcrumb title={product.title} />
+      <ProductNav currentHandle={product.handle} />
 
       <div className="product">
-        {/* Image column: flat lay first, model as secondary */}
-        <div className="product-image-col">
-          <div className="product-image">
-            <img
-              src={selectedColor.image}
-              alt={`${product.title}${product.colors.length > 1 ? ` — ${selectedColor.name}` : ''}`}
-              key={selectedColor.image}
-            />
-          </div>
-          {selectedColor.modelImage && (
-            <div className="product-image product-image-secondary">
-              <img
-                src={selectedColor.modelImage}
-                alt={`${product.title} — model`}
-                key={selectedColor.modelImage}
-              />
-            </div>
-          )}
-        </div>
+        <ImageCarousel
+          images={images}
+          alt={`${product.title}${product.colors.length > 1 ? ` — ${selectedColor.name}` : ''}`}
+        />
 
         <div className="product-main">
           <h1 className="product-title">{product.title}</h1>
@@ -333,7 +418,11 @@ function StaticProductPage({product}: {product: StaticProduct}) {
                 </svg>
               </summary>
               <div className="product-size-guide-content">
-                <img src={product.sizeGuide} alt="Size Guide" />
+                {sizeGuideSvg ? (
+                  <div className="product-size-guide-svg" dangerouslySetInnerHTML={{__html: sizeGuideSvg}} />
+                ) : (
+                  <img src={product.sizeGuide} alt="Size Guide" />
+                )}
                 {product.sizePhoto && (
                   <div className="product-size-guide-photo">
                     <img src={product.sizePhoto} alt="Measurement Reference" />

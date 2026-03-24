@@ -5,11 +5,14 @@ export type ColorVariant = {
   modelImage?: string; // model wearing the product (used as hero on detail page)
 };
 
+export type Category = 'tops-shirts' | 'outerwear' | 'pants' | 'accessories';
+
 export type StaticProduct = {
   handle: string;
   title: string;
   price: string;
   description: string;
+  category: Category;
   colors: ColorVariant[];
   sizeGuide?: string; // path to size guide image, e.g. '/products/size-guides/tee-size-guide.svg'
   sizePhoto?: string; // path to garment illustration from size chart
@@ -31,6 +34,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     title: 'Bubble Letter Ringer Tee',
     price: '$48',
     description: 'Description coming soon.',
+    category: 'tops-shirts',
     sizeGuide: '/products/size-guides/bubble-letter-ringer-tee.svg',
     sizePhoto: '/products/measurements/Ringer%20Short%20Sleeve%20Tee%20Chart%201.png',
     colors: [
@@ -59,6 +63,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     title: 'Leopard Flared Pants',
     price: '$89',
     description: 'Description coming soon.',
+    category: 'pants',
     sizeGuide: '/products/size-guides/leopard-flared-pants.svg',
     sizePhoto: '/products/measurements/Leopard%20Flared%20Pants%20Chart%201.png',
     colors: [
@@ -79,6 +84,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     title: 'Leopard Jacket',
     price: '$125',
     description: 'Description coming soon.',
+    category: 'outerwear',
     sizeGuide: '/products/size-guides/leopard-jacket.svg',
     sizePhoto: '/products/measurements/Leopard%20Work%20Jacket%20Chart%201.png',
     colors: [
@@ -99,6 +105,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     title: 'Leopard Shorts',
     price: '$68',
     description: 'Description coming soon.',
+    category: 'pants',
     sizeGuide: '/products/size-guides/leopard-shorts.svg',
     sizePhoto: '/products/measurements/Leopard%20Short%20Pants%20Charts%201.png',
     colors: [
@@ -119,6 +126,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     title: 'Nhím Long Sleeve Tees',
     price: '$58',
     description: 'Description coming soon.',
+    category: 'tops-shirts',
     sizeGuide: '/products/size-guides/nhim-long-sleeve-tees.svg',
     sizePhoto: '/products/measurements/2026%20Nhi%CC%81m%20Long%20Sleeve%20Tee%20Chart%201.png',
     colors: [
@@ -144,6 +152,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     title: 'Dog Failure Tee',
     price: '$42',
     description: 'Description coming soon.',
+    category: 'tops-shirts',
     sizeGuide: '/products/size-guides/dog-failure-tee.svg',
     colors: [
       {
@@ -163,6 +172,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     title: 'Dog Screw Hoodie',
     price: '$98',
     description: 'Description coming soon.',
+    category: 'outerwear',
     sizeGuide: '/products/size-guides/dog-screw-hoodie.svg',
     sizePhoto: '/products/measurements/Hoodie%20Size%20Chart%201.png',
     colors: [
@@ -183,6 +193,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     title: 'Dragon Jersey',
     price: '$78',
     description: 'Description coming soon.',
+    category: 'tops-shirts',
     sizeGuide: '/products/size-guides/dragon-jersey.svg',
     sizePhoto: '/products/measurements/Jersey%20Size%20Chart%201.png',
     colors: [
@@ -208,6 +219,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     title: 'Hater Baby Tee',
     price: '$45',
     description: 'Description coming soon.',
+    category: 'tops-shirts',
     sizeGuide: '/products/size-guides/hater-baby-tee.svg',
     sizePhoto: '/products/measurements/2025%20Hater%20Baby%20Tee%20Size%20Chart%201.png',
     colors: [
@@ -223,6 +235,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     title: 'Hater Tee',
     price: '$45',
     description: 'Description coming soon.',
+    category: 'tops-shirts',
     sizeGuide: '/products/size-guides/hater-tee.svg',
     sizePhoto: '/products/measurements/2025%20Hater%20Oversized%20Short%20Sleeve%20Boxy%20Tee%20Chart%201.png',
     colors: [
@@ -243,6 +256,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     title: 'Horse Trucker Hat',
     price: '$38',
     description: 'Description coming soon.',
+    category: 'accessories',
     sizeGuide: '/products/size-guides/horse-trucker-hat.svg',
     colors: [
       {
@@ -257,6 +271,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     title: 'Nhîm Tees',
     price: '$52',
     description: 'Description coming soon.',
+    category: 'tops-shirts',
     sizeGuide: '/products/size-guides/nhim-tees.svg',
     sizePhoto: '/products/measurements/2026%20Nhi%CC%81m%20Short%20Sleeve%20Tee%20Chart%201.png',
     colors: [
@@ -276,6 +291,20 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
 
 export const STATIC_PRODUCTS_MAP: Record<string, StaticProduct> =
   Object.fromEntries(STATIC_PRODUCTS.map((p) => [p.handle, p]));
+
+export function getCollectionItems(category: Category): CollectionItem[] {
+  return STATIC_PRODUCTS.filter((p) => p.category === category).flatMap(
+    (product) =>
+      product.colors.map((color) => ({
+        id: `${product.handle}-${color.key}`,
+        parentHandle: product.handle,
+        colorKey: product.colors.length > 1 ? color.key : undefined,
+        displayTitle: product.title,
+        image: color.image,
+        price: product.price,
+      })),
+  );
+}
 
 // Flat list of collection grid cards — one per color variant
 export const COLLECTION_ITEMS: CollectionItem[] = STATIC_PRODUCTS.flatMap(

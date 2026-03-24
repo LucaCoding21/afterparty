@@ -41,6 +41,7 @@ export default function ShopAll() {
 
   return (
     <div className="collection">
+      <h1 className="collection-title">All Products</h1>
       <div className="products-grid">
         {products.map((product, index) => (
           <Link

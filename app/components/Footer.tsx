@@ -50,14 +50,19 @@ export function Footer() {
         {/* Bottom: links left, copyright right */}
         <div className="footer-bottom">
           <nav className="footer-links-row">
-            <Link to="/pages/faq" className="footer-link">FAQ</Link>
-            <Link to="/pages/shipping-and-payment" className="footer-link">Shipping</Link>
-            <Link to="/policies/privacy-policy" className="footer-link">Privacy</Link>
-            <Link to="/policies/terms-of-service" className="footer-link">Terms</Link>
-            <a href="https://instagram.com/afterparty" target="_blank" rel="noopener noreferrer" className="footer-link">Instagram</a>
-            <a href="https://facebook.com/afterparty" target="_blank" rel="noopener noreferrer" className="footer-link">Facebook</a>
+            <Link to="/pages/support" className="footer-link">FAQ</Link>
+            <Link to="/pages/support" className="footer-link">Shipping</Link>
+            <a href="https://www.instagram.com/afterparty.space/" target="_blank" rel="noopener noreferrer" className="footer-link">Instagram</a>
+            <a href="https://www.facebook.com/afterparty.space/" target="_blank" rel="noopener noreferrer" className="footer-link">Facebook</a>
           </nav>
           <p className="footer-legal">&copy; {new Date().getFullYear()} Afterparty</p>
+        </div>
+
+        {/* Legal */}
+        <div className="footer-legal-bar">
+          <span className="footer-legal-label">Legal</span>
+          <Link to="/policies/terms-of-service" className="footer-legal-link">Terms of Service</Link>
+          <Link to="/policies/privacy-policy" className="footer-legal-link">Privacy Policy</Link>
         </div>
 
       </div>

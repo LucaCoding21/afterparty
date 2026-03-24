@@ -13,7 +13,7 @@ import {
 import type {RegularSearchQuery, PredictiveSearchQuery} from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Search`}];
+  return [{title: `Afterparty | Search`}];
 };
 
 export async function loader({request, context}: Route.LoaderArgs) {
@@ -40,26 +40,42 @@ export default function SearchPage() {
   if (type === 'predictive') return null;
 
   return (
-    <div className="search">
-      <h1>Search</h1>
-      <SearchForm>
-        {({inputRef}) => (
-          <>
-            <input
-              defaultValue={term}
-              name="q"
-              placeholder="Search…"
-              ref={inputRef}
-              type="search"
-            />
-            &nbsp;
-            <button type="submit">Search</button>
-          </>
-        )}
-      </SearchForm>
-      {error && <p style={{color: 'red'}}>{error}</p>}
+    <div className="search-page">
+      <div className="search-page-header">
+        <h1 className="search-page-title">Search</h1>
+        <SearchForm>
+          {({inputRef}) => (
+            <div className="search-page-input-wrap">
+              <svg className="search-page-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                defaultValue={term}
+                name="q"
+                placeholder="Search products..."
+                ref={inputRef}
+                type="search"
+                className="search-page-input"
+                autoComplete="off"
+              />
+            </div>
+          )}
+        </SearchForm>
+      </div>
+
+      {error && <p className="search-page-error">{error}</p>}
+
+      {term && (
+        <p className="search-page-meta">
+          {result?.total
+            ? `${result.total} result${result.total !== 1 ? 's' : ''} for "${term}"`
+            : `No results for "${term}"`}
+        </p>
+      )}
+
       {!term || !result?.total ? (
-        <SearchResults.Empty />
+        !term ? null : <SearchResults.Empty />
       ) : (
         <SearchResults result={result} term={term}>
           {({articles, pages, products, term}) => (

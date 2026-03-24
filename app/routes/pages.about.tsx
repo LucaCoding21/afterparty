@@ -6,51 +6,28 @@ export const meta: Route.MetaFunction = () => {
 
 export default function AboutPage() {
   return (
-    <div className="about">
-      <section className="about-intro">
-        <div className="about-intro-text">
-          <h1 className="about-heading">The Story</h1>
-          <p className="about-lead">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua.
-          </p>
+    <div className="about-layout">
+      <div className="about-left">
+        <div className="about-title-block">
+          <div>
+            <h1 className="about-heading">About Us</h1>
+            <p className="about-description">A brand built after hours, for the ones who stay.</p>
+          </div>
+          <div className="about-body">
+            <p>Afterparty started in a small room in Ho Chi Minh City with one idea — make clothes that feel like the moment after the show ends and everyone finally relaxes.</p>
+            <p>We design for the in-between. The late nights, the slow mornings, the fits you reach for when you actually want to feel something.</p>
+            <p>Every piece is made in limited runs, close to home, with people we trust. No filler, no fuss — just the stuff that lasts.</p>
+          </div>
         </div>
-        <div className="about-intro-img">
-          <img src="/hero.gif" alt="Afterparty DJ Cat" className="about-img" />
-        </div>
-      </section>
+      </div>
 
-      <section className="about-values">
-        <div className="about-value">
-          <span className="about-value-number">01</span>
-          <h3 className="about-value-title">The Clothes</h3>
-          <p className="about-value-text">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad
-            minim veniam, quis nostrud exercitation ullamco laboris.
-          </p>
-        </div>
-        <div className="about-value">
-          <span className="about-value-number">02</span>
-          <h3 className="about-value-title">The People</h3>
-          <p className="about-value-text">
-            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-            dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat.
-          </p>
-        </div>
-        <div className="about-value">
-          <span className="about-value-number">03</span>
-          <h3 className="about-value-title">The Space</h3>
-          <p className="about-value-text">
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-            accusantium doloremque laudantium, totam rem aperiam.
-          </p>
-        </div>
-      </section>
-
-      <section className="about-cta">
-        <p className="about-cta-text">Come Hang Out</p>
-        <a href="/pages/stockists" className="about-cta-btn">Visit Us &rarr;</a>
-      </section>
+      <div className="about-right">
+        <img
+          src="/location-pic.PNG"
+          alt="Afterparty"
+          className="about-photo"
+        />
+      </div>
     </div>
   );
 }

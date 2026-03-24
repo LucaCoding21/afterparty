@@ -90,16 +90,12 @@ function CartEmpty({
   layout?: CartMainProps['layout'];
 }) {
   const {close} = useAside();
+  if (hidden) return null;
   return (
-    <div hidden={hidden}>
-      <br />
-      <p>
-        Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you
-        started!
-      </p>
-      <br />
-      <Link to="/collections" onClick={close} prefetch="viewport">
-        Continue shopping →
+    <div className="cart-empty">
+      <p className="cart-empty-msg">Your cart is empty.</p>
+      <Link to="/collections/all" onClick={close} prefetch="viewport" className="cart-empty-link">
+        Shop All →
       </Link>
     </div>
   );

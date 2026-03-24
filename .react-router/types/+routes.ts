@@ -36,6 +36,15 @@ type Pages = {
       "blogHandle": string;
     };
   };
+  "/collections/accessories": {
+    params: {};
+  };
+  "/collections/tops-shirts": {
+    params: {};
+  };
+  "/collections/outerwear": {
+    params: {};
+  };
   "/collections/:handle": {
     params: {
       "handle": string;
@@ -45,6 +54,9 @@ type Pages = {
     params: {};
   };
   "/collections": {
+    params: {};
+  };
+  "/collections/pants": {
     params: {};
   };
   "/policies/:handle": {
@@ -84,6 +96,9 @@ type Pages = {
     params: {
       "handle": string;
     };
+  };
+  "/pages/support": {
+    params: {};
   };
   "/robots.txt": {
     params: {};
@@ -146,7 +161,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/blogs/:blogHandle/:articleHandle" | "/api/:version/graphql.json" | "/sitemap/:type/:page.xml" | "/blogs/:blogHandle" | "/collections/:handle" | "/account/authorize" | "/collections" | "/policies/:handle" | "/products/:handle" | "/account/logout" | "/collections/all" | "/pages/stockists" | "/policies" | "/account/login" | "/discount/:code" | "/sitemap.xml" | "/pages/:handle" | "/robots.txt" | "/blogs" | "/pages/about" | "/account" | "/account/orders" | "/account/orders/:id" | "/account/addresses" | "/account/profile" | "/account/*" | "/search" | "/cart" | "/cart/:lines" | "/*" | "/graphiql" | "/subrequest-profiler" | "/.well-known/appspecific/com.chrome.devtools.json";
+    page: "/" | "/blogs/:blogHandle/:articleHandle" | "/api/:version/graphql.json" | "/sitemap/:type/:page.xml" | "/blogs/:blogHandle" | "/collections/accessories" | "/collections/tops-shirts" | "/collections/outerwear" | "/collections/:handle" | "/account/authorize" | "/collections" | "/collections/pants" | "/policies/:handle" | "/products/:handle" | "/account/logout" | "/collections/all" | "/pages/stockists" | "/policies" | "/account/login" | "/discount/:code" | "/sitemap.xml" | "/pages/:handle" | "/pages/support" | "/robots.txt" | "/blogs" | "/pages/about" | "/account" | "/account/orders" | "/account/orders/:id" | "/account/addresses" | "/account/profile" | "/account/*" | "/search" | "/cart" | "/cart/:lines" | "/*" | "/graphiql" | "/subrequest-profiler" | "/.well-known/appspecific/com.chrome.devtools.json";
   };
   "routes/blogs.$blogHandle.$articleHandle.tsx": {
     id: "routes/blogs.$blogHandle.$articleHandle";
@@ -164,6 +179,18 @@ type RouteFiles = {
     id: "routes/blogs.$blogHandle._index";
     page: "/blogs/:blogHandle";
   };
+  "routes/collections.accessories.tsx": {
+    id: "routes/collections.accessories";
+    page: "/collections/accessories";
+  };
+  "routes/collections.tops-shirts.tsx": {
+    id: "routes/collections.tops-shirts";
+    page: "/collections/tops-shirts";
+  };
+  "routes/collections.outerwear.tsx": {
+    id: "routes/collections.outerwear";
+    page: "/collections/outerwear";
+  };
   "routes/collections.$handle.tsx": {
     id: "routes/collections.$handle";
     page: "/collections/:handle";
@@ -175,6 +202,10 @@ type RouteFiles = {
   "routes/collections._index.tsx": {
     id: "routes/collections._index";
     page: "/collections";
+  };
+  "routes/collections.pants.tsx": {
+    id: "routes/collections.pants";
+    page: "/collections/pants";
   };
   "routes/policies.$handle.tsx": {
     id: "routes/policies.$handle";
@@ -215,6 +246,10 @@ type RouteFiles = {
   "routes/pages.$handle.tsx": {
     id: "routes/pages.$handle";
     page: "/pages/:handle";
+  };
+  "routes/pages.support.tsx": {
+    id: "routes/pages.support";
+    page: "/pages/support";
   };
   "routes/[robots.txt].tsx": {
     id: "routes/[robots.txt]";
@@ -304,9 +339,13 @@ type RouteModules = {
   "routes/api.$version.[graphql.json]": typeof import("./app/routes/api.$version.[graphql.json].tsx");
   "routes/sitemap.$type.$page[.xml]": typeof import("./app/routes/sitemap.$type.$page[.xml].tsx");
   "routes/blogs.$blogHandle._index": typeof import("./app/routes/blogs.$blogHandle._index.tsx");
+  "routes/collections.accessories": typeof import("./app/routes/collections.accessories.tsx");
+  "routes/collections.tops-shirts": typeof import("./app/routes/collections.tops-shirts.tsx");
+  "routes/collections.outerwear": typeof import("./app/routes/collections.outerwear.tsx");
   "routes/collections.$handle": typeof import("./app/routes/collections.$handle.tsx");
   "routes/account_.authorize": typeof import("./app/routes/account_.authorize.tsx");
   "routes/collections._index": typeof import("./app/routes/collections._index.tsx");
+  "routes/collections.pants": typeof import("./app/routes/collections.pants.tsx");
   "routes/policies.$handle": typeof import("./app/routes/policies.$handle.tsx");
   "routes/products.$handle": typeof import("./app/routes/products.$handle.tsx");
   "routes/account_.logout": typeof import("./app/routes/account_.logout.tsx");
@@ -317,6 +356,7 @@ type RouteModules = {
   "routes/discount.$code": typeof import("./app/routes/discount.$code.tsx");
   "routes/[sitemap.xml]": typeof import("./app/routes/[sitemap.xml].tsx");
   "routes/pages.$handle": typeof import("./app/routes/pages.$handle.tsx");
+  "routes/pages.support": typeof import("./app/routes/pages.support.tsx");
   "routes/[robots.txt]": typeof import("./app/routes/[robots.txt].tsx");
   "routes/blogs._index": typeof import("./app/routes/blogs._index.tsx");
   "routes/pages.about": typeof import("./app/routes/pages.about.tsx");
