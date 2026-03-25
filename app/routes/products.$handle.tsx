@@ -366,7 +366,7 @@ function StaticProductPage({product, sizeGuideSvg}: {product: StaticProduct; siz
           {product.colors.length > 1 && (
             <div className="product-options">
               <h5>
-                Color: <span style={{color: '#000', fontWeight: 500, textTransform: 'none', letterSpacing: 0}}>{selectedColor.name}</span>
+                Color: <span style={{color: '#000', fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0}}>{selectedColor.name}</span>
               </h5>
               <div className="product-color-swatches">
                 {product.colors.map((color) => (
