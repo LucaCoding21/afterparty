@@ -2260,8 +2260,8 @@ main {
   letter-spacing: -0.03em;
   margin: 0 0 0.6rem;
   @media (max-width: 48em) {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 0.7rem;
+    font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     margin: 0 0 2rem;
@@ -2503,8 +2503,8 @@ main {
   letter-spacing: -0.03em;
   margin: 0 0 0.6rem;
   @media (max-width: 48em) {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 0.7rem;
+    font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     margin: 0 0 2rem;
@@ -2750,7 +2750,14 @@ main {
   letter-spacing: -0.03em;
   margin: 0 0 0.6rem;
   @media (max-width: 48em) {
-    font-size: 3rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 0 0 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e8e8e8;
+    line-height: normal;
   }
 }
 
@@ -2964,8 +2971,8 @@ main {
   letter-spacing: -0.03em;
   margin: 0 0 0.6rem;
   @media (max-width: 48em) {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 0.7rem;
+    font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     margin: 0 0 2rem;
