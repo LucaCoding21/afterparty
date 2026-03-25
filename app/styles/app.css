@@ -189,6 +189,7 @@ button.reset {
   border: 0;
   background: inherit;
   font-size: inherit;
+  color: inherit;
 }
 
 button.reset > * {
@@ -1349,6 +1350,7 @@ main {
   border: 1px solid #ddd;
   border-radius: 0;
   background: #fff;
+  color: #000;
   padding: 0 1rem;
   font-size: 0.68rem;
   letter-spacing: 0.08em;
@@ -2077,6 +2079,7 @@ main {
   padding: 0.4rem 0.9rem;
   background-color: transparent;
   border: 1px solid #e0e0e0 !important;
+  color: #000;
   font-size: 0.8rem;
   font-family: var(--font-sans);
   font-weight: 400;

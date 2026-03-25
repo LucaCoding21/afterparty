@@ -128,22 +128,22 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     description: 'Description coming soon.',
     category: 'tops-shirts',
     sizeGuide: '/products/size-guides/nhim-long-sleeve-tees.svg',
-    sizePhoto: '/products/measurements/2026%20Nhi%CC%81m%20Long%20Sleeve%20Tee%20Chart%201.png',
+    sizePhoto: '/products/measurements/2026-nhim-long-sleeve-tee-chart-1.png',
     colors: [
       {
         name: 'White',
         key: 'white',
-        image: '/products/Nhi%CC%81m-Long-Sleeve%20Tees%20-white.jpg',
+        image: '/products/nhim-long-sleeve-tees-white.jpg',
       },
       {
         name: 'Green',
         key: 'green',
-        image: '/products/Nhi%CC%81m-Long-Sleeve%20Tees-green.jpg',
+        image: '/products/nhim-long-sleeve-tees-green.jpg',
       },
       {
         name: 'Red',
         key: 'red',
-        image: '/products/Nhi%CC%81m-Long-Sleeve%20Tees-red.jpg',
+        image: '/products/nhim-long-sleeve-tees-red.jpg',
       },
     ],
   },
@@ -273,17 +273,17 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
     description: 'Description coming soon.',
     category: 'tops-shirts',
     sizeGuide: '/products/size-guides/nhim-tees.svg',
-    sizePhoto: '/products/measurements/2026%20Nhi%CC%81m%20Short%20Sleeve%20Tee%20Chart%201.png',
+    sizePhoto: '/products/measurements/2026-nhim-short-sleeve-tee-chart-1.png',
     colors: [
       {
         name: 'Black',
         key: 'black',
-        image: '/products/nhi%CC%82m-tees-black.jpg',
+        image: '/products/nhim-tees-black.jpg',
       },
       {
         name: 'White',
         key: 'white',
-        image: '/products/nhi%CC%82m-tees-white.jpg',
+        image: '/products/nhim-tees-white.jpg',
       },
     ],
   },
