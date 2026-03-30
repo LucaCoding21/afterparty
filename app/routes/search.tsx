@@ -13,7 +13,7 @@ import {
 import type {RegularSearchQuery, PredictiveSearchQuery} from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Afterparty | Search`}];
+  return [{title: `afterparty | Search`}];
 };
 
 export async function loader({request, context}: Route.LoaderArgs) {

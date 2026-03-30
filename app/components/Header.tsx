@@ -129,7 +129,7 @@ export function Header({
         <nav className="header-nav-right">
           <HeaderSearch />
           <NavLink to="/pages/support" className="header-nav-link" prefetch="intent">
-            Support <span aria-hidden="true">&rsaquo;</span>
+            Support <span aria-hidden="true" className="header-support-arrow">&rsaquo;</span>
           </NavLink>
           <CartToggle cart={cart} />
         </nav>
@@ -188,7 +188,7 @@ export function Header({
                     mobileSearchInputRef.current?.focus();
                   }}
                 >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                     <line x1="18" y1="6" x2="6" y2="18" />
                     <line x1="6" y1="6" x2="18" y2="18" />
                   </svg>
@@ -550,10 +550,9 @@ function MobileCartBadge({count}: {count: number | null}) {
         } as CartViewPayload);
       }}
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-        <line x1="3" y1="6" x2="21" y2="6" />
-        <path d="M16 10a4 4 0 01-8 0" />
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="7" width="18" height="15" rx="1" />
+        <path d="M8 7V5a4 4 0 018 0v2" />
       </svg>
       {count !== null && count > 0 && (
         <span className="header-mobile-cart-count">{count}</span>

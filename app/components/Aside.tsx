@@ -63,7 +63,7 @@ export function Aside({
         <header>
           <h3>{heading}</h3>
           <button className="close reset" onClick={close} aria-label="Close">
-            &minus;
+            &times;
           </button>
         </header>
         <main>{children}</main>

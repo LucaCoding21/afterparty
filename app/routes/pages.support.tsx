@@ -1,7 +1,7 @@
 import {useState} from 'react';
 
 export const meta = () => {
-  return [{title: 'Afterparty | Support'}];
+  return [{title: 'afterparty | Support'}];
 };
 
 function Section({title, children}: {title: string; children: React.ReactNode}) {
@@ -33,21 +33,21 @@ export default function SupportPage() {
   return (
     <div className="support-layout">
       <div className="support-left">
-        <div className="support-title-block">
-          <h1 className="support-heading">Support</h1>
-          <p className="support-description">We're here — reach out any time.</p>
+        <h1 className="support-heading">Support</h1>
 
+        <div className="support-section-block">
+          <div className="support-section-label">Contact</div>
           <div className="support-contact-block">
             <div className="support-contact-row">
-              <span className="support-label">Email</span>
+              <span className="support-contact-key">Email</span>
               <a href="mailto:hello@afterparty.com" className="support-link">hello@afterparty.com</a>
             </div>
             <div className="support-contact-row">
-              <span className="support-label">Hours</span>
-              <span>Mon – Fri, 10 AM – 6 PM ICT</span>
+              <span className="support-contact-key">Response</span>
+              <span>Within 48 hours</span>
             </div>
             <div className="support-contact-row">
-              <span className="support-label">Instagram</span>
+              <span className="support-contact-key">Instagram</span>
               <a href="https://instagram.com/afterparty" target="_blank" rel="noopener noreferrer" className="support-link">@afterparty</a>
             </div>
           </div>
@@ -74,28 +74,9 @@ export default function SupportPage() {
 
         {/* ── Shipping ── */}
         <Section title="Shipping">
-          <p className="support-body-text">All orders are packed by hand at Afterparty HQ in Ho Chi Minh City and dispatched within 1–3 business days. You'll receive tracking as soon as your parcel is on its way.</p>
+          <p className="support-body-text">All orders are packed by hand at afterparty HQ in Ho Chi Minh City and dispatched within 1–3 business days. You'll receive tracking as soon as your parcel is on its way.</p>
 
           <div className="support-shipping-group">
-            <p className="support-shipping-region">Vietnam</p>
-            <div className="support-table">
-              <div className="support-table-row">
-                <span className="support-label">Standard</span>
-                <span>2–4 business days &nbsp;·&nbsp; 30,000 VND</span>
-              </div>
-              <div className="support-table-row">
-                <span className="support-label">Express</span>
-                <span>Same / next day (HCMC only) &nbsp;·&nbsp; 60,000 VND</span>
-              </div>
-              <div className="support-table-row">
-                <span className="support-label">Free</span>
-                <span>Orders over 1,500,000 VND</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="support-shipping-group">
-            <p className="support-shipping-region">International</p>
             <div className="support-table">
               <div className="support-table-row">
                 <span className="support-label">Southeast Asia</span>

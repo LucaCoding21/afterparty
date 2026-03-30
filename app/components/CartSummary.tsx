@@ -25,7 +25,6 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
           )}
         </span>
       </div>
-      <CartDiscounts discountCodes={cart?.discountCodes} />
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
     </div>
   );

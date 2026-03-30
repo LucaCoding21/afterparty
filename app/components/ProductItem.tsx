@@ -25,6 +25,7 @@ export function ProductItem({
       key={product.id}
       prefetch="intent"
       to={variantUrl}
+      data-handle={product.handle}
     >
       {image && (
         <Image

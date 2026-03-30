@@ -3,7 +3,7 @@ import {useState, useEffect} from 'react';
 import type {Route} from './+types/_index';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Afterparty'}];
+  return [{title: 'afterparty'}];
 };
 
 const HERO_IMAGES = [
@@ -41,7 +41,7 @@ export default function Homepage() {
           <img
             key={src}
             src={src}
-            alt="Afterparty"
+            alt="afterparty"
             style={{
               position: 'absolute',
               top: 0,

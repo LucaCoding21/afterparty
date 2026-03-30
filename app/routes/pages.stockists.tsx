@@ -1,126 +1,70 @@
 import type {Route} from './+types/pages.stockists';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Afterparty | Locations'}];
+  return [{title: 'afterparty | Locations'}];
 };
 
 const LOCATIONS = [
   {
     city: 'Ho Chi Minh City, Vietnam',
     stores: [
-      {
-        name: 'Rue Miche Boutique',
-        address: '98 Phùng Khắc Khoan, Ho Chi Minh City, Vietnam',
-        hours: '10 AM – 6 PM',
-        days: 'Monday – Sunday',
-        query: 'Rue+Miche+Boutique+98+Phung+Khac+Khoan+Ho+Chi+Minh+City',
-      },
-      {
-        name: '11 Garmentory',
-        address: '98 Phùng Khắc Khoan, Ho Chi Minh City, Vietnam',
-        hours: '10 AM – 6 PM',
-        days: 'Monday – Sunday',
-        query: '11+Garmentory+98+Phung+Khac+Khoan+Ho+Chi+Minh+City',
-      },
-      {
-        name: 'Objoff',
-        address: '98 Phùng Khắc Khoan, Ho Chi Minh City, Vietnam',
-        hours: '10 AM – 6 PM',
-        days: 'Monday – Sunday',
-        query: 'Objoff+98+Phung+Khac+Khoan+Ho+Chi+Minh+City',
-      },
-      {
-        name: 'Nay Mai',
-        address: '98 Phùng Khắc Khoan, Ho Chi Minh City, Vietnam',
-        hours: '10 AM – 6 PM',
-        days: 'Monday – Sunday',
-        query: 'Nay+Mai+98+Phung+Khac+Khoan+Ho+Chi+Minh+City',
-      },
+      {name: 'Rue Miche Boutique'},
+      {name: '11 Garmentory'},
+      {name: 'Objoff'},
+      {name: 'Nay Mai'},
     ],
   },
   {
     city: 'Hanoi, Vietnam',
     stores: [
-      {
-        name: 'The Raw Compound',
-        address: '98 Phùng Khắc Khoan, Ho Chi Minh City, Vietnam',
-        hours: '10 AM – 6 PM',
-        days: 'Monday – Sunday',
-        query: 'The+Raw+Compound+Hanoi+Vietnam',
-      },
+      {name: 'The Raw Compound'},
     ],
   },
   {
     city: 'Malaysia',
     stores: [
-      {
-        name: '3rd Space',
-        address: '98 Phùng Khắc Khoan, Ho Chi Minh City, Vietnam',
-        hours: '10 AM – 6 PM',
-        days: 'Monday – Sunday',
-        query: '3rd+Space+Malaysia',
-      },
-      {
-        name: 'Snub',
-        address: '98 Phùng Khắc Khoan, Ho Chi Minh City, Vietnam',
-        hours: '10 AM – 6 PM',
-        days: 'Monday – Sunday',
-        query: 'Snub+Malaysia',
-      },
+      {name: '3rd Space'},
+      {name: 'Snub'},
     ],
   },
 ];
 
 export default function LocationsPage() {
   return (
-    <div className="locations-layout">
-      <div className="locations-left">
-        <div className="locations-title-block">
-          <h1 className="locations-heading">Locations</h1>
-          <p className="locations-description">Find us where the culture lives — stores and stockists across the globe.</p>
-        </div>
+    <div className="locations-page">
+      <div className="locations-page-header">
+        <h1 className="locations-heading">Locations</h1>
       </div>
 
-      <div className="locations-content">
+      <div className="locations-body">
         <div className="locations-flagship">
-          <div className="locations-flagship-label">Our Space</div>
-          <h2 className="locations-flagship-name">Afterparty HQ</h2>
-          <div className="locations-flagship-address">98 Phùng Khắc Khoan, Ho Chi Minh City, Vietnam</div>
-          <div className="locations-flagship-meta">Monday – Sunday &nbsp;·&nbsp; 10 AM – 6 PM</div>
+          <div className="locations-flagship-label">Private Showroom</div>
+          <h2 className="locations-flagship-name">afterparty</h2>
+          <div className="locations-flagship-address">District 1, Ho Chi Minh City</div>
           <a
-            href="https://www.google.com/maps/search/?api=1&query=98+Phung+Khac+Khoan+Ho+Chi+Minh+City"
+            href="https://ig.me/m/afterparty.space"
             target="_blank"
             rel="noopener noreferrer"
             className="locations-flagship-btn"
           >
-            Book a Visit &rarr;
+            Book an Appointment &rarr;
           </a>
         </div>
 
-        <div className="locations-grid">
-          {LOCATIONS.map((location) => (
-            <div key={location.city} className="locations-city-block">
-              <h2 className="locations-city">{location.city}</h2>
-              {location.stores.map((store, i) => (
-                <div key={store.name} className="locations-store">
-                  <span className="locations-store-number">{i + 1})</span>
-                  <div className="locations-store-details">
-                    <div className="locations-store-name">{store.name}</div>
-                    <div className="locations-store-address">{store.address}</div>
-                    <div className="locations-store-meta">{store.days} &nbsp;·&nbsp; {store.hours}</div>
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${store.query}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="locations-directions"
-                    >
-                      See Location &rarr;
-                    </a>
+        <div className="locations-stockists">
+          <div className="locations-stockists-label">Stockists</div>
+          <div className="locations-grid">
+            {LOCATIONS.map((location) => (
+              <div key={location.city} className="locations-city-block">
+                <h2 className="locations-city">{location.city}</h2>
+                {location.stores.map((store) => (
+                  <div key={store.name} className="locations-store-name">
+                    {store.name}
                   </div>
-                </div>
-              ))}
-            </div>
-          ))}
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

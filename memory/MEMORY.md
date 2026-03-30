@@ -1,0 +1,1 @@
+- [Styling preferences](feedback_styling.md) — minimal, no borders/outlines, Stussy-inspired clean aesthetic

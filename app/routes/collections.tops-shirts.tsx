@@ -1,7 +1,7 @@
 import {Link} from 'react-router';
 import {getCollectionItems} from '~/lib/staticProducts';
 
-export const meta = () => [{title: 'Afterparty | Tops & Shirts'}];
+export const meta = () => [{title: 'afterparty | Tops & Shirts'}];
 
 const items = getCollectionItems('tops-shirts');
 

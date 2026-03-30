@@ -29,7 +29,7 @@ export const meta: Route.MetaFunction = ({data}) => {
     ? data.staticProduct.title
     : data?.product?.title ?? '';
   return [
-    {title: `Afterparty | ${title}`},
+    {title: `afterparty | ${title}`},
     {
       rel: 'canonical',
       href: `/products/${data?.staticProduct?.handle ?? data?.product?.handle}`,
@@ -123,6 +123,7 @@ function ProductCard({product}: {product: StaticProduct}) {
       to={`/products/${product.handle}`}
       className="product-item"
       prefetch="intent"
+      data-handle={product.handle}
     >
       <div className="product-item-img">
         <img src={firstColor.image} alt={product.title} loading="lazy" />
@@ -166,9 +167,7 @@ function RecentlyViewed({items}: {items: StaticProduct[]}) {
 function Breadcrumb({title}: {title: string}) {
   return (
     <nav className="product-breadcrumb" aria-label="Breadcrumb">
-      <Link to="/collections/all" className="breadcrumb-link">Shop All</Link>
-      <span className="breadcrumb-sep">/</span>
-      <span className="breadcrumb-current">{title}</span>
+      <Link to="/collections/all" className="breadcrumb-link"><span className="breadcrumb-arrow">&lsaquo;</span> Shop All</Link>
     </nav>
   );
 }
@@ -259,8 +258,53 @@ function DynamicProductPage({product}: {product: NonNullable<any>}) {
 
 const SIZES = ['S', 'M', 'L'];
 
+function ImageZoomOverlay({src, alt, onClose}: {src: string; alt: string; onClose: () => void}) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [onClose]);
+
+  function handleImageLoad() {
+    const overlay = overlayRef.current;
+    const img = imgRef.current;
+    if (overlay && img) {
+      const scrollTop = (img.offsetHeight - overlay.clientHeight) / 2;
+      if (scrollTop > 0) overlay.scrollTop = scrollTop;
+    }
+  }
+
+  return (
+    <div className="zoom-overlay" onClick={onClose} ref={overlayRef}>
+      <button className="zoom-close" onClick={onClose} aria-label="Close zoom">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <path d="M4 4l12 12M16 4L4 16" />
+        </svg>
+      </button>
+      <img
+        ref={imgRef}
+        src={src}
+        alt={alt}
+        className="zoom-image"
+        onLoad={handleImageLoad}
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>
+  );
+}
+
 function ImageCarousel({images, alt}: {images: string[]; alt: string}) {
   const [index, setIndex] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -290,7 +334,7 @@ function ImageCarousel({images, alt}: {images: string[]; alt: string}) {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="product-image">
+        <div className="product-image product-image-zoomable" onClick={() => setZoomed(true)}>
           <img src={images[index]} alt={alt} key={images[index]} />
         </div>
         {images.length > 1 && (
@@ -309,21 +353,46 @@ function ImageCarousel({images, alt}: {images: string[]; alt: string}) {
         )}
       </div>
       {images.length > 1 && (
-        <div className="carousel-thumbs">
-          {images.map((src, i) => (
+        <div className="carousel-dots">
+          {images.map((_, i) => (
             <button
               key={i}
-              className={`carousel-thumb${i === index ? ' active' : ''}`}
+              className={`carousel-dot${i === index ? ' active' : ''}`}
               onClick={() => setIndex(i)}
               aria-label={`Image ${i + 1}`}
-            >
-              <img src={src} alt={`${alt} ${i + 1}`} />
-            </button>
+            />
           ))}
         </div>
       )}
+      {zoomed && (
+        <ImageZoomOverlay
+          src={images[index]}
+          alt={alt}
+          onClose={() => setZoomed(false)}
+        />
+      )}
     </div>
   );
+}
+
+function useStickyAddToCart() {
+  const formRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(true);
+
+  useEffect(() => {
+    function check() {
+      const el = formRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      // Only show sticky if the real button is below the viewport
+      setShowSticky(rect.top > window.innerHeight);
+    }
+    check();
+    window.addEventListener('scroll', check, {passive: true});
+    return () => window.removeEventListener('scroll', check);
+  }, []);
+
+  return {formRef, showSticky};
 }
 
 function StaticProductPage({product, sizeGuideSvg}: {product: StaticProduct; sizeGuideSvg?: string | null}) {
@@ -334,6 +403,7 @@ function StaticProductPage({product, sizeGuideSvg}: {product: StaticProduct; siz
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const recentlyViewedItems = useRecentlyViewed(product.handle);
   const recentlyViewedHandles = recentlyViewedItems.map((p) => p.handle);
+  const {formRef, showSticky} = useStickyAddToCart();
 
   const images = [
     selectedColor.image,
@@ -432,11 +502,17 @@ function StaticProductPage({product, sizeGuideSvg}: {product: StaticProduct; siz
             </details>
           )}
 
-          <div className="product-form">
+          <div className="product-form" ref={formRef}>
             <button type="submit">Add to Cart</button>
           </div>
         </div>
       </div>
+
+      {showSticky && (
+        <div className="sticky-add-to-cart">
+          <button type="submit">Add to Cart</button>
+        </div>
+      )}
 
       <RecentlyViewed items={recentlyViewedItems} />
       <ShopOthers currentHandle={product.handle} excludeHandles={recentlyViewedHandles} />

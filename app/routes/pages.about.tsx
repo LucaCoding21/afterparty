@@ -1,7 +1,7 @@
 import type {Route} from './+types/pages.about';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Afterparty | About Us'}];
+  return [{title: 'afterparty | About Us'}];
 };
 
 export default function AboutPage() {
@@ -9,14 +9,14 @@ export default function AboutPage() {
     <div className="about-layout">
       <div className="about-left">
         <div className="about-title-block">
-          <div>
-            <h1 className="about-heading">About Us</h1>
-            <p className="about-description">A brand built after hours, for the ones who stay.</p>
-          </div>
-          <div className="about-body">
-            <p>Afterparty started in a small room in Ho Chi Minh City with one idea — make clothes that feel like the moment after the show ends and everyone finally relaxes.</p>
-            <p>We design for the in-between. The late nights, the slow mornings, the fits you reach for when you actually want to feel something.</p>
-            <p>Every piece is made in limited runs, close to home, with people we trust. No filler, no fuss — just the stuff that lasts.</p>
+          <h1 className="about-heading">About</h1>
+          <div className="about-section">
+            <div className="about-section-label">Brand Story</div>
+            <div className="about-body">
+              <p>Established in early 2025 and based in Saigon, afterparty has built a following by crafting pieces that speak to the rhythm of nights out, shared stories and music, and the mood that lingers after.</p>
+              <p>Designed for those who identify with Vietnam's evolving subcultural scenes, afterparty draws from underground music, art collectives, and creative communities that value authenticity and individuality.</p>
+              <p>For them, these spaces are more than social outlets; they are platforms for self-expression and a temporary escape from the boundaries of daily life.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -24,7 +24,7 @@ export default function AboutPage() {
       <div className="about-right">
         <img
           src="/location-pic.PNG"
-          alt="Afterparty"
+          alt="afterparty"
           className="about-photo"
         />
       </div>

@@ -4,7 +4,7 @@ import {Image, Money} from '@shopify/hydrogen';
 import {COLLECTION_ITEMS} from '~/lib/staticProducts';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Afterparty | Shop All'}];
+  return [{title: 'afterparty | Shop All'}];
 };
 
 export async function loader({context}: Route.LoaderArgs) {
@@ -49,6 +49,7 @@ export default function ShopAll() {
             className="product-item"
             prefetch="intent"
             to={`/products/${product.handle}`}
+            data-handle={product.handle}
           >
             <div className="product-item-img">
               {product.featuredImage && (
@@ -76,6 +77,7 @@ export default function ShopAll() {
                 ? `/products/${item.parentHandle}?color=${item.colorKey}`
                 : `/products/${item.parentHandle}`
             }
+            data-handle={item.parentHandle}
           >
             <div className="product-item-img">
               <img src={item.image} alt={item.displayTitle} loading="lazy" />
