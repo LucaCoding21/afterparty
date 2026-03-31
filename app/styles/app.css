@@ -1704,6 +1704,9 @@ aside main {
     font-size: 12px;
     font-weight: 500;
     margin-top: 0.6rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

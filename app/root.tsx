@@ -57,6 +57,7 @@ export function links() {
     {
       rel: 'preconnect',
       href: 'https://rsms.me',
+      crossOrigin: 'anonymous',
     },
     {
       rel: 'stylesheet',
