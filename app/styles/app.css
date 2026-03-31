@@ -1658,6 +1658,7 @@ aside main {
 .product-item {
   display: block;
   text-decoration: none;
+  min-width: 0;
 }
 
 .product-item:hover {

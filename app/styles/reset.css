@@ -133,14 +133,9 @@ body {
 
 body > main {
   padding-top: 2.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  margin-bottom: 1rem;
-  overflow-x: hidden;
+  margin: 0 1rem 1rem 1rem;
   @media (min-width: 45em) {
-    padding-left: 5rem;
-    padding-right: 5rem;
-    margin-bottom: 2rem;
+    margin: 0 5rem 2rem 5rem;
   }
 }
 
