@@ -48,7 +48,7 @@ export default function SupportPage() {
             </div>
             <div className="support-contact-row">
               <span className="support-contact-key">Instagram</span>
-              <a href="https://instagram.com/afterparty" target="_blank" rel="noopener noreferrer" className="support-link">@afterparty</a>
+              <a href="https://www.instagram.com/afterparty.space/" target="_blank" rel="noopener noreferrer" className="support-link">@afterparty.space</a>
             </div>
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function SupportPage() {
 
         {/* ── Shipping ── */}
         <Section title="Shipping">
-          <p className="support-body-text">All orders are packed by hand at afterparty HQ in Ho Chi Minh City and dispatched within 1–3 business days. You'll receive tracking as soon as your parcel is on its way.</p>
+          <p className="support-body-text">All orders are packed by hand in Ho Chi Minh City and dispatched within 1–3 business days. You'll receive tracking as soon as your parcel is on its way.</p>
 
           <div className="support-shipping-group">
             <div className="support-table">

@@ -81,7 +81,7 @@ aside header {
 aside header h3 {
   margin: 0;
   font-size: 0.7rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -316,7 +316,7 @@ button.reset:hover:not(:has(> *)) {
 
 .header-search-input::placeholder {
   color: #aaa;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
 }
 
 /* hide the native search clear button */
@@ -388,7 +388,7 @@ button.reset:hover:not(:has(> *)) {
 .header-search-result-title {
   font-size: 12px;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
@@ -410,7 +410,7 @@ button.reset:hover:not(:has(> *)) {
   text-align: center;
   background: #fafafa;
   border-top: 1px solid #eee;
-  letter-spacing: 0.03em;
+  letter-spacing: 0;
   transition: background 0.1s, color 0.1s;
 }
 
@@ -610,7 +610,7 @@ button.reset:hover:not(:has(> *)) {
   font-size: 12px;
   font-weight: 500;
   font-family: var(--font-sans);
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #111;
 }
@@ -630,7 +630,7 @@ button.reset:hover:not(:has(> *)) {
   color: #555;
   text-decoration: none;
   text-align: center;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
 }
 
 .mobile-search-no-results {
@@ -802,7 +802,7 @@ button.reset:hover:not(:has(> *)) {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #adaaaa;
   margin: 0 0 0.5rem;
@@ -816,7 +816,7 @@ button.reset:hover:not(:has(> *)) {
   font-family: var(--font-sans);
   font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   text-transform: uppercase;
   line-height: 1;
   padding: 0.8rem 0;
@@ -835,7 +835,7 @@ button.reset:hover:not(:has(> *)) {
 /* Discover section links — smaller */
 .mobile-menu-section:last-child .mobile-menu-link {
   font-size: 0.8rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
 }
 
 /* Footer row: support + search */
@@ -851,7 +851,7 @@ button.reset:hover:not(:has(> *)) {
   font-family: var(--font-sans);
   font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.07em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #999;
   text-decoration: none;
@@ -875,7 +875,7 @@ button.reset:hover:not(:has(> *)) {
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -929,7 +929,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.65rem;
   font-weight: 400;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #999;
   margin: 0;
@@ -976,7 +976,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.65rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
   padding: 0.3rem 0;
   cursor: pointer;
@@ -1010,7 +1010,7 @@ aside main {
 .footer-link {
   font-size: 0.62rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #bbb !important;
   text-decoration: none;
@@ -1076,7 +1076,7 @@ aside main {
 
 .cart-empty-link {
   font-size: 0.8rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
   text-decoration: none;
   color: #000;
@@ -1135,7 +1135,7 @@ aside main {
 .cart-line-title {
   font-size: 0.7rem;
   font-weight: 500;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
   text-decoration: none;
   color: #000;
@@ -1150,7 +1150,7 @@ aside main {
   background: none;
   border: none;
   font-size: 0.6rem;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #bbb;
   cursor: pointer;
@@ -1254,103 +1254,13 @@ aside main {
   align-items: center;
   font-size: 0.85rem;
   font-weight: 500;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
   margin-bottom: 0.75rem;
   padding-right: 0.5rem;
 }
 
 /* Discount */
-.cart-discounts {
-  margin-bottom: 1rem;
-}
-
-.cart-discounts form {
-  width: 100%;
-  display: block;
-}
-
-.cart-applied-discount {
-  margin-bottom: 0.5rem;
-}
-
-.cart-discount-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #f5f5f5;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.75rem;
-}
-
-.cart-discount-code {
-  flex: 1;
-  letter-spacing: 0.05em;
-}
-
-.cart-discount-remove {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  color: #999;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-}
-
-.cart-code-row {
-  display: flex;
-  align-items: stretch;
-  height: 44px;
-  width: 100%;
-}
-
-.cart-code-input {
-  flex: 1;
-  border: 1px solid #ddd;
-  border-right: none;
-  border-radius: 0;
-  padding: 0 0.75rem;
-  font-size: 0.75rem;
-  font-family: var(--font-sans);
-  outline: none;
-  background: #fff;
-  box-sizing: border-box;
-  -webkit-appearance: none;
-}
-
-.cart-code-input::placeholder {
-  color: #bbb;
-}
-
-.cart-code-input:focus {
-  border-color: #aaa;
-}
-
-.cart-code-apply {
-  border: 1px solid #ddd;
-  border-radius: 0;
-  background: #fff;
-  color: #000;
-  padding: 0 1rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  box-sizing: border-box;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-
-.cart-code-apply:hover {
-  background: #000;
-  color: #fff;
-  border-color: #000;
-}
-
 /* Checkout button */
 .cart-checkout-btn {
   display: block;
@@ -1361,7 +1271,7 @@ aside main {
   text-decoration: none;
   font-size: 0.7rem;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   text-transform: uppercase;
   padding: 0.85rem;
   box-sizing: border-box;
@@ -1456,7 +1366,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #000;
   margin: 0 0 1.25rem;
@@ -1497,7 +1407,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   color: #999;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
   margin: 0 0 2rem;
 }
@@ -1529,7 +1439,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #aaa;
   text-decoration: underline;
@@ -1606,7 +1516,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #000;
   margin: 0 0 0.75rem;
@@ -1701,7 +1611,7 @@ aside main {
   font-size: 12px;
   font-weight: 400;
   color: #000;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   @media (max-width: 45em) {
     font-size: 12px;
   }
@@ -1722,7 +1632,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: 500;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
   @media (max-width: 45em) {
     display: none;
@@ -2016,7 +1926,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #999;
   list-style: none;
@@ -2128,7 +2038,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.85rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
   line-height: 1.2;
   margin: 0 0 0.75rem;
@@ -2148,7 +2058,7 @@ aside main {
   font-size: 0.8rem;
   font-weight: 400;
   color: #000;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   @media (max-width: 45em) {
     font-size: 12px;
   }
@@ -2174,7 +2084,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #999;
   margin: 0 0 0.6rem;
@@ -2198,7 +2108,7 @@ aside main {
   font-size: 0.8rem;
   font-family: var(--font-sans);
   font-weight: 400;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
 }
@@ -2243,7 +2153,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   text-transform: uppercase;
   padding: 1rem 1.5rem;
   cursor: pointer;
@@ -2275,6 +2185,10 @@ aside main {
   }
 }
 
+body.mobile-menu-open .sticky-add-to-cart {
+  display: none !important;
+}
+
 .sticky-add-to-cart button {
   width: 100%;
   background: #000;
@@ -2283,7 +2197,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   text-transform: uppercase;
   padding: 1rem;
   cursor: pointer;
@@ -2304,7 +2218,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #999;
   margin: 0 0 0.75rem;
@@ -2334,7 +2248,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #999;
   @media (max-width: 45em) {
@@ -2385,16 +2299,15 @@ aside main {
 }
 
 .lookbook-page-label {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   font-family: var(--font-sans);
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #000;
   line-height: 1;
   @media (max-width: 45em) {
     font-size: 1rem;
-    letter-spacing: 0.1em;
   }
 }
 
@@ -2412,7 +2325,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #999;
   cursor: pointer;
@@ -2640,10 +2553,10 @@ aside main {
 }
 
 .locations-heading {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   text-transform: uppercase;
   margin: 0;
   @media (max-width: 45em) {
@@ -2667,7 +2580,7 @@ aside main {
   font-size: 0.7rem;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
   color: #000;
   margin-bottom: 0.8rem;
   @media (max-width: 45em) {
@@ -2692,7 +2605,7 @@ aside main {
   font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   color: #000;
   background: none;
   border: none;
@@ -2714,7 +2627,7 @@ aside main {
   font-size: 0.7rem;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
   color: #000;
   margin-bottom: 1.5rem;
   @media (max-width: 45em) {
@@ -2784,10 +2697,10 @@ aside main {
 }
 
 .support-heading {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   text-transform: uppercase;
   margin: 0;
 }
@@ -2875,7 +2788,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #aaa;
   margin: 0;
@@ -2925,7 +2838,7 @@ aside main {
 .support-shipping-region {
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #aaa;
   margin: 0;
@@ -2996,10 +2909,10 @@ aside main {
 }
 
 .about-heading {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   text-transform: uppercase;
   margin: 0;
   color: #000;
@@ -3018,7 +2931,7 @@ aside main {
   font-size: 0.7rem;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
   color: #000;
   @media (max-width: 45em) {
     letter-spacing: 0;
