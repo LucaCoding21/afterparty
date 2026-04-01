@@ -1599,7 +1599,7 @@ aside main {
   line-height: 1.4;
   color: #000;
   @media (max-width: 45em) {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 500;
     -webkit-text-stroke: 0.2px;
     margin-top: 0.6rem;
