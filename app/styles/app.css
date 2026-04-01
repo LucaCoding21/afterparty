@@ -1706,7 +1706,7 @@ aside main {
   color: #000;
   @media (max-width: 45em) {
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     margin-top: 0.6rem;
     margin-bottom: 0;
     line-height: 1.2;
