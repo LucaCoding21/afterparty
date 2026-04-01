@@ -815,11 +815,12 @@ button.reset:hover:not(:has(> *)) {
   text-decoration: none;
   font-family: var(--font-sans);
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
+  -webkit-text-stroke: 0.2px;
   letter-spacing: 0;
   text-transform: uppercase;
   line-height: 1;
-  padding: 0.8rem 0;
+  padding: 0.45rem 0;
   border-bottom: none;
   transition: opacity 0.15s;
 }
@@ -844,7 +845,7 @@ button.reset:hover:not(:has(> *)) {
   padding-top: 1.5rem;
   border-top: none;
   display: flex;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .mobile-menu-footer-link {
@@ -2044,13 +2045,17 @@ aside main {
   margin: 0 0 0.75rem;
   @media (max-width: 45em) {
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 500;
+    -webkit-text-stroke: 0.2px;
   }
 }
 
 /* Price */
 .product-price-wrap {
   margin-bottom: 2.5rem;
+  @media (max-width: 45em) {
+    margin-bottom: 1.5rem;
+  }
 }
 
 .product-price {
