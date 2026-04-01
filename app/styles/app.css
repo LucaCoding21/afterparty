@@ -1593,6 +1593,7 @@ aside main {
 .product-item h4 {
   font-size: 12px;
   font-weight: 500;
+  -webkit-text-stroke: 0.2px;
   text-transform: uppercase;
   margin-top: 1rem;
   margin-bottom: 0.2rem;
@@ -2038,7 +2039,8 @@ aside main {
 .product-title {
   font-family: var(--font-sans);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 500;
+  -webkit-text-stroke: 0.2px;
   letter-spacing: 0;
   text-transform: uppercase;
   line-height: 1.2;
