@@ -1675,6 +1675,7 @@ aside main {
     align-items: center;
     justify-content: space-between;
     padding: 0 0.1rem;
+    margin-bottom: 0.4rem;
   }
 }
 
