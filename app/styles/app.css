@@ -1703,7 +1703,7 @@ aside main {
   color: #000;
   @media (max-width: 45em) {
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 500;
     margin-top: 0.6rem;
     white-space: nowrap;
     overflow: hidden;
