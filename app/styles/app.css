@@ -1686,8 +1686,7 @@ aside main {
   letter-spacing: 0;
   text-transform: uppercase;
   color: #818181 !important;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration: none;
   transition: color 0.15s;
 }
 
