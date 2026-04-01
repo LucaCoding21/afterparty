@@ -1182,10 +1182,12 @@ aside main {
 }
 
 .cart-line-options {
-  font-size: 0.65rem;
-  color: #888;
-  margin: 0;
-  letter-spacing: 0.02em;
+  font-size: 0.7rem;
+  color: #000;
+  margin: 0.15rem 0 0;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  font-weight: 400;
 }
 
 .cart-line-bottom {
@@ -1458,7 +1460,7 @@ aside main {
 .search-page {
   padding: 3rem 4rem 6rem;
   @media (max-width: 45em) {
-    padding: 2rem 0.75rem 6rem;
+    padding: 2rem 0.1rem 6rem;
   }
 }
 
@@ -1613,7 +1615,7 @@ aside main {
 .collection {
   padding: 3rem 4rem 0;
   @media (max-width: 45em) {
-    padding: 0 0.75rem 0;
+    padding: 0 0.1rem 0;
   }
 }
 
@@ -1624,12 +1626,13 @@ aside main {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #000;
-  margin: 0 0 2rem;
-  padding-bottom: 1rem;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0;
   border-bottom: none;
   display: none;
   @media (max-width: 45em) {
     display: block;
+    letter-spacing: 0;
   }
 }
 
@@ -1651,7 +1654,7 @@ aside main {
     grid-gap: 3rem 2.5rem;
   }
   @media (max-width: 45em) {
-    grid-gap: 1.75rem 0.75rem;
+    grid-gap: 2.5rem 0.75rem;
   }
 }
 
@@ -1705,9 +1708,8 @@ aside main {
     font-size: 12px;
     font-weight: 500;
     margin-top: 0.6rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin-bottom: 0;
+    line-height: 1.2;
   }
 }
 
@@ -1717,7 +1719,7 @@ aside main {
   color: #000;
   letter-spacing: 0.02em;
   @media (max-width: 45em) {
-    font-size: 0.78rem;
+    font-size: 12px;
   }
 }
 
@@ -1777,7 +1779,7 @@ aside main {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 0.75rem;
+    padding: 0 0.1rem;
   }
 }
 
@@ -1785,7 +1787,7 @@ aside main {
   font-family: var(--font-sans);
   font-size: 0.65rem;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #818181 !important;
   text-decoration: underline;
@@ -2132,7 +2134,7 @@ aside main {
   gap: 0;
   @media (max-width: 45em) {
     position: static;
-    padding: 0 0.75rem;
+    padding: 0 0.1rem;
   }
 }
 
@@ -2339,7 +2341,7 @@ aside main {
   border-top: none;
   margin-top: 2.5rem;
   @media (max-width: 45em) {
-    padding: 1.5rem 0.75rem 2rem;
+    padding: 1.5rem 0.1rem 2rem;
   }
 }
 
@@ -2430,6 +2432,9 @@ aside main {
   color: #999;
   cursor: pointer;
   transition: color 0.15s;
+  @media (max-width: 45em) {
+    letter-spacing: 0;
+  }
 }
 
 .lookbook-tab:hover {
@@ -2680,6 +2685,9 @@ aside main {
   letter-spacing: 0.12em;
   color: #000;
   margin-bottom: 0.8rem;
+  @media (max-width: 45em) {
+    letter-spacing: 0;
+  }
 }
 
 .locations-flagship-name {
@@ -2724,6 +2732,9 @@ aside main {
   letter-spacing: 0.12em;
   color: #000;
   margin-bottom: 1.5rem;
+  @media (max-width: 45em) {
+    letter-spacing: 0;
+  }
 }
 
 .locations-grid {
@@ -3024,6 +3035,9 @@ aside main {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: #000;
+  @media (max-width: 45em) {
+    letter-spacing: 0;
+  }
 }
 
 .about-body {

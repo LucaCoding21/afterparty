@@ -12,6 +12,7 @@ export default defineConfig({
     assetsInlineLimit: 0,
   },
   ssr: {
+    external: ['node:fs', 'node:path'],
     optimizeDeps: {
       /**
        * Include dependencies here if they throw CJS<>ESM errors.
