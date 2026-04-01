@@ -1654,7 +1654,7 @@ aside main {
     grid-gap: 3rem 2.5rem;
   }
   @media (max-width: 45em) {
-    grid-gap: 2.5rem 0.75rem;
+    grid-gap: 1.75rem 0.75rem;
   }
 }
 
@@ -1707,7 +1707,7 @@ aside main {
   @media (max-width: 45em) {
     font-size: 12px;
     font-weight: 500;
-    -webkit-text-stroke: 0.3px;
+    -webkit-text-stroke: 0.2px;
     margin-top: 0.6rem;
     margin-bottom: 0;
     line-height: 1.2;
