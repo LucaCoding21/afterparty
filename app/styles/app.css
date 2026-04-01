@@ -1998,11 +1998,12 @@ aside main {
 .product-size-guide::before {
   content: '';
   display: block;
-  width: 28rem;
+  width: 100%;
+  max-width: 28rem;
   height: 1px;
   background: #e8e8e8;
   @media (max-width: 45em) {
-    width: 100%;
+    max-width: 100%;
   }
 }
 
