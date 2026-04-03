@@ -4,7 +4,7 @@ export const meta: Route.MetaFunction = () => {
   return [{title: 'afterparty | Locations'}];
 };
 
-const LOCATIONS = [
+const STOCKISTS = [
   {
     city: 'Ho Chi Minh City, Vietnam',
     stores: [
@@ -32,36 +32,41 @@ const LOCATIONS = [
 export default function LocationsPage() {
   return (
     <div className="locations-page">
-      <div className="locations-page-header">
-        <h1 className="locations-heading">Locations</h1>
-      </div>
+      <h1 className="locations-heading">Locations</h1>
 
-      <div className="locations-body">
-        <div className="locations-flagship">
-          <div className="locations-flagship-label">Private Showroom</div>
-          <h2 className="locations-flagship-name">afterparty</h2>
-          <div className="locations-flagship-address">District 1, Ho Chi Minh City</div>
-          <a
-            href="https://ig.me/m/afterparty.space"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="locations-flagship-btn"
-          >
-            Book an Appointment &rarr;
-          </a>
+      <div className="locations-layout">
+        <div className="locations-left">
+          <div className="locations-section-label">Private Showroom</div>
+          <div className="locations-showroom">
+            <div className="locations-showroom-name">afterparty</div>
+            <div className="locations-showroom-detail">District 1, Ho Chi Minh City, Vietnam</div>
+            <div className="locations-showroom-note">
+              DM @afterparty.space on Instagram to book
+            </div>
+            <a
+              href="https://ig.me/m/afterparty.space"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="locations-showroom-cta"
+            >
+              Book an Appointment &rarr;
+            </a>
+          </div>
         </div>
 
-        <div className="locations-stockists">
-          <div className="locations-stockists-label">Stockists</div>
-          <div className="locations-grid">
-            {LOCATIONS.map((location) => (
+        <div className="locations-right">
+          <div className="locations-section-label">Stockists</div>
+          <div className="locations-stockists-grid">
+            {STOCKISTS.map((location) => (
               <div key={location.city} className="locations-city-block">
-                <h2 className="locations-city">{location.city}</h2>
-                {location.stores.map((store) => (
-                  <div key={store.name} className="locations-store-name">
-                    {store.name}
-                  </div>
-                ))}
+                <div className="locations-city">{location.city}</div>
+                <div className="locations-stores">
+                  {location.stores.map((store) => (
+                    <span key={store.name} className="locations-store-name">
+                      {store.name}
+                    </span>
+                  ))}
+                </div>
               </div>
             ))}
           </div>

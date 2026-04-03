@@ -40,7 +40,7 @@ export default function SupportPage() {
           <div className="support-contact-block">
             <div className="support-contact-row">
               <span className="support-contact-key">Email</span>
-              <a href="mailto:hello@afterparty.com" className="support-link">hello@afterparty.com</a>
+              <a href="mailto:minh@afterparty.space" className="support-link">minh@afterparty.space</a>
             </div>
             <div className="support-contact-row">
               <span className="support-contact-key">Response</span>
@@ -76,21 +76,17 @@ export default function SupportPage() {
         <Section title="Shipping">
           <p className="support-body-text">All orders are packed by hand in Ho Chi Minh City and dispatched within 1–3 business days. You'll receive tracking as soon as your parcel is on its way.</p>
 
-          <div className="support-shipping-group">
-            <div className="support-table">
-              <div className="support-table-row">
-                <span className="support-label">Southeast Asia</span>
-                <span>5–10 business days &nbsp;·&nbsp; from $8 USD</span>
-              </div>
-              <div className="support-table-row">
-                <span className="support-label">Rest of World</span>
-                <span>10–20 business days &nbsp;·&nbsp; from $15 USD</span>
-              </div>
-              <div className="support-table-row">
-                <span className="support-label">Duties & taxes</span>
-                <span>Responsibility of the recipient. We are not liable for customs delays.</span>
-              </div>
-            </div>
+          <div className="support-faq-item">
+            <p className="support-faq-q">Southeast Asia</p>
+            <p className="support-faq-a">5–10 business days · from $8 USD</p>
+          </div>
+          <div className="support-faq-item">
+            <p className="support-faq-q">Rest of World</p>
+            <p className="support-faq-a">10–20 business days · from $15 USD</p>
+          </div>
+          <div className="support-faq-item">
+            <p className="support-faq-q">Duties &amp; taxes</p>
+            <p className="support-faq-a">Responsibility of the recipient. We are not liable for customs delays.</p>
           </div>
         </Section>
 
@@ -99,7 +95,7 @@ export default function SupportPage() {
           <p className="support-body-text">We accept returns and exchanges on unworn, unwashed, unaltered items with original tags attached within <strong>14 days</strong> of delivery. Sale items and limited drops are final sale.</p>
           <div className="support-faq-item">
             <p className="support-faq-q">Returns</p>
-            <p className="support-faq-a">Email hello@afterparty.com with your order number and reason. We'll send you a return authorisation and instructions. Return shipping is the customer's responsibility unless the item is defective.</p>
+            <p className="support-faq-a">Email minh@afterparty.space with your order number and reason. We'll send you a return authorisation and instructions. Return shipping is the customer's responsibility unless the item is defective.</p>
           </div>
           <div className="support-faq-item">
             <p className="support-faq-q">Exchanges</p>
@@ -116,7 +112,7 @@ export default function SupportPage() {
           </div>
           <div className="support-faq-item">
             <p className="support-faq-q">How to claim</p>
-            <p className="support-faq-a">Email hello@afterparty.com with your order number, a description of the fault, and clear photos.</p>
+            <p className="support-faq-a">Email minh@afterparty.space with your order number, a description of the fault, and clear photos.</p>
           </div>
         </Section>
 

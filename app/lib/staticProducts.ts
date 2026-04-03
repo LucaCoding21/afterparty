@@ -3,6 +3,7 @@ export type ColorVariant = {
   key: string;         // URL-safe color key, e.g., "navy-blue"
   image: string;       // flat lay product image
   modelImage?: string; // model wearing the product (used as hero on detail page)
+  soldOut?: boolean;
 };
 
 export type Category = 'tops-shirts' | 'outerwear' | 'pants' | 'accessories';
@@ -17,6 +18,7 @@ export type StaticProduct = {
   sizeGuide?: string; // path to size guide image, e.g. '/products/size-guides/tee-size-guide.svg'
   sizePhoto?: string; // path to garment illustration from size chart
   sizePhotoMaxHeight?: number; // px height to crop illustration (hides data table portion)
+  soldOut?: boolean; // marks entire product as sold out (overridden by per-color soldOut)
 };
 
 export type CollectionItem = {
@@ -26,6 +28,7 @@ export type CollectionItem = {
   displayTitle: string;
   image: string;
   price: string;
+  soldOut?: boolean;
 };
 
 export const STATIC_PRODUCTS: StaticProduct[] = [
@@ -43,6 +46,7 @@ export const STATIC_PRODUCTS: StaticProduct[] = [
         key: 'navy-blue',
         image: '/products/bubble-letter-ringer-tee-navyblue.jpg',
         modelImage: '/product-details-models/bubble-letter-ringer-tee-navy-model.jpg',
+        soldOut: true,
       },
       {
         name: 'Orange',
@@ -306,6 +310,68 @@ export function getCollectionItems(category: Category): CollectionItem[] {
   );
 }
 
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp: number[][] = Array.from({length: m + 1}, (_, i) =>
+    Array.from({length: n + 1}, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
+  );
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+  return dp[m][n];
+}
+
+export function searchStaticProducts(term: string): CollectionItem[] {
+  const q = term.toLowerCase();
+
+  // Exact match first
+  const exact = STATIC_PRODUCTS.filter((p) => {
+    const searchable = `${p.title} ${p.category} ${p.handle}`.toLowerCase();
+    return searchable.includes(q);
+  });
+
+  const matches = exact.length > 0 ? exact : fuzzyMatchProducts(q);
+
+  return matches.flatMap((product) =>
+    product.colors.map((color) => ({
+      id: `${product.handle}-${color.key}`,
+      parentHandle: product.handle,
+      colorKey: product.colors.length > 1 ? color.key : undefined,
+      displayTitle: product.title,
+      image: color.image,
+      price: product.price,
+      soldOut: color.soldOut ?? product.soldOut,
+    })),
+  );
+}
+
+function fuzzyMatchProducts(q: string): StaticProduct[] {
+  const allWords = new Set<string>();
+  STATIC_PRODUCTS.forEach((p) => {
+    p.title.toLowerCase().split(/\s+/).forEach((w) => allWords.add(w));
+    p.category.replace(/-/g, ' ').split(/\s+/).forEach((w) => allWords.add(w));
+  });
+
+  let bestWord = '';
+  let bestDist = Infinity;
+  for (const word of allWords) {
+    const d = levenshtein(q, word);
+    if (d < bestDist && d <= Math.max(2, Math.floor(q.length / 2))) {
+      bestDist = d;
+      bestWord = word;
+    }
+  }
+
+  if (!bestWord) return [];
+
+  return STATIC_PRODUCTS.filter((p) => {
+    const searchable = `${p.title} ${p.category} ${p.handle}`.toLowerCase();
+    return searchable.includes(bestWord);
+  });
+}
+
 // Flat list of collection grid cards — one per color variant
 export const COLLECTION_ITEMS: CollectionItem[] = STATIC_PRODUCTS.flatMap(
   (product) =>
@@ -316,5 +382,6 @@ export const COLLECTION_ITEMS: CollectionItem[] = STATIC_PRODUCTS.flatMap(
       displayTitle: product.title,
       image: color.image,
       price: product.price,
+      soldOut: color.soldOut ?? product.soldOut,
     })),
 );

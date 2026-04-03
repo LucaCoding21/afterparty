@@ -4,20 +4,20 @@
   <line y1="92" x2="441" y2="92" stroke="#D8D8D8" stroke-opacity="0.4"/>
   <line y1="144" x2="441" y2="144" stroke="#D8D8D8" stroke-opacity="0.4"/>
   <line y1="195.5" x2="441" y2="195.5" stroke="#D8D8D8" stroke-opacity="0.4"/>
-  <text x="14" y="26" fill="#111" font-family="sans-serif" font-size="11">SIZE</text>
-  <text x="141" y="26" fill="#111" font-family="sans-serif" font-size="11" text-anchor="middle">S</text>
-  <text x="261" y="26" fill="#111" font-family="sans-serif" font-size="11" text-anchor="middle">M</text>
-  <text x="381" y="26" fill="#111" font-family="sans-serif" font-size="11" text-anchor="middle">L</text>
-  <text x="14" y="70" fill="#111" font-family="sans-serif" font-size="10">WIDTH</text>
-  <text x="141" y="70" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">37 cm</text>
-  <text x="261" y="70" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">39 cm</text>
-  <text x="381" y="70" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">41 cm</text>
-  <text x="14" y="121.5" fill="#111" font-family="sans-serif" font-size="10">LENGTH</text>
-  <text x="141" y="121.5" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">42 cm</text>
-  <text x="261" y="121.5" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">44 cm</text>
-  <text x="381" y="121.5" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">46 cm</text>
-  <text x="14" y="173.3" fill="#111" font-family="sans-serif" font-size="10">SLEEVES</text>
-  <text x="141" y="173.3" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">10 cm</text>
-  <text x="261" y="173.3" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">11 cm</text>
-  <text x="381" y="173.3" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">12 cm</text>
+  <text x="14" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11">SIZE</text>
+  <text x="141" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11" text-anchor="middle">S</text>
+  <text x="261" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11" text-anchor="middle">M</text>
+  <text x="381" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11" text-anchor="middle">L</text>
+  <text x="14" y="70" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="12">WIDTH</text>
+  <text x="141" y="70" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">37 cm</text>
+  <text x="261" y="70" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">39 cm</text>
+  <text x="381" y="70" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">41 cm</text>
+  <text x="14" y="121.5" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="12">LENGTH</text>
+  <text x="141" y="121.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">42 cm</text>
+  <text x="261" y="121.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">44 cm</text>
+  <text x="381" y="121.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">46 cm</text>
+  <text x="14" y="173.3" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="12">SLEEVES</text>
+  <text x="141" y="173.3" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">10 cm</text>
+  <text x="261" y="173.3" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">11 cm</text>
+  <text x="381" y="173.3" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">12 cm</text>
 </svg>

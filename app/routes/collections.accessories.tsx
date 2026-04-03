@@ -21,7 +21,7 @@ export default function Accessories() {
               <img src={item.image} alt={item.displayTitle} loading="lazy" />
             </div>
             <h4>{item.displayTitle}</h4>
-            <small>{item.price}</small>
+            <small>{item.soldOut ? 'SOLD OUT' : item.price}</small>
           </Link>
         ))}
       </div>

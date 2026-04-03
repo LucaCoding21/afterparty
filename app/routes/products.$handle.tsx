@@ -129,7 +129,7 @@ function ProductCard({product}: {product: StaticProduct}) {
         <img src={firstColor.image} alt={product.title} loading="lazy" />
       </div>
       <h4>{product.title}</h4>
-      <small>{product.price}</small>
+      <small>{product.soldOut || product.colors.every((c) => c.soldOut) ? 'SOLD OUT' : product.price}</small>
     </Link>
   );
 }
@@ -164,24 +164,50 @@ function RecentlyViewed({items}: {items: StaticProduct[]}) {
   );
 }
 
-function Breadcrumb({title}: {title: string}) {
+function Breadcrumb({handle}: {handle: string}) {
+  const product = STATIC_PRODUCTS_MAP[handle];
+  const category = product?.category;
+  const backLink = category ? `/collections/${category}` : '/collections/all';
+  const backLabel = category ? CATEGORY_LABELS[category] || category : 'Shop All';
+
   return (
     <nav className="product-breadcrumb" aria-label="Breadcrumb">
-      <Link to="/collections/all" className="breadcrumb-link"><span className="breadcrumb-arrow">&lsaquo;</span> Shop All</Link>
+      <Link to={backLink} className="breadcrumb-link"><span className="breadcrumb-arrow">&lsaquo;</span> <span className="breadcrumb-text">{backLabel}</span></Link>
     </nav>
   );
 }
 
+const CATEGORY_LABELS: Record<string, string> = {
+  'tops-shirts': 'Tops & Shirts',
+  outerwear: 'Outerwear',
+  pants: 'Pants',
+  accessories: 'Accessories',
+};
+
 function ProductNav({currentHandle}: {currentHandle: string}) {
-  const currentIndex = STATIC_PRODUCTS.findIndex((p) => p.handle === currentHandle);
+  const currentProduct = STATIC_PRODUCTS_MAP[currentHandle];
+  const category = currentProduct?.category;
+
+  const categoryProducts = category
+    ? STATIC_PRODUCTS.filter((p) => p.category === category)
+    : STATIC_PRODUCTS;
+
+  const currentIndex = categoryProducts.findIndex((p) => p.handle === currentHandle);
   const nextProduct =
     currentIndex >= 0
-      ? STATIC_PRODUCTS[(currentIndex + 1) % STATIC_PRODUCTS.length]
+      ? categoryProducts[(currentIndex + 1) % categoryProducts.length]
       : null;
+
+  const backLink = category
+    ? `/collections/${category}`
+    : '/collections/all';
+  const backLabel = category
+    ? `Back to ${CATEGORY_LABELS[category] || category}`
+    : 'Back to All';
 
   return (
     <nav className="product-nav" aria-label="Product navigation">
-      <Link to="/collections/all" className="product-nav-btn">Back to All</Link>
+      <Link to={backLink} className="product-nav-btn">{backLabel}</Link>
       {nextProduct && (
         <Link to={`/products/${nextProduct.handle}`} className="product-nav-btn">Next Product</Link>
       )}
@@ -208,7 +234,7 @@ function DynamicProductPage({product}: {product: NonNullable<any>}) {
 
   return (
     <div className="product-page">
-      <Breadcrumb title={title} />
+      <Breadcrumb handle={product.handle} />
       <ProductNav currentHandle={product.handle} />
 
       <div className="product">
@@ -401,9 +427,20 @@ function StaticProductPage({product, sizeGuideSvg}: {product: StaticProduct; siz
   const selectedColor: ColorVariant =
     product.colors.find((c) => c.key === colorKey) ?? product.colors[0];
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [sizeWarning, setSizeWarning] = useState(false);
   const recentlyViewedItems = useRecentlyViewed(product.handle);
   const recentlyViewedHandles = recentlyViewedItems.map((p) => p.handle);
   const {formRef, showSticky} = useStickyAddToCart();
+  const isSoldOut = selectedColor.soldOut ?? product.soldOut ?? false;
+
+  function handleAddToCart() {
+    if (!selectedSize) {
+      setSizeWarning(true);
+      setTimeout(() => setSizeWarning(false), 1500);
+      return;
+    }
+    // TODO: actual add-to-cart logic
+  }
 
   const images = [
     selectedColor.image,
@@ -418,7 +455,7 @@ function StaticProductPage({product, sizeGuideSvg}: {product: StaticProduct; siz
 
   return (
     <div className="product-page">
-      <Breadcrumb title={product.title} />
+      <Breadcrumb handle={product.handle} />
       <ProductNav currentHandle={product.handle} />
 
       <div className="product">
@@ -430,7 +467,7 @@ function StaticProductPage({product, sizeGuideSvg}: {product: StaticProduct; siz
         <div className="product-main">
           <h1 className="product-title">{product.title}</h1>
           <div className="product-price-wrap">
-            <div className="product-price">{product.price}</div>
+            <div className="product-price">{isSoldOut ? 'SOLD OUT' : product.price}</div>
           </div>
 
           {product.colors.length > 1 && (
@@ -462,8 +499,8 @@ function StaticProductPage({product, sizeGuideSvg}: {product: StaticProduct; siz
                 <button
                   key={size}
                   type="button"
-                  className={`product-options-item${selectedSize === size ? ' selected' : ''}`}
-                  onClick={() => setSelectedSize(size)}
+                  className={`product-options-item${selectedSize === size ? ' selected' : ''}${sizeWarning ? ' size-warning' : ''}`}
+                  onClick={() => { setSelectedSize(size); setSizeWarning(false); }}
                 >
                   {size}
                 </button>
@@ -503,14 +540,18 @@ function StaticProductPage({product, sizeGuideSvg}: {product: StaticProduct; siz
           )}
 
           <div className="product-form" ref={formRef}>
-            <button type="submit">Add to Cart</button>
+            <button type="submit" onClick={isSoldOut ? undefined : handleAddToCart} disabled={isSoldOut} className={isSoldOut ? 'sold-out' : ''}>
+              {isSoldOut ? 'Sold Out' : sizeWarning ? 'Select a Size' : 'Add to Cart'}
+            </button>
           </div>
         </div>
       </div>
 
-      {showSticky && (
+      {showSticky && !isSoldOut && (
         <div className="sticky-add-to-cart">
-          <button type="submit">Add to Cart</button>
+          <button type="submit" onClick={handleAddToCart}>
+            {sizeWarning ? 'Select a Size' : 'Add to Cart'}
+          </button>
         </div>
       )}
 

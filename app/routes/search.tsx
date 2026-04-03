@@ -1,4 +1,5 @@
 import {
+  Link,
   useLoaderData,
 } from 'react-router';
 import type {Route} from './+types/search';
@@ -11,6 +12,7 @@ import {
   getEmptyPredictiveSearchResult,
 } from '~/lib/search';
 import type {RegularSearchQuery, PredictiveSearchQuery} from 'storefrontapi.generated';
+import {searchStaticProducts, type CollectionItem} from '~/lib/staticProducts';
 
 export const meta: Route.MetaFunction = () => {
   return [{title: `afterparty | Search`}];
@@ -29,15 +31,26 @@ export async function loader({request, context}: Route.LoaderArgs) {
     return {term: '', result: null, error: error.message};
   });
 
-  return await searchPromise;
+  const searchResult = await searchPromise;
+
+  // Fallback: search static products when Shopify returns no results
+  let staticResults: CollectionItem[] = [];
+  if (searchResult.term && searchResult.type === 'regular' && !searchResult.result?.total) {
+    staticResults = searchStaticProducts(searchResult.term);
+  }
+
+  return {...searchResult, staticResults};
 }
 
 /**
  * Renders the /search route
  */
 export default function SearchPage() {
-  const {type, term, result, error} = useLoaderData<typeof loader>();
+  const {type, term, result, error, staticResults} = useLoaderData<typeof loader>();
   if (type === 'predictive') return null;
+
+  const hasShopifyResults = !!(result?.total);
+  const hasStaticResults = !!(staticResults as CollectionItem[] | undefined)?.length;
 
   return (
     <div className="search-page">
@@ -66,17 +79,13 @@ export default function SearchPage() {
 
       {error && <p className="search-page-error">{error}</p>}
 
-      {term && (
+      {term && hasShopifyResults && (
         <p className="search-page-meta">
-          {result?.total
-            ? `${result.total} result${result.total !== 1 ? 's' : ''} for "${term}"`
-            : `No results for "${term}"`}
+          {`${result.total} result${result.total !== 1 ? 's' : ''} for "${term}"`}
         </p>
       )}
 
-      {!term || !result?.total ? (
-        !term ? null : <SearchResults.Empty />
-      ) : (
+      {hasShopifyResults && (
         <SearchResults result={result} term={term}>
           {({articles, pages, products, term}) => (
             <div>
@@ -87,6 +96,39 @@ export default function SearchPage() {
           )}
         </SearchResults>
       )}
+
+      {term && !hasShopifyResults && hasStaticResults && (
+        <>
+          <p className="search-page-meta">
+            Showing results for "{term}"
+          </p>
+          <div className="products-grid">
+            {(staticResults as CollectionItem[]).map((item) => (
+              <Link
+                key={item.id}
+                className="product-item"
+                prefetch="intent"
+                to={
+                  item.colorKey
+                    ? `/products/${item.parentHandle}?color=${item.colorKey}`
+                    : `/products/${item.parentHandle}`
+                }
+              >
+                <div className="product-item-img">
+                  <img src={item.image} alt={item.displayTitle} loading="lazy" />
+                </div>
+                <h4>{item.displayTitle}</h4>
+                <small>{item.soldOut ? 'SOLD OUT' : item.price}</small>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
+
+      {term && !hasShopifyResults && !hasStaticResults && (
+        <p className="search-page-meta">No results for "{term}"</p>
+      )}
+
       <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
     </div>
   );

@@ -10,6 +10,19 @@ import {useAside} from '~/components/Aside';
 import {SEARCH_ENDPOINT} from '~/components/SearchFormPredictive';
 import {STATIC_PRODUCTS} from '~/lib/staticProducts';
 
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp: number[][] = Array.from({length: m + 1}, (_, i) =>
+    Array.from({length: n + 1}, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
+  );
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+  return dp[m][n];
+}
+
 interface HeaderProps {
   header: HeaderQuery;
   cart: Promise<CartApiQueryFragment | null>;
@@ -34,13 +47,44 @@ export function Header({
   const mobileSearchBtnRef = useRef<HTMLButtonElement>(null);
 
   const mobileSearchResults = useMemo(() => {
-    if (!mobileSearchQuery.trim()) return [];
+    if (!mobileSearchQuery.trim()) return {products: [] as typeof STATIC_PRODUCTS, suggestion: ''};
     const q = mobileSearchQuery.toLowerCase();
-    return STATIC_PRODUCTS.filter(
+    const exact = STATIC_PRODUCTS.filter(
       (p) =>
         p.title.toLowerCase().includes(q) ||
+        p.handle.toLowerCase().includes(q) ||
         p.category.replace(/-/g, ' ').toLowerCase().includes(q),
     ).slice(0, 6);
+    if (exact.length > 0) return {products: exact, suggestion: ''};
+
+    // Fuzzy fallback: find the best-matching keyword from product titles
+    const allWords = new Set<string>();
+    STATIC_PRODUCTS.forEach((p) => {
+      p.title.toLowerCase().split(/\s+/).forEach((w) => allWords.add(w));
+      p.category.replace(/-/g, ' ').split(/\s+/).forEach((w) => allWords.add(w));
+    });
+
+    let bestWord = '';
+    let bestDist = Infinity;
+    for (const word of allWords) {
+      const d = levenshtein(q, word);
+      if (d < bestDist && d <= Math.max(2, Math.floor(q.length / 2))) {
+        bestDist = d;
+        bestWord = word;
+      }
+    }
+
+    if (bestWord) {
+      const fuzzy = STATIC_PRODUCTS.filter(
+        (p) =>
+          p.title.toLowerCase().includes(bestWord) ||
+          p.handle.toLowerCase().includes(bestWord) ||
+          p.category.replace(/-/g, ' ').toLowerCase().includes(bestWord),
+      ).slice(0, 6);
+      if (fuzzy.length > 0) return {products: fuzzy, suggestion: bestWord};
+    }
+
+    return {products: [] as typeof STATIC_PRODUCTS, suggestion: ''};
   }, [mobileSearchQuery]);
 
   function closeMobileSearch() {
@@ -132,7 +176,7 @@ export function Header({
         <nav className="header-nav-right">
           <HeaderSearch />
           <NavLink to="/pages/support" className="header-nav-link" prefetch="intent">
-            Support <span aria-hidden="true" className="header-support-arrow">&rsaquo;</span>
+            Support
           </NavLink>
           <CartToggle cart={cart} />
         </nav>
@@ -145,7 +189,7 @@ export function Header({
             aria-label="Open search"
             onClick={toggleMobileSearch}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
@@ -175,7 +219,7 @@ export function Header({
                 ref={mobileSearchInputRef}
                 name="q"
                 type="search"
-                placeholder="Search products..."
+                placeholder="SEARCH PRODUCTS..."
                 className="mobile-search-input"
                 value={mobileSearchQuery}
                 onChange={(e) => setMobileSearchQuery(e.target.value)}
@@ -201,9 +245,14 @@ export function Header({
           </form>
           {mobileSearchQuery.trim().length > 0 && (
             <div className="mobile-search-results">
-              {mobileSearchResults.length > 0 ? (
+              {mobileSearchResults.products.length > 0 ? (
                 <>
-                  {mobileSearchResults.map((product) => (
+                  {mobileSearchResults.suggestion && (
+                    <div className="mobile-search-suggestion">
+                      Did you mean &ldquo;{mobileSearchResults.suggestion}&rdquo;?
+                    </div>
+                  )}
+                  {mobileSearchResults.products.map((product) => (
                     <a
                       key={product.handle}
                       href={`/products/${product.handle}`}
@@ -218,11 +267,11 @@ export function Header({
                     </a>
                   ))}
                   <a
-                    href={`${SEARCH_ENDPOINT}?q=${encodeURIComponent(mobileSearchQuery)}`}
+                    href={`${SEARCH_ENDPOINT}?q=${encodeURIComponent(mobileSearchResults.suggestion || mobileSearchQuery)}`}
                     className="mobile-search-view-all"
                     onClick={closeMobileSearch}
                   >
-                    See all results for &ldquo;{mobileSearchQuery}&rdquo; &rarr;
+                    See all results for &ldquo;{mobileSearchResults.suggestion || mobileSearchQuery}&rdquo; &rarr;
                   </a>
                 </>
               ) : (
@@ -283,6 +332,9 @@ export function Header({
             {/* Discover */}
             <div className="mobile-menu-section">
               <p className="mobile-menu-section-label">Discover</p>
+              <NavLink to="/pages/support" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
+                Support
+              </NavLink>
               <NavLink to="/blogs" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
                 Lookbook
               </NavLink>
@@ -295,15 +347,6 @@ export function Header({
             </div>
           </div>
 
-          {/* Footer links */}
-          <div className="mobile-menu-bottom">
-            <NavLink to="/pages/support" className="mobile-menu-footer-link" onClick={closeMobile} prefetch="intent">
-              Support
-            </NavLink>
-            <NavLink to="/search" className="mobile-menu-footer-link" onClick={closeMobile} prefetch="intent">
-              Search
-            </NavLink>
-          </div>
         </nav>
       </div>
     </div>
@@ -422,7 +465,7 @@ function HeaderSearch() {
         }}
       >
         {open ? (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
@@ -553,7 +596,7 @@ function MobileCartBadge({count}: {count: number | null}) {
         } as CartViewPayload);
       }}
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="7" width="18" height="15" rx="1" />
         <path d="M8 7V5a4 4 0 018 0v2" />
       </svg>

@@ -7,32 +7,32 @@
   <line y1="246.5" x2="441" y2="246.5" stroke="#D8D8D8" stroke-opacity="0.4"/>
   <line y1="297.5" x2="441" y2="297.5" stroke="#D8D8D8" stroke-opacity="0.4"/>
   <line y1="347.5" x2="441" y2="347.5" stroke="#D8D8D8" stroke-opacity="0.4"/>
-  <text x="14" y="26" fill="#111" font-family="sans-serif" font-size="11">SIZE</text>
-  <text x="141" y="26" fill="#111" font-family="sans-serif" font-size="11" text-anchor="middle">S</text>
-  <text x="261" y="26" fill="#111" font-family="sans-serif" font-size="11" text-anchor="middle">M</text>
-  <text x="381" y="26" fill="#111" font-family="sans-serif" font-size="11" text-anchor="middle">L</text>
-  <text x="14" y="70" fill="#111" font-family="sans-serif" font-size="10">WAIST</text>
-  <text x="141" y="70" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">37.5 cm</text>
-  <text x="261" y="70" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">38.5 cm</text>
-  <text x="381" y="70" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">40 cm</text>
-  <text x="14" y="121.5" fill="#111" font-family="sans-serif" font-size="10">RISE</text>
-  <text x="141" y="121.5" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">31 cm</text>
-  <text x="261" y="121.5" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">32 cm</text>
-  <text x="381" y="121.5" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">33 cm</text>
-  <text x="14" y="173.3" fill="#111" font-family="sans-serif" font-size="10">THIGH</text>
-  <text x="141" y="173.3" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">26.5 cm</text>
-  <text x="261" y="173.3" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">27 cm</text>
-  <text x="381" y="173.3" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">28.5 cm</text>
-  <text x="14" y="224.5" fill="#111" font-family="sans-serif" font-size="10">INSEAM</text>
-  <text x="141" y="224.5" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">76 cm</text>
-  <text x="261" y="224.5" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">76.5 cm</text>
-  <text x="381" y="224.5" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">77 cm</text>
-  <text x="14" y="275.5" fill="#111" font-family="sans-serif" font-size="10">LENGTH</text>
-  <text x="141" y="275.5" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">107 cm</text>
-  <text x="261" y="275.5" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">108.5 cm</text>
-  <text x="381" y="275.5" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">110 cm</text>
-  <text x="14" y="326" fill="#111" font-family="sans-serif" font-size="10">LEG OPENING</text>
-  <text x="141" y="326" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">31 cm</text>
-  <text x="261" y="326" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">32 cm</text>
-  <text x="381" y="326" fill="#888" font-family="sans-serif" font-size="10" text-anchor="middle">33 cm</text>
+  <text x="14" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11">SIZE</text>
+  <text x="141" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11" text-anchor="middle">S</text>
+  <text x="261" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11" text-anchor="middle">M</text>
+  <text x="381" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11" text-anchor="middle">L</text>
+  <text x="14" y="70" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="12">WAIST</text>
+  <text x="141" y="70" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">37.5 cm</text>
+  <text x="261" y="70" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">38.5 cm</text>
+  <text x="381" y="70" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">40 cm</text>
+  <text x="14" y="121.5" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="12">RISE</text>
+  <text x="141" y="121.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">31 cm</text>
+  <text x="261" y="121.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">32 cm</text>
+  <text x="381" y="121.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">33 cm</text>
+  <text x="14" y="173.3" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="12">THIGH</text>
+  <text x="141" y="173.3" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">26.5 cm</text>
+  <text x="261" y="173.3" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">27 cm</text>
+  <text x="381" y="173.3" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">28.5 cm</text>
+  <text x="14" y="224.5" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="12">INSEAM</text>
+  <text x="141" y="224.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">76 cm</text>
+  <text x="261" y="224.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">76.5 cm</text>
+  <text x="381" y="224.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">77 cm</text>
+  <text x="14" y="275.5" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="12">LENGTH</text>
+  <text x="141" y="275.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">107 cm</text>
+  <text x="261" y="275.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">108.5 cm</text>
+  <text x="381" y="275.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">110 cm</text>
+  <text x="14" y="326" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="12">LEG OPENING</text>
+  <text x="141" y="326" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">31 cm</text>
+  <text x="261" y="326" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">32 cm</text>
+  <text x="381" y="326" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">33 cm</text>
 </svg>

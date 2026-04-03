@@ -5,8 +5,7 @@ html {
 }
 
 body {
-  font-family: 'Inter var', 'Inter', sans-serif;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  font-family: var(--font-sans);
   margin: 0;
   padding: 0;
 }
@@ -41,7 +40,7 @@ h1 {
 
 h2 {
   font-size: clamp(1.5rem, 2.5vw, 2rem);
-  font-weight: 650;
+  font-weight: 600;
   line-height: 1.25;
   letter-spacing: -0.015em;
   margin-bottom: 1rem;
@@ -169,7 +168,7 @@ input {
   border-radius: 4px;
   border: 1px solid #000;
   color: #000;
-  font-family: 'Inter var', 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1rem;
   margin-bottom: 0.5rem;
   margin-top: 0.25rem;
