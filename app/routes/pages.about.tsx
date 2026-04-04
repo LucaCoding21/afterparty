@@ -11,7 +11,6 @@ export default function AboutPage() {
         <div className="about-title-block">
           <h1 className="about-heading">About</h1>
           <div className="about-section">
-            <div className="about-section-label">Brand Story</div>
             <div className="about-body">
               <p>Established in early 2025 and based in Saigon, afterparty has built a following by crafting pieces that speak to the rhythm of nights out, shared stories and music, and the mood that lingers after.</p>
               <p>Designed for those who identify with Vietnam's evolving subcultural scenes, afterparty draws from underground music, art collectives, and creative communities that value authenticity and individuality.</p>

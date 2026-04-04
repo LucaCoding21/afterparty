@@ -2119,6 +2119,8 @@ aside main {
 .product-size-guide-svg text {
   fill: #000 !important;
   font-size: 0.75rem !important;
+  dominant-baseline: central;
+  transform: translateY(2px);
 }
 
 .product-size-guide-svg path[fill="white"] {
@@ -2447,7 +2449,7 @@ body.mobile-menu-open .sticky-add-to-cart {
 }
 
 .lookbook-page-header {
-  margin-bottom: 3.5rem;
+  margin-bottom: 2.5rem;
 }
 
 .lookbook-page-label {
@@ -2470,7 +2472,11 @@ body.mobile-menu-open .sticky-add-to-cart {
   margin-bottom: 2rem;
   max-width: 85%;
   @media (max-width: 48em) {
-    gap: 0.4rem 0.8rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.15rem 0;
+    max-width: 100%;
+    margin-bottom: 1.25rem;
   }
 }
 
@@ -2491,7 +2497,9 @@ body.mobile-menu-open .sticky-add-to-cart {
   text-decoration-thickness: 1px;
   transition: color 0.15s, text-decoration-color 0.15s;
   @media (max-width: 48em) {
-    font-size: 0.8rem;
+    font-size: 12px;
+    text-align: left;
+    padding: 0.5rem 0;
   }
 }
 

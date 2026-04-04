@@ -165,10 +165,12 @@ function RecentlyViewed({items}: {items: StaticProduct[]}) {
 }
 
 function Breadcrumb({handle}: {handle: string}) {
+  const [searchParams] = useSearchParams();
+  const from = searchParams.get('from');
   const product = STATIC_PRODUCTS_MAP[handle];
   const category = product?.category;
-  const backLink = category ? `/collections/${category}` : '/collections/all';
-  const backLabel = category ? CATEGORY_LABELS[category] || category : 'Shop All';
+  const backLink = from === 'all' ? '/collections/all' : category ? `/collections/${category}` : '/collections/all';
+  const backLabel = from === 'all' ? 'Shop All' : category ? CATEGORY_LABELS[category] || category : 'Shop All';
 
   return (
     <nav className="product-breadcrumb" aria-label="Breadcrumb">
@@ -185,12 +187,16 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 function ProductNav({currentHandle}: {currentHandle: string}) {
+  const [searchParams] = useSearchParams();
+  const from = searchParams.get('from');
   const currentProduct = STATIC_PRODUCTS_MAP[currentHandle];
   const category = currentProduct?.category;
 
-  const categoryProducts = category
-    ? STATIC_PRODUCTS.filter((p) => p.category === category)
-    : STATIC_PRODUCTS;
+  const categoryProducts = from === 'all'
+    ? STATIC_PRODUCTS
+    : category
+      ? STATIC_PRODUCTS.filter((p) => p.category === category)
+      : STATIC_PRODUCTS;
 
   const currentIndex = categoryProducts.findIndex((p) => p.handle === currentHandle);
   const nextProduct =
@@ -198,18 +204,22 @@ function ProductNav({currentHandle}: {currentHandle: string}) {
       ? categoryProducts[(currentIndex + 1) % categoryProducts.length]
       : null;
 
-  const backLink = category
-    ? `/collections/${category}`
-    : '/collections/all';
-  const backLabel = category
-    ? `Back to ${CATEGORY_LABELS[category] || category}`
-    : 'Back to All';
+  const backLink = from === 'all'
+    ? '/collections/all'
+    : category
+      ? `/collections/${category}`
+      : '/collections/all';
+  const backLabel = from === 'all'
+    ? 'Back to All'
+    : category
+      ? `Back to ${CATEGORY_LABELS[category] || category}`
+      : 'Back to All';
 
   return (
     <nav className="product-nav" aria-label="Product navigation">
       <Link to={backLink} className="product-nav-btn">{backLabel}</Link>
       {nextProduct && (
-        <Link to={`/products/${nextProduct.handle}`} className="product-nav-btn">Next Product</Link>
+        <Link to={`/products/${nextProduct.handle}${from === 'all' ? '?from=all' : ''}`} className="product-nav-btn">Next Product</Link>
       )}
     </nav>
   );

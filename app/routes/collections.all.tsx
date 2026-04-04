@@ -48,7 +48,7 @@ export default function ShopAll() {
             key={product.id}
             className="product-item"
             prefetch="intent"
-            to={`/products/${product.handle}`}
+            to={`/products/${product.handle}?from=all`}
             data-handle={product.handle}
           >
             <div className="product-item-img">
@@ -74,8 +74,8 @@ export default function ShopAll() {
             prefetch="intent"
             to={
               item.colorKey
-                ? `/products/${item.parentHandle}?color=${item.colorKey}`
-                : `/products/${item.parentHandle}`
+                ? `/products/${item.parentHandle}?color=${item.colorKey}&from=all`
+                : `/products/${item.parentHandle}?from=all`
             }
             data-handle={item.parentHandle}
           >
