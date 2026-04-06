@@ -164,7 +164,6 @@ const SECTION_OFFSETS = LOOKBOOK_SECTIONS.map((_, i) =>
 export default function Lookbook() {
   const [activeTab, setActiveTab] = useState(0);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
   const section = LOOKBOOK_SECTIONS[activeTab];
   const sectionOffset = SECTION_OFFSETS[activeTab];
 
@@ -196,16 +195,18 @@ export default function Lookbook() {
           <span className="lookbook-page-label">Lookbook</span>
         </div>
 
-        <div className="lookbook-tabs">
-          {LOOKBOOK_SECTIONS.map((s, i) => (
-            <button
-              key={s.title}
-              className={`lookbook-tab${activeTab === i ? ' active' : ''}`}
-              onClick={() => setActiveTab(i)}
-            >
-              {s.title}
-            </button>
-          ))}
+        <div className="lookbook-tabs-wrap">
+          <div className="lookbook-tabs">
+            {LOOKBOOK_SECTIONS.map((s, i) => (
+              <button
+                key={s.title}
+                className={`lookbook-tab${activeTab === i ? ' active' : ''}`}
+                onClick={() => setActiveTab(i)}
+              >
+                {s.title}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="lookbook-section-grid">

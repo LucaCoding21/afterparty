@@ -2465,6 +2465,28 @@ body.mobile-menu-open .sticky-add-to-cart {
   }
 }
 
+.lookbook-tabs-wrap {
+  position: relative;
+}
+
+.lookbook-tabs-wrap::after {
+  display: none;
+}
+
+@media (max-width: 48em) {
+  .lookbook-tabs-wrap::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 2.5rem;
+    background: linear-gradient(to right, transparent, #fff);
+    pointer-events: none;
+  }
+}
+
 .lookbook-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -2472,11 +2494,19 @@ body.mobile-menu-open .sticky-add-to-cart {
   margin-bottom: 2rem;
   max-width: 85%;
   @media (max-width: 48em) {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.15rem 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 0 1rem;
     max-width: 100%;
     margin-bottom: 1.25rem;
+    scrollbar-width: none;
+    padding-right: 2rem;
+  }
+  @media (max-width: 48em) {
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
@@ -2500,6 +2530,8 @@ body.mobile-menu-open .sticky-add-to-cart {
     font-size: 12px;
     text-align: left;
     padding: 0.5rem 0;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 }
 
@@ -2832,13 +2864,9 @@ body.mobile-menu-open .sticky-add-to-cart {
 }
 
 .locations-stockists-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 3rem 2.5rem;
-  @media (max-width: 48em) {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 .locations-city-block {
