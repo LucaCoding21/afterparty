@@ -35,18 +35,21 @@ export async function loader({request, context}: Route.LoaderArgs) {
 
   // Fallback: search static products when Shopify returns no results
   let staticResults: CollectionItem[] = [];
+  let isFuzzy = false;
   if (searchResult.term && searchResult.type === 'regular' && !searchResult.result?.total) {
-    staticResults = searchStaticProducts(searchResult.term);
+    const staticSearch = searchStaticProducts(searchResult.term);
+    staticResults = staticSearch.results;
+    isFuzzy = staticSearch.isFuzzy;
   }
 
-  return {...searchResult, staticResults};
+  return {...searchResult, staticResults, isFuzzy};
 }
 
 /**
  * Renders the /search route
  */
 export default function SearchPage() {
-  const {type, term, result, error, staticResults} = useLoaderData<typeof loader>();
+  const {type, term, result, error, staticResults, isFuzzy} = useLoaderData<typeof loader>();
   if (type === 'predictive') return null;
 
   const hasShopifyResults = !!(result?.total);
@@ -54,7 +57,10 @@ export default function SearchPage() {
 
   return (
     <div className="search-page">
-      <div className="search-page-header">
+      <div className="search-page-header" onClick={(e) => {
+        const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>('.search-page-input');
+        if (input) input.focus();
+      }} style={{cursor: 'text'}}>
         <h1 className="search-page-title">Search</h1>
         <SearchForm>
           {({inputRef}) => (
@@ -90,8 +96,6 @@ export default function SearchPage() {
           {({articles, pages, products, term}) => (
             <div>
               <SearchResults.Products products={products} term={term} />
-              <SearchResults.Pages pages={pages} term={term} />
-              <SearchResults.Articles articles={articles} term={term} />
             </div>
           )}
         </SearchResults>
@@ -100,7 +104,10 @@ export default function SearchPage() {
       {term && !hasShopifyResults && hasStaticResults && (
         <>
           <p className="search-page-meta">
-            Showing results for "{term}"
+            {isFuzzy
+              ? <>SHOWING SIMILAR RESULTS FOR &ldquo;{term.toUpperCase()}&rdquo;</>
+              : <>SHOWING RESULTS FOR &ldquo;{term.toUpperCase()}&rdquo;</>
+            }
           </p>
           <div className="products-grid">
             {(staticResults as CollectionItem[]).map((item) => (

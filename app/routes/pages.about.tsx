@@ -9,7 +9,7 @@ export default function AboutPage() {
     <div className="about-layout">
       <div className="about-left">
         <div className="about-title-block">
-          <h1 className="about-heading">About</h1>
+          <h1 className="about-heading">About Us</h1>
           <div className="about-section">
             <div className="about-body">
               <p>Established in early 2025 and based in Saigon, afterparty has built a following by crafting pieces that speak to the rhythm of nights out, shared stories and music, and the mood that lingers after.</p>

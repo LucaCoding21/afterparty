@@ -94,9 +94,9 @@ function CartEmpty({
   return (
     <div className="cart-empty">
       <p className="cart-empty-msg">Your cart is empty.</p>
-      <Link to="/collections/all" onClick={close} prefetch="viewport" className="cart-empty-link">
-        Shop All →
-      </Link>
+      <button onClick={close} className="cart-empty-link">
+        Continue Shopping
+      </button>
     </div>
   );
 }

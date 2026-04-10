@@ -210,16 +210,16 @@ function ProductNav({currentHandle}: {currentHandle: string}) {
       ? `/collections/${category}`
       : '/collections/all';
   const backLabel = from === 'all'
-    ? 'Back to All'
+    ? 'Shop All'
     : category
-      ? `Back to ${CATEGORY_LABELS[category] || category}`
-      : 'Back to All';
+      ? CATEGORY_LABELS[category] || category
+      : 'Shop All';
 
   return (
     <nav className="product-nav" aria-label="Product navigation">
-      <Link to={backLink} className="product-nav-btn">{backLabel}</Link>
+      <Link to={backLink} className="product-nav-btn"><span className="nav-arrow">&lsaquo;</span> {backLabel}</Link>
       {nextProduct && (
-        <Link to={`/products/${nextProduct.handle}${from === 'all' ? '?from=all' : ''}`} className="product-nav-btn">Next Product</Link>
+        <Link to={`/products/${nextProduct.handle}${from === 'all' ? '?from=all' : ''}`} className="product-nav-btn">Next Product <span className="nav-arrow">&rsaquo;</span></Link>
       )}
     </nav>
   );
@@ -370,7 +370,7 @@ function ImageCarousel({images, alt}: {images: string[]; alt: string}) {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="product-image product-image-zoomable" onClick={() => setZoomed(true)}>
+        <div className={`product-image product-image-zoomable${index > 0 ? ' product-image-model' : ''}`} onClick={() => setZoomed(true)}>
           <img src={images[index]} alt={alt} key={images[index]} />
         </div>
         {images.length > 1 && (

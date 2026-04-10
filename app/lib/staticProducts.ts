@@ -323,7 +323,7 @@ function levenshtein(a: string, b: string): number {
   return dp[m][n];
 }
 
-export function searchStaticProducts(term: string): CollectionItem[] {
+export function searchStaticProducts(term: string): {results: CollectionItem[]; isFuzzy: boolean} {
   const q = term.toLowerCase();
 
   // Exact match first
@@ -332,9 +332,10 @@ export function searchStaticProducts(term: string): CollectionItem[] {
     return searchable.includes(q);
   });
 
-  const matches = exact.length > 0 ? exact : fuzzyMatchProducts(q);
+  const isFuzzy = exact.length === 0;
+  const matches = isFuzzy ? fuzzyMatchProducts(q) : exact;
 
-  return matches.flatMap((product) =>
+  const results = matches.flatMap((product) =>
     product.colors.map((color) => ({
       id: `${product.handle}-${color.key}`,
       parentHandle: product.handle,
@@ -345,6 +346,8 @@ export function searchStaticProducts(term: string): CollectionItem[] {
       soldOut: color.soldOut ?? product.soldOut,
     })),
   );
+
+  return {results, isFuzzy};
 }
 
 function fuzzyMatchProducts(q: string): StaticProduct[] {
@@ -356,11 +359,14 @@ function fuzzyMatchProducts(q: string): StaticProduct[] {
 
   let bestWord = '';
   let bestDist = Infinity;
+  let bestLenDiff = Infinity;
   for (const word of allWords) {
     const d = levenshtein(q, word);
-    if (d < bestDist && d <= Math.max(2, Math.floor(q.length / 2))) {
+    const lenDiff = Math.abs(q.length - word.length);
+    if (d <= Math.max(2, Math.ceil(q.length / 2)) && (d < bestDist || (d === bestDist && lenDiff < bestLenDiff))) {
       bestDist = d;
       bestWord = word;
+      bestLenDiff = lenDiff;
     }
   }
 

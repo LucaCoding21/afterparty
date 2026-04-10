@@ -66,11 +66,14 @@ export function Header({
 
     let bestWord = '';
     let bestDist = Infinity;
+    let bestLenDiff = Infinity;
     for (const word of allWords) {
       const d = levenshtein(q, word);
-      if (d < bestDist && d <= Math.max(2, Math.floor(q.length / 2))) {
+      const lenDiff = Math.abs(q.length - word.length);
+      if (d <= Math.max(2, Math.ceil(q.length / 2)) && (d < bestDist || (d === bestDist && lenDiff < bestLenDiff))) {
         bestDist = d;
         bestWord = word;
+        bestLenDiff = lenDiff;
       }
     }
 
@@ -249,7 +252,7 @@ export function Header({
                 <>
                   {mobileSearchResults.suggestion && (
                     <div className="mobile-search-suggestion">
-                      Did you mean &ldquo;{mobileSearchResults.suggestion}&rdquo;?
+                      SHOWING SIMILAR RESULTS FOR &ldquo;{mobileSearchQuery.toUpperCase()}&rdquo;
                     </div>
                   )}
                   {mobileSearchResults.products.map((product) => (
@@ -332,17 +335,17 @@ export function Header({
             {/* Discover */}
             <div className="mobile-menu-section">
               <p className="mobile-menu-section-label">Discover</p>
-              <NavLink to="/pages/support" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
-                Support
+              <NavLink to="/pages/about" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
+                About Us
               </NavLink>
               <NavLink to="/blogs" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
                 Lookbook
               </NavLink>
-              <NavLink to="/pages/about" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
-                About Us
-              </NavLink>
               <NavLink to="/pages/stockists" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
                 Locations
+              </NavLink>
+              <NavLink to="/pages/support" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
+                Support
               </NavLink>
             </div>
           </div>
@@ -385,14 +388,45 @@ function HeaderSearch() {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const results = useMemo(() => {
-    if (!query.trim()) return [];
+  const {results, suggestion} = useMemo(() => {
+    if (!query.trim()) return {results: [] as typeof STATIC_PRODUCTS, suggestion: ''};
     const q = query.toLowerCase();
-    return STATIC_PRODUCTS.filter(
+    const exact = STATIC_PRODUCTS.filter(
       (p) =>
         p.title.toLowerCase().includes(q) ||
+        p.handle.toLowerCase().includes(q) ||
         p.category.replace(/-/g, ' ').toLowerCase().includes(q),
     ).slice(0, 6);
+    if (exact.length > 0) return {results: exact, suggestion: ''};
+
+    // Fuzzy fallback
+    const allWords = new Set<string>();
+    STATIC_PRODUCTS.forEach((p) => {
+      p.title.toLowerCase().split(/\s+/).forEach((w) => allWords.add(w));
+      p.category.replace(/-/g, ' ').split(/\s+/).forEach((w) => allWords.add(w));
+    });
+    let bestWord = '';
+    let bestDist = Infinity;
+    let bestLenDiff = Infinity;
+    for (const word of allWords) {
+      const d = levenshtein(q, word);
+      const lenDiff = Math.abs(q.length - word.length);
+      if (d <= Math.max(2, Math.ceil(q.length / 2)) && (d < bestDist || (d === bestDist && lenDiff < bestLenDiff))) {
+        bestDist = d;
+        bestWord = word;
+        bestLenDiff = lenDiff;
+      }
+    }
+    if (bestWord) {
+      const fuzzy = STATIC_PRODUCTS.filter(
+        (p) =>
+          p.title.toLowerCase().includes(bestWord) ||
+          p.handle.toLowerCase().includes(bestWord) ||
+          p.category.replace(/-/g, ' ').toLowerCase().includes(bestWord),
+      ).slice(0, 6);
+      if (fuzzy.length > 0) return {results: fuzzy, suggestion: bestWord};
+    }
+    return {results: [] as typeof STATIC_PRODUCTS, suggestion: ''};
   }, [query]);
 
   const showDropdown = open && query.trim().length > 0;
@@ -498,6 +532,11 @@ function HeaderSearch() {
         <div className="header-search-dropdown" role="listbox">
           {results.length > 0 ? (
             <>
+              {suggestion && (
+                <div className="header-search-similar-label">
+                  SHOWING SIMILAR RESULTS FOR &ldquo;{query.toUpperCase()}&rdquo;
+                </div>
+              )}
               {results.map((product, i) => (
                 <a
                   key={product.handle}
