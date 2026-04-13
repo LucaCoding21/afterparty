@@ -2269,6 +2269,10 @@ aside main {
   }
 }
 
+.product-price div {
+  display: inline;
+}
+
 .product-price-on-sale {
   display: flex;
   gap: 0.5rem;
@@ -2362,6 +2366,11 @@ aside main {
   }
 }
 
+.product-form form {
+  margin: 0;
+  padding: 0;
+}
+
 .product-size-guide + .product-form {
   border-top: none;
 }
@@ -2415,6 +2424,11 @@ aside main {
 
 body.mobile-menu-open .sticky-add-to-cart {
   display: none !important;
+}
+
+.sticky-add-to-cart form {
+  margin: 0;
+  padding: 0;
 }
 
 .sticky-add-to-cart button {

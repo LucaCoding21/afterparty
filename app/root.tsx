@@ -110,17 +110,27 @@ export async function loader(args: Route.LoaderArgs) {
 async function loadCriticalData({context}: Route.LoaderArgs) {
   const {storefront} = context;
 
-  const [header] = await Promise.all([
+  const [header, {products}] = await Promise.all([
     storefront.query(HEADER_QUERY, {
       cache: storefront.CacheLong(),
       variables: {
-        headerMenuHandle: 'main-menu', // Adjust to your header menu handle
+        headerMenuHandle: 'main-menu',
       },
     }),
-    // Add other queries here, so that they are loaded in parallel
+    storefront.query(SEARCH_CATALOG_QUERY, {
+      cache: storefront.CacheLong(),
+    }),
   ]);
 
-  return {header};
+  // Lightweight product index for instant client-side search
+  const searchCatalog = products.nodes.map((p: any) => ({
+    handle: p.handle,
+    title: p.title,
+    image: p.variants?.nodes?.[0]?.image?.url || p.featuredImage?.url || '',
+    price: p.variants?.nodes?.[0]?.price,
+  }));
+
+  return {header, searchCatalog};
 }
 
 /**
@@ -219,3 +229,21 @@ export function ErrorBoundary() {
     </div>
   );
 }
+
+const SEARCH_CATALOG_QUERY = `#graphql
+  query SearchCatalog {
+    products(first: 50) {
+      nodes {
+        handle
+        title
+        featuredImage { url }
+        variants(first: 1) {
+          nodes {
+            image { url }
+            price { amount currencyCode }
+          }
+        }
+      }
+    }
+  }
+` as const;

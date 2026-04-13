@@ -1,6 +1,7 @@
 import {Link} from 'react-router';
-import {Image, Money, Pagination} from '@shopify/hydrogen';
+import {Money, Pagination} from '@shopify/hydrogen';
 import {urlWithTrackingParams, type RegularSearchReturn} from '~/lib/search';
+import {flattenToColorVariants} from '~/lib/collections';
 
 type SearchItems = RegularSearchReturn['result']['items'];
 type PartialSearchResult<ItemType extends keyof SearchItems> = Pick<
@@ -103,38 +104,41 @@ function SearchResultsProducts({
 
   return (
     <Pagination connection={products}>
-      {({nodes, isLoading, NextLink, PreviousLink}) => (
-        <div>
-          <div className="search-results-grid">
-            {nodes.map((product) => {
-              const productUrl = urlWithTrackingParams({
-                baseUrl: `/products/${product.handle}`,
-                trackingParams: product.trackingParameters,
-                term,
-              });
-              const price = product?.selectedOrFirstAvailableVariant?.price;
-              const image = product?.selectedOrFirstAvailableVariant?.image;
-              return (
-                <Link key={product.id} prefetch="intent" to={productUrl} className="product-item">
-                  <div className="product-item-img">
-                    {image && <Image data={image} alt={product.title} />}
-                  </div>
-                  <h4>{product.title}</h4>
-                  <small>{price && <Money data={price} />}</small>
-                </Link>
-              );
-            })}
+      {({nodes, isLoading, NextLink, PreviousLink}) => {
+        const items = flattenToColorVariants(nodes);
+        return (
+          <div>
+            <div className="search-results-grid">
+              {items.map((item) => {
+                const productUrl = urlWithTrackingParams({
+                  baseUrl: `/products/${item.handle}`,
+                  trackingParams: item.trackingParameters,
+                  term,
+                }) + (item.colorName ? `&Color=${encodeURIComponent(item.colorName)}` : '');
+                return (
+                  <Link key={item.id} prefetch="intent" to={productUrl} className="product-item">
+                    <div className="product-item-img">
+                      {item.image && <img src={item.image} alt={item.title} />}
+                    </div>
+                    <h4>{item.title}</h4>
+                    <small>
+                      {!item.availableForSale ? 'SOLD OUT' : item.price ? <Money data={item.price} /> : ''}
+                    </small>
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="search-pagination">
+              <PreviousLink className="search-pagination-btn">
+                {isLoading ? 'Loading...' : 'Load previous'}
+              </PreviousLink>
+              <NextLink className="search-pagination-btn">
+                {isLoading ? 'Loading...' : 'Load more'}
+              </NextLink>
+            </div>
           </div>
-          <div className="search-pagination">
-            <PreviousLink className="search-pagination-btn">
-              {isLoading ? 'Loading...' : 'Load previous'}
-            </PreviousLink>
-            <NextLink className="search-pagination-btn">
-              {isLoading ? 'Loading...' : 'Load more'}
-            </NextLink>
-          </div>
-        </div>
-      )}
+        );
+      }}
     </Pagination>
   );
 }

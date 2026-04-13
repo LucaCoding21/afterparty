@@ -1,34 +1,49 @@
 import type {Route} from './+types/collections.all';
 import {Link, useLoaderData} from 'react-router';
-import {Image, Money} from '@shopify/hydrogen';
-import {COLLECTION_ITEMS} from '~/lib/staticProducts';
-
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'afterparty | Shop All'}];
-};
+import {Money} from '@shopify/hydrogen';
+import {flattenToColorVariants} from '~/lib/collections';
 
 export async function loader({context}: Route.LoaderArgs) {
   const {products} = await context.storefront.query(CATALOG_QUERY);
-  return {products: products.nodes};
+  return {items: flattenToColorVariants(products.nodes)};
 }
 
 const CATALOG_QUERY = `#graphql
   query Catalog {
-    products(first: 8) {
+    products(first: 50) {
       nodes {
         id
         handle
         title
+        availableForSale
         featuredImage {
           url
-          altText
-          width
-          height
+        }
+        options {
+          name
+          values
         }
         priceRange {
           minVariantPrice {
             amount
             currencyCode
+          }
+        }
+        variants(first: 50) {
+          nodes {
+            id
+            availableForSale
+            selectedOptions {
+              name
+              value
+            }
+            image {
+              url
+            }
+            price {
+              amount
+              currencyCode
+            }
           }
         }
       }
@@ -37,53 +52,39 @@ const CATALOG_QUERY = `#graphql
 ` as const;
 
 export default function ShopAll() {
-  const {products} = useLoaderData<typeof loader>();
+  const {items} = useLoaderData<typeof loader>();
 
   return (
     <div className="collection">
       <h1 className="collection-title">All Products</h1>
       <div className="products-grid">
-        {products.map((product, index) => (
-          <Link
-            key={product.id}
-            className="product-item"
-            prefetch="intent"
-            to={`/products/${product.handle}?from=all`}
-            data-handle={product.handle}
-          >
-            <div className="product-item-img">
-              {product.featuredImage && (
-                <Image
-                  alt={product.featuredImage.altText || product.title}
-                  data={product.featuredImage}
-                  loading={index < 4 ? 'eager' : undefined}
-                  sizes="(min-width: 45em) 400px, 100vw"
-                />
-              )}
-            </div>
-            <h4>{product.title}</h4>
-            <small>
-              <Money data={product.priceRange.minVariantPrice} />
-            </small>
-          </Link>
-        ))}
-        {COLLECTION_ITEMS.map((item) => (
+        {items.map((item, index) => (
           <Link
             key={item.id}
             className="product-item"
             prefetch="intent"
             to={
-              item.colorKey
-                ? `/products/${item.parentHandle}?color=${item.colorKey}&from=all`
-                : `/products/${item.parentHandle}?from=all`
+              item.colorName
+                ? `/products/${item.handle}?Color=${encodeURIComponent(item.colorName)}&from=all`
+                : `/products/${item.handle}?from=all`
             }
-            data-handle={item.parentHandle}
+            data-handle={item.handle}
           >
             <div className="product-item-img">
-              <img src={item.image} alt={item.displayTitle} loading="lazy" />
+              {item.image && (
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  loading={index < 4 ? 'eager' : 'lazy'}
+                />
+              )}
             </div>
-            <h4>{item.displayTitle}</h4>
-            <small>{item.soldOut ? 'SOLD OUT' : item.price}</small>
+            <h4>{item.title}</h4>
+            <small>
+              {!item.availableForSale ? 'SOLD OUT' : (
+                <Money data={item.price} />
+              )}
+            </small>
           </Link>
         ))}
       </div>

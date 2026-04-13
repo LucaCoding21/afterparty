@@ -12,7 +12,6 @@ import {
   getEmptyPredictiveSearchResult,
 } from '~/lib/search';
 import type {RegularSearchQuery, PredictiveSearchQuery} from 'storefrontapi.generated';
-import {searchStaticProducts, type CollectionItem} from '~/lib/staticProducts';
 
 export const meta: Route.MetaFunction = () => {
   return [{title: `afterparty | Search`}];
@@ -33,27 +32,17 @@ export async function loader({request, context}: Route.LoaderArgs) {
 
   const searchResult = await searchPromise;
 
-  // Fallback: search static products when Shopify returns no results
-  let staticResults: CollectionItem[] = [];
-  let isFuzzy = false;
-  if (searchResult.term && searchResult.type === 'regular' && !searchResult.result?.total) {
-    const staticSearch = searchStaticProducts(searchResult.term);
-    staticResults = staticSearch.results;
-    isFuzzy = staticSearch.isFuzzy;
-  }
-
-  return {...searchResult, staticResults, isFuzzy};
+  return {...searchResult};
 }
 
 /**
  * Renders the /search route
  */
 export default function SearchPage() {
-  const {type, term, result, error, staticResults, isFuzzy} = useLoaderData<typeof loader>();
+  const {type, term, result, error} = useLoaderData<typeof loader>();
   if (type === 'predictive') return null;
 
   const hasShopifyResults = !!(result?.total);
-  const hasStaticResults = !!(staticResults as CollectionItem[] | undefined)?.length;
 
   return (
     <div className="search-page">
@@ -87,7 +76,7 @@ export default function SearchPage() {
 
       {term && hasShopifyResults && (
         <p className="search-page-meta">
-          {`${result.total} result${result.total !== 1 ? 's' : ''} for "${term}"`}
+          SHOWING SIMILAR RESULTS FOR &ldquo;{term.toUpperCase()}&rdquo;
         </p>
       )}
 
@@ -101,38 +90,7 @@ export default function SearchPage() {
         </SearchResults>
       )}
 
-      {term && !hasShopifyResults && hasStaticResults && (
-        <>
-          <p className="search-page-meta">
-            {isFuzzy
-              ? <>SHOWING SIMILAR RESULTS FOR &ldquo;{term.toUpperCase()}&rdquo;</>
-              : <>SHOWING RESULTS FOR &ldquo;{term.toUpperCase()}&rdquo;</>
-            }
-          </p>
-          <div className="products-grid">
-            {(staticResults as CollectionItem[]).map((item) => (
-              <Link
-                key={item.id}
-                className="product-item"
-                prefetch="intent"
-                to={
-                  item.colorKey
-                    ? `/products/${item.parentHandle}?color=${item.colorKey}`
-                    : `/products/${item.parentHandle}`
-                }
-              >
-                <div className="product-item-img">
-                  <img src={item.image} alt={item.displayTitle} loading="lazy" />
-                </div>
-                <h4>{item.displayTitle}</h4>
-                <small>{item.soldOut ? 'SOLD OUT' : item.price}</small>
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
-
-      {term && !hasShopifyResults && !hasStaticResults && (
+      {term && !hasShopifyResults && (
         <p className="search-page-meta">No results for "{term}"</p>
       )}
 
@@ -154,6 +112,28 @@ const SEARCH_PRODUCT_FRAGMENT = `#graphql
     title
     trackingParameters
     vendor
+    availableForSale
+    options {
+      name
+      values
+    }
+    variants(first: 50) {
+      nodes {
+        id
+        availableForSale
+        selectedOptions {
+          name
+          value
+        }
+        image {
+          url
+        }
+        price {
+          amount
+          currencyCode
+        }
+      }
+    }
     selectedOrFirstAvailableVariant(
       selectedOptions: []
       ignoreUnknownOptions: true

@@ -2,7 +2,7 @@ import {useState, useEffect, useRef} from 'react';
 import {
   useLoaderData,
   Link,
-  useSearchParams,
+  useNavigate,
 } from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {
@@ -12,27 +12,97 @@ import {
   getProductOptions,
   getAdjacentAndFirstAvailableVariants,
   useSelectedOptionInUrlParam,
+  Money,
 } from '@shopify/hydrogen';
-import {ProductPrice} from '~/components/ProductPrice';
-import {ProductImage} from '~/components/ProductImage';
-import {ProductForm} from '~/components/ProductForm';
+import {AddToCartButton} from '~/components/AddToCartButton';
+import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import {
-  STATIC_PRODUCTS,
-  STATIC_PRODUCTS_MAP,
-  type StaticProduct,
-  type ColorVariant,
-} from '~/lib/staticProducts';
+
+// Maps both static and Shopify handles to size guide assets
+const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = {
+  'bubble-letter-ringer-tee': {
+    sizeGuide: '/products/size-guides/bubble-letter-ringer-tee.svg',
+    sizePhoto: '/products/measurements/Ringer%20Short%20Sleeve%20Tee%20Chart%201.png',
+  },
+  'leopard-flared-pants': {
+    sizeGuide: '/products/size-guides/leopard-flared-pants.svg',
+    sizePhoto: '/products/measurements/Leopard%20Flared%20Pants%20Chart%201.png',
+  },
+  'leopard-jacket': {
+    sizeGuide: '/products/size-guides/leopard-jacket.svg',
+    sizePhoto: '/products/measurements/Leopard%20Work%20Jacket%20Chart%201.png',
+  },
+  'leopard-work-jacket': {
+    sizeGuide: '/products/size-guides/leopard-jacket.svg',
+    sizePhoto: '/products/measurements/Leopard%20Work%20Jacket%20Chart%201.png',
+  },
+  'leopard-shorts': {
+    sizeGuide: '/products/size-guides/leopard-shorts.svg',
+    sizePhoto: '/products/measurements/Leopard%20Short%20Pants%20Charts%201.png',
+  },
+  'nhim-long-sleeve-tees': {
+    sizeGuide: '/products/size-guides/nhim-long-sleeve-tees.svg',
+    sizePhoto: '/products/measurements/2026-nhim-long-sleeve-tee-chart-1.png',
+  },
+  'nhim-long-sleeve-tee': {
+    sizeGuide: '/products/size-guides/nhim-long-sleeve-tees.svg',
+    sizePhoto: '/products/measurements/2026-nhim-long-sleeve-tee-chart-1.png',
+  },
+  'dog-failure-tee': {
+    sizeGuide: '/products/size-guides/dog-failure-tee.svg',
+  },
+  'dog-screw-hoodie': {
+    sizeGuide: '/products/size-guides/dog-screw-hoodie.svg',
+    sizePhoto: '/products/measurements/Hoodie%20Size%20Chart%201.png',
+  },
+  'dragon-jersey': {
+    sizeGuide: '/products/size-guides/dragon-jersey.svg',
+    sizePhoto: '/products/measurements/Jersey%20Size%20Chart%201.png',
+  },
+  'hater-baby-tee': {
+    sizeGuide: '/products/size-guides/hater-baby-tee.svg',
+    sizePhoto: '/products/measurements/2025%20Hater%20Baby%20Tee%20Size%20Chart%201.png',
+  },
+  'worlds-biggest-hater-baby-tee': {
+    sizeGuide: '/products/size-guides/hater-baby-tee.svg',
+    sizePhoto: '/products/measurements/2025%20Hater%20Baby%20Tee%20Size%20Chart%201.png',
+  },
+  'hater-tee': {
+    sizeGuide: '/products/size-guides/hater-tee.svg',
+    sizePhoto: '/products/measurements/2025%20Hater%20Oversized%20Short%20Sleeve%20Boxy%20Tee%20Chart%201.png',
+  },
+  'world-biggest-hater-oversized-tee': {
+    sizeGuide: '/products/size-guides/hater-tee.svg',
+    sizePhoto: '/products/measurements/2025%20Hater%20Oversized%20Short%20Sleeve%20Boxy%20Tee%20Chart%201.png',
+  },
+  'horse-trucker-hat': {
+    sizeGuide: '/products/size-guides/horse-trucker-hat.svg',
+  },
+  'nhim-tees': {
+    sizeGuide: '/products/size-guides/nhim-tees.svg',
+    sizePhoto: '/products/measurements/2026-nhim-short-sleeve-tee-chart-1.png',
+  },
+  'nhim-short-sleeve-tee': {
+    sizeGuide: '/products/size-guides/nhim-tees.svg',
+    sizePhoto: '/products/measurements/2026-nhim-short-sleeve-tee-chart-1.png',
+  },
+  'velour-track-jacket': {
+    sizeGuide: '/products/size-guides/leopard-jacket.svg',
+    sizePhoto: '/products/measurements/Velour%20Track%20Jacket%20Chart%201.png',
+  },
+  'velour-track-pants': {
+    sizeGuide: '/products/size-guides/leopard-flared-pants.svg',
+    sizePhoto: '/products/measurements/Velour%20Track%20Pants%20Chart%201.png',
+  },
+};
 
 export const meta: Route.MetaFunction = ({data}) => {
-  const title = data?.staticProduct
-    ? data.staticProduct.title
-    : data?.product?.title ?? '';
+  const title = data?.product?.title ?? '';
   return [
     {title: `afterparty | ${title}`},
     {
       rel: 'canonical',
-      href: `/products/${data?.staticProduct?.handle ?? data?.product?.handle}`,
+      href: `/products/${data?.product?.handle}`,
     },
   ];
 };
@@ -61,27 +131,14 @@ async function loadCriticalData({
     }),
   ]);
 
-  if (product?.id) {
-    redirectIfHandleIsLocalized(request, {handle, data: product});
-    return {product, staticProduct: null};
+  if (!product?.id) {
+    throw new Response(null, {status: 404});
   }
 
-  // Fall back to static product catalog
-  const staticProduct = STATIC_PRODUCTS_MAP[handle] ?? null;
-  if (staticProduct) {
-    let sizeGuideSvg: string | null = null;
-    if (staticProduct.sizeGuide) {
-      try {
-        const {readFileSync} = await import('node:fs');
-        const {join} = await import('node:path');
-        const svgPath = join(process.cwd(), 'public', staticProduct.sizeGuide);
-        sizeGuideSvg = readFileSync(svgPath, 'utf-8');
-      } catch {}
-    }
-    return {product: null, staticProduct, sizeGuideSvg};
-  }
+  redirectIfHandleIsLocalized(request, {handle, data: product});
 
-  throw new Response(null, {status: 404});
+  const sizeGuideInfo = SIZE_GUIDE_MAP[handle] ?? null;
+  return {product, sizeGuideInfo};
 }
 
 function loadDeferredData({context, params}: Route.LoaderArgs) {
@@ -91,141 +148,26 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
 export default function Product() {
   const data = useLoaderData<typeof loader>();
 
-  if (data.staticProduct) {
-    return <StaticProductPage product={data.staticProduct} sizeGuideSvg={(data as any).sizeGuideSvg ?? null} />;
-  }
-
-  return <DynamicProductPage product={data.product!} />;
-}
-
-function useRecentlyViewed(currentHandle: string) {
-  const [items, setItems] = useState<StaticProduct[]>([]);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('ap-recently-viewed');
-    const handles: string[] = stored ? JSON.parse(stored) : [];
-    const updated = [currentHandle, ...handles.filter((h) => h !== currentHandle)].slice(0, 10);
-    localStorage.setItem('ap-recently-viewed', JSON.stringify(updated));
-    const products = updated
-      .filter((h) => h !== currentHandle)
-      .map((h) => STATIC_PRODUCTS_MAP[h])
-      .filter(Boolean) as StaticProduct[];
-    setItems(products);
-  }, [currentHandle]);
-
-  return items;
-}
-
-function ProductCard({product}: {product: StaticProduct}) {
-  const firstColor = product.colors[0];
+  const sizeGuideInfo = (data as {sizeGuideInfo?: {sizeGuide: string; sizePhoto?: string}}).sizeGuideInfo ?? null;
   return (
-    <Link
-      to={`/products/${product.handle}`}
-      className="product-item"
-      prefetch="intent"
-      data-handle={product.handle}
-    >
-      <div className="product-item-img">
-        <img src={firstColor.image} alt={product.title} loading="lazy" />
-      </div>
-      <h4>{product.title}</h4>
-      <small>{product.soldOut || product.colors.every((c) => c.soldOut) ? 'SOLD OUT' : product.price}</small>
-    </Link>
+    <DynamicProductPage
+      product={data.product!}
+      sizeGuideInfo={sizeGuideInfo}
+    />
   );
 }
 
-function ShopOthers({currentHandle, excludeHandles = []}: {currentHandle: string; excludeHandles?: string[]}) {
-  const excluded = new Set([currentHandle, ...excludeHandles]);
-  const others = STATIC_PRODUCTS.filter((p) => !excluded.has(p.handle)).slice(0, 4);
-  if (others.length === 0) return null;
-  return (
-    <section className="product-related-section">
-      <h2 className="product-related-heading">Shop Others</h2>
-      <div className="product-related-grid">
-        {others.map((p) => (
-          <ProductCard key={p.handle} product={p} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function RecentlyViewed({items}: {items: StaticProduct[]}) {
-  if (items.length === 0) return null;
-  return (
-    <section className="product-related-section">
-      <h2 className="product-related-heading">Recently Viewed</h2>
-      <div className="product-related-grid">
-        {items.map((p) => (
-          <ProductCard key={p.handle} product={p} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function Breadcrumb({handle}: {handle: string}) {
-  const [searchParams] = useSearchParams();
-  const from = searchParams.get('from');
-  const product = STATIC_PRODUCTS_MAP[handle];
-  const category = product?.category;
-  const backLink = from === 'all' ? '/collections/all' : category ? `/collections/${category}` : '/collections/all';
-  const backLabel = from === 'all' ? 'Shop All' : category ? CATEGORY_LABELS[category] || category : 'Shop All';
-
+function Breadcrumb() {
   return (
     <nav className="product-breadcrumb" aria-label="Breadcrumb">
-      <Link to={backLink} className="breadcrumb-link"><span className="breadcrumb-arrow">&lsaquo;</span> <span className="breadcrumb-text">{backLabel}</span></Link>
+      <Link to="/collections/all" className="breadcrumb-link"><span className="breadcrumb-arrow">&lsaquo;</span> <span className="breadcrumb-text">Shop All</span></Link>
     </nav>
   );
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  'tops-shirts': 'Tops & Shirts',
-  outerwear: 'Outerwear',
-  pants: 'Pants',
-  accessories: 'Accessories',
-};
-
-function ProductNav({currentHandle}: {currentHandle: string}) {
-  const [searchParams] = useSearchParams();
-  const from = searchParams.get('from');
-  const currentProduct = STATIC_PRODUCTS_MAP[currentHandle];
-  const category = currentProduct?.category;
-
-  const categoryProducts = from === 'all'
-    ? STATIC_PRODUCTS
-    : category
-      ? STATIC_PRODUCTS.filter((p) => p.category === category)
-      : STATIC_PRODUCTS;
-
-  const currentIndex = categoryProducts.findIndex((p) => p.handle === currentHandle);
-  const nextProduct =
-    currentIndex >= 0
-      ? categoryProducts[(currentIndex + 1) % categoryProducts.length]
-      : null;
-
-  const backLink = from === 'all'
-    ? '/collections/all'
-    : category
-      ? `/collections/${category}`
-      : '/collections/all';
-  const backLabel = from === 'all'
-    ? 'Shop All'
-    : category
-      ? CATEGORY_LABELS[category] || category
-      : 'Shop All';
-
-  return (
-    <nav className="product-nav" aria-label="Product navigation">
-      <Link to={backLink} className="product-nav-btn"><span className="nav-arrow">&lsaquo;</span> {backLabel}</Link>
-      {nextProduct && (
-        <Link to={`/products/${nextProduct.handle}${from === 'all' ? '?from=all' : ''}`} className="product-nav-btn">Next Product <span className="nav-arrow">&rsaquo;</span></Link>
-      )}
-    </nav>
-  );
-}
-
-function DynamicProductPage({product}: {product: NonNullable<any>}) {
+function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>; sizeGuideInfo?: {sizeGuide: string; sizePhoto?: string} | null}) {
+  const navigate = useNavigate();
+  const {open} = useAside();
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
     getAdjacentAndFirstAvailableVariants(product),
@@ -239,36 +181,240 @@ function DynamicProductPage({product}: {product: NonNullable<any>}) {
   });
 
   const {title, descriptionHtml} = product;
-  const recentlyViewedItems = useRecentlyViewed(product.handle);
-  const recentlyViewedHandles = recentlyViewedItems.map((p) => p.handle);
+  const {formRef, showSticky} = useStickyAddToCart();
+  const isSoldOut = !selectedVariant?.availableForSale;
+  const [sizeWarning, setSizeWarning] = useState(false);
+
+  // Build carousel images: variant flat-lay first, then matching lookbook photos
+  const images: string[] = [];
+  if (selectedVariant?.image?.url) {
+    images.push(selectedVariant.image.url);
+  }
+  // Add lookbook/extra product images that match the selected color (by alt text)
+  const selectedColorName = selectedVariant?.selectedOptions?.find(
+    (o: any) => o.name.toLowerCase() === 'color',
+  )?.value;
+  if (product.images?.nodes) {
+    const variantImageUrl = selectedVariant?.image?.url;
+    for (const img of product.images.nodes) {
+      if (img.url === variantImageUrl) continue; // skip the flat-lay already added
+      // Match by alt text containing the color name
+      if (selectedColorName && img.altText?.toLowerCase().includes(selectedColorName.toLowerCase())) {
+        images.push(img.url);
+      }
+    }
+  }
+
+  // Separate color and size options for custom rendering
+  const colorOption = productOptions.find(
+    (o) => o.name.toLowerCase() === 'color',
+  );
+  const sizeOption = productOptions.find(
+    (o) => o.name.toLowerCase() === 'size',
+  );
+  const otherOptions = productOptions.filter(
+    (o) => o.name.toLowerCase() !== 'color' && o.name.toLowerCase() !== 'size',
+  );
+
+  // Get selected size name from variant
+  const selectedSizeName = selectedVariant?.selectedOptions?.find(
+    (o: any) => o.name.toLowerCase() === 'size',
+  )?.value;
 
   return (
     <div className="product-page">
-      <Breadcrumb handle={product.handle} />
-      <ProductNav currentHandle={product.handle} />
+      <Breadcrumb />
 
       <div className="product">
-        <ProductImage image={selectedVariant?.image} />
+        <ImageCarousel
+          images={images.length > 0 ? images : ['']}
+          alt={`${title}${selectedColorName ? ` — ${selectedColorName}` : ''}`}
+        />
+
         <div className="product-main">
           <h1 className="product-title">{title}</h1>
           <div className="product-price-wrap">
-            <ProductPrice
-              price={selectedVariant?.price}
-              compareAtPrice={selectedVariant?.compareAtPrice}
-            />
+            <div className="product-price">
+              {isSoldOut ? 'SOLD OUT' : selectedVariant?.price ? (
+                <Money data={selectedVariant.price} />
+              ) : ''}
+            </div>
           </div>
-          <ProductForm
-            productOptions={productOptions}
-            selectedVariant={selectedVariant}
-          />
-          {descriptionHtml && (
-            <div className="product-description">
-              <p className="product-description-label">Description</p>
-              <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
+
+          {/* Color swatches — matching static design */}
+          {colorOption && colorOption.optionValues.length > 1 && (
+            <div className="product-options">
+              <h5>
+                Color: <span style={{color: '#000', fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0}}>{selectedColorName}</span>
+              </h5>
+              <div className="product-color-swatches">
+                {colorOption.optionValues.map((value) => {
+                  const variantImage = value.firstSelectableVariant?.image?.url;
+                  return (
+                    <button
+                      key={value.name}
+                      type="button"
+                      className={`product-color-swatch${value.selected ? ' selected' : ''}`}
+                      aria-label={value.name}
+                      title={value.name}
+                      disabled={!value.exists}
+                      onClick={() => {
+                        if (!value.selected) {
+                          navigate(`?${value.variantUriQuery}`, {
+                            replace: true,
+                            preventScrollReset: true,
+                          });
+                        }
+                      }}
+                    >
+                      {variantImage && <img src={variantImage} alt={value.name} />}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
+
+          {/* Size selector — matching static design */}
+          {sizeOption && (
+            <div className="product-options">
+              <h5>
+                Size{selectedSizeName ? ': ' : ''}
+                {selectedSizeName && (
+                  <span style={{color: '#000', fontWeight: 500, textTransform: 'none', letterSpacing: 0}}>{selectedSizeName}</span>
+                )}
+              </h5>
+              <div className="product-options-grid">
+                {sizeOption.optionValues.map((value) => (
+                  <button
+                    key={value.name}
+                    type="button"
+                    className={`product-options-item${value.selected ? ' selected' : ''}${sizeWarning ? ' size-warning' : ''}`}
+                    onClick={() => {
+                      setSizeWarning(false);
+                      if (!value.selected) {
+                        navigate(`?${value.variantUriQuery}`, {
+                          replace: true,
+                          preventScrollReset: true,
+                        });
+                      }
+                    }}
+                  >
+                    {value.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Other options (if any beyond Color/Size) */}
+          {otherOptions.map((option) => {
+            if (option.optionValues.length === 1) return null;
+            return (
+              <div className="product-options" key={option.name}>
+                <h5>{option.name}</h5>
+                <div className="product-options-grid">
+                  {option.optionValues.map((value) => (
+                    <button
+                      key={value.name}
+                      type="button"
+                      className={`product-options-item${value.selected ? ' selected' : ''}`}
+                      disabled={!value.exists}
+                      style={{opacity: value.available ? 1 : 0.3}}
+                      onClick={() => {
+                        if (!value.selected) {
+                          navigate(`?${value.variantUriQuery}`, {
+                            replace: true,
+                            preventScrollReset: true,
+                          });
+                        }
+                      }}
+                    >
+                      {value.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Description — matching static design */}
+          <div className="product-description">
+            <p className="product-description-label">Description</p>
+            {descriptionHtml ? (
+              <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
+            ) : (
+              <div><p>Description coming soon.</p></div>
+            )}
+          </div>
+
+          {/* Size guide — matching static design */}
+          {sizeGuideInfo?.sizeGuide && (
+            <details className="product-size-guide">
+              <summary>
+                Size Guide
+                <svg className="product-size-guide-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <path d="M2 4.5l4 4 4-4" />
+                </svg>
+              </summary>
+              <div className="product-size-guide-content">
+                <img src={sizeGuideInfo.sizeGuide} alt="Size Guide" />
+                {sizeGuideInfo.sizePhoto && (
+                  <div className="product-size-guide-photo">
+                    <img src={sizeGuideInfo.sizePhoto} alt="Measurement Reference" />
+                  </div>
+                )}
+              </div>
+            </details>
+          )}
+
+          {/* Add to cart — matching static design */}
+          <div className="product-form" ref={formRef}>
+            <AddToCartButton
+              disabled={isSoldOut}
+              onClick={() => {
+                if (!selectedSizeName && sizeOption) {
+                  setSizeWarning(true);
+                  setTimeout(() => setSizeWarning(false), 1500);
+                  return;
+                }
+                open('cart');
+              }}
+              lines={
+                selectedVariant
+                  ? [{merchandiseId: selectedVariant.id, quantity: 1, selectedVariant}]
+                  : []
+              }
+            >
+              {isSoldOut ? 'Sold Out' : sizeWarning ? 'Select a Size' : 'Add to Cart'}
+            </AddToCartButton>
+          </div>
         </div>
       </div>
+
+      {/* Sticky add to cart — matching static design */}
+      {showSticky && !isSoldOut && (
+        <div className="sticky-add-to-cart">
+          <AddToCartButton
+            disabled={isSoldOut}
+            onClick={() => {
+              if (!selectedSizeName && sizeOption) {
+                setSizeWarning(true);
+                setTimeout(() => setSizeWarning(false), 1500);
+                return;
+              }
+              open('cart');
+            }}
+            lines={
+              selectedVariant
+                ? [{merchandiseId: selectedVariant.id, quantity: 1, selectedVariant}]
+                : []
+            }
+          >
+            {sizeWarning ? 'Select a Size' : 'Add to Cart'}
+          </AddToCartButton>
+        </div>
+      )}
 
       <Analytics.ProductView
         data={{
@@ -286,13 +432,9 @@ function DynamicProductPage({product}: {product: NonNullable<any>}) {
         }}
       />
 
-      <RecentlyViewed items={recentlyViewedItems} />
-      <ShopOthers currentHandle={product.handle} excludeHandles={recentlyViewedHandles} />
     </div>
   );
 }
-
-const SIZES = ['S', 'M', 'L'];
 
 function ImageZoomOverlay({src, alt, onClose}: {src: string; alt: string; onClose: () => void}) {
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -431,145 +573,6 @@ function useStickyAddToCart() {
   return {formRef, showSticky};
 }
 
-function StaticProductPage({product, sizeGuideSvg}: {product: StaticProduct; sizeGuideSvg?: string | null}) {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const colorKey = searchParams.get('color');
-  const selectedColor: ColorVariant =
-    product.colors.find((c) => c.key === colorKey) ?? product.colors[0];
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [sizeWarning, setSizeWarning] = useState(false);
-  const recentlyViewedItems = useRecentlyViewed(product.handle);
-  const recentlyViewedHandles = recentlyViewedItems.map((p) => p.handle);
-  const {formRef, showSticky} = useStickyAddToCart();
-  const isSoldOut = selectedColor.soldOut ?? product.soldOut ?? false;
-
-  function handleAddToCart() {
-    if (!selectedSize) {
-      setSizeWarning(true);
-      setTimeout(() => setSizeWarning(false), 1500);
-      return;
-    }
-    // TODO: actual add-to-cart logic
-  }
-
-  const images = [
-    selectedColor.image,
-    ...(selectedColor.modelImage ? [selectedColor.modelImage] : []),
-  ];
-
-  function selectColor(color: ColorVariant) {
-    if (product.colors.length > 1) {
-      setSearchParams({color: color.key}, {preventScrollReset: true});
-    }
-  }
-
-  return (
-    <div className="product-page">
-      <Breadcrumb handle={product.handle} />
-      <ProductNav currentHandle={product.handle} />
-
-      <div className="product">
-        <ImageCarousel
-          images={images}
-          alt={`${product.title}${product.colors.length > 1 ? ` — ${selectedColor.name}` : ''}`}
-        />
-
-        <div className="product-main">
-          <h1 className="product-title">{product.title}</h1>
-          <div className="product-price-wrap">
-            <div className="product-price">{isSoldOut ? 'SOLD OUT' : product.price}</div>
-          </div>
-
-          {product.colors.length > 1 && (
-            <div className="product-options">
-              <h5>
-                Color: <span style={{color: '#000', fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0}}>{selectedColor.name}</span>
-              </h5>
-              <div className="product-color-swatches">
-                {product.colors.map((color) => (
-                  <button
-                    key={color.key}
-                    type="button"
-                    className={`product-color-swatch${color.key === selectedColor.key ? ' selected' : ''}`}
-                    aria-label={color.name}
-                    title={color.name}
-                    onClick={() => selectColor(color)}
-                  >
-                    <img src={color.image} alt={color.name} />
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="product-options">
-            <h5>Size{selectedSize && `: `}{selectedSize && <span style={{color: '#000', fontWeight: 500, textTransform: 'none', letterSpacing: 0}}>{selectedSize}</span>}</h5>
-            <div className="product-options-grid">
-              {SIZES.map((size) => (
-                <button
-                  key={size}
-                  type="button"
-                  className={`product-options-item${selectedSize === size ? ' selected' : ''}${sizeWarning ? ' size-warning' : ''}`}
-                  onClick={() => { setSelectedSize(size); setSizeWarning(false); }}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="product-description">
-            <p className="product-description-label">Description</p>
-            <div>
-              <p>{product.description}</p>
-            </div>
-          </div>
-
-          {/* Size guide */}
-          {product.sizeGuide && (
-            <details className="product-size-guide">
-              <summary>
-                Size Guide
-                <svg className="product-size-guide-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                  <path d="M2 4.5l4 4 4-4" />
-                </svg>
-              </summary>
-              <div className="product-size-guide-content">
-                {sizeGuideSvg ? (
-                  <div className="product-size-guide-svg" dangerouslySetInnerHTML={{__html: sizeGuideSvg}} />
-                ) : (
-                  <img src={product.sizeGuide} alt="Size Guide" />
-                )}
-                {product.sizePhoto && (
-                  <div className="product-size-guide-photo">
-                    <img src={product.sizePhoto} alt="Measurement Reference" />
-                  </div>
-                )}
-              </div>
-            </details>
-          )}
-
-          <div className="product-form" ref={formRef}>
-            <button type="submit" onClick={isSoldOut ? undefined : handleAddToCart} disabled={isSoldOut} className={isSoldOut ? 'sold-out' : ''}>
-              {isSoldOut ? 'Sold Out' : sizeWarning ? 'Select a Size' : 'Add to Cart'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {showSticky && !isSoldOut && (
-        <div className="sticky-add-to-cart">
-          <button type="submit" onClick={handleAddToCart}>
-            {sizeWarning ? 'Select a Size' : 'Add to Cart'}
-          </button>
-        </div>
-      )}
-
-      <RecentlyViewed items={recentlyViewedItems} />
-      <ShopOthers currentHandle={product.handle} excludeHandles={recentlyViewedHandles} />
-    </div>
-  );
-}
 
 const PRODUCT_VARIANT_FRAGMENT = `#graphql
   fragment ProductVariant on ProductVariant {
@@ -640,6 +643,12 @@ const PRODUCT_FRAGMENT = `#graphql
     }
     adjacentVariants (selectedOptions: $selectedOptions) {
       ...ProductVariant
+    }
+    images(first: 20) {
+      nodes {
+        url
+        altText
+      }
     }
     seo {
       description

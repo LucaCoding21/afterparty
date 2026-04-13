@@ -8,7 +8,8 @@ import {
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {SEARCH_ENDPOINT} from '~/components/SearchFormPredictive';
-import {STATIC_PRODUCTS} from '~/lib/staticProducts';
+
+type CatalogProduct = {handle: string; title: string; image: string; price?: {amount: string; currencyCode: string}};
 
 function levenshtein(a: string, b: string): number {
   const m = a.length, n = b.length;
@@ -23,11 +24,52 @@ function levenshtein(a: string, b: string): number {
   return dp[m][n];
 }
 
+function fuzzySearch(catalog: CatalogProduct[], query: string): {results: CatalogProduct[]; suggestion: string} {
+  if (!query.trim()) return {results: [], suggestion: ''};
+  const q = query.toLowerCase();
+
+  // Exact substring match first
+  const exact = catalog.filter(
+    (p) => p.title.toLowerCase().includes(q) || p.handle.toLowerCase().includes(q),
+  ).slice(0, 6);
+  if (exact.length > 0) return {results: exact, suggestion: ''};
+
+  // Fuzzy fallback: find the best-matching keyword
+  const allWords = new Set<string>();
+  catalog.forEach((p) => {
+    p.title.toLowerCase().split(/\s+/).forEach((w) => allWords.add(w));
+    p.handle.replace(/-/g, ' ').split(/\s+/).forEach((w) => allWords.add(w));
+  });
+
+  let bestWord = '';
+  let bestDist = Infinity;
+  let bestLenDiff = Infinity;
+  for (const word of allWords) {
+    const d = levenshtein(q, word);
+    const lenDiff = Math.abs(q.length - word.length);
+    if (d <= Math.max(2, Math.ceil(q.length / 2)) && (d < bestDist || (d === bestDist && lenDiff < bestLenDiff))) {
+      bestDist = d;
+      bestWord = word;
+      bestLenDiff = lenDiff;
+    }
+  }
+
+  if (bestWord) {
+    const fuzzy = catalog.filter(
+      (p) => p.title.toLowerCase().includes(bestWord) || p.handle.toLowerCase().includes(bestWord),
+    ).slice(0, 6);
+    if (fuzzy.length > 0) return {results: fuzzy, suggestion: bestWord};
+  }
+
+  return {results: [], suggestion: ''};
+}
+
 interface HeaderProps {
   header: HeaderQuery;
   cart: Promise<CartApiQueryFragment | null>;
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
+  searchCatalog?: CatalogProduct[];
 }
 
 type Viewport = 'desktop' | 'mobile';
@@ -37,6 +79,7 @@ export function Header({
   isLoggedIn,
   cart,
   publicStoreDomain,
+  searchCatalog = [],
 }: HeaderProps) {
   const {shop, menu} = header;
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -46,49 +89,10 @@ export function Header({
   const mobileSearchRef = useRef<HTMLDivElement>(null);
   const mobileSearchBtnRef = useRef<HTMLButtonElement>(null);
 
-  const mobileSearchResults = useMemo(() => {
-    if (!mobileSearchQuery.trim()) return {products: [] as typeof STATIC_PRODUCTS, suggestion: ''};
-    const q = mobileSearchQuery.toLowerCase();
-    const exact = STATIC_PRODUCTS.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        p.handle.toLowerCase().includes(q) ||
-        p.category.replace(/-/g, ' ').toLowerCase().includes(q),
-    ).slice(0, 6);
-    if (exact.length > 0) return {products: exact, suggestion: ''};
-
-    // Fuzzy fallback: find the best-matching keyword from product titles
-    const allWords = new Set<string>();
-    STATIC_PRODUCTS.forEach((p) => {
-      p.title.toLowerCase().split(/\s+/).forEach((w) => allWords.add(w));
-      p.category.replace(/-/g, ' ').split(/\s+/).forEach((w) => allWords.add(w));
-    });
-
-    let bestWord = '';
-    let bestDist = Infinity;
-    let bestLenDiff = Infinity;
-    for (const word of allWords) {
-      const d = levenshtein(q, word);
-      const lenDiff = Math.abs(q.length - word.length);
-      if (d <= Math.max(2, Math.ceil(q.length / 2)) && (d < bestDist || (d === bestDist && lenDiff < bestLenDiff))) {
-        bestDist = d;
-        bestWord = word;
-        bestLenDiff = lenDiff;
-      }
-    }
-
-    if (bestWord) {
-      const fuzzy = STATIC_PRODUCTS.filter(
-        (p) =>
-          p.title.toLowerCase().includes(bestWord) ||
-          p.handle.toLowerCase().includes(bestWord) ||
-          p.category.replace(/-/g, ' ').toLowerCase().includes(bestWord),
-      ).slice(0, 6);
-      if (fuzzy.length > 0) return {products: fuzzy, suggestion: bestWord};
-    }
-
-    return {products: [] as typeof STATIC_PRODUCTS, suggestion: ''};
-  }, [mobileSearchQuery]);
+  const mobileSearchResults = useMemo(
+    () => fuzzySearch(searchCatalog, mobileSearchQuery),
+    [searchCatalog, mobileSearchQuery],
+  );
 
   function closeMobileSearch() {
     setMobileSearchOpen(false);
@@ -177,7 +181,7 @@ export function Header({
 
         {/* Desktop right nav */}
         <nav className="header-nav-right">
-          <HeaderSearch />
+          <HeaderSearch catalog={searchCatalog} />
           <NavLink to="/pages/support" className="header-nav-link" prefetch="intent">
             Support
           </NavLink>
@@ -248,24 +252,28 @@ export function Header({
           </form>
           {mobileSearchQuery.trim().length > 0 && (
             <div className="mobile-search-results">
-              {mobileSearchResults.products.length > 0 ? (
+              {mobileSearchResults.results.length > 0 ? (
                 <>
                   {mobileSearchResults.suggestion && (
                     <div className="mobile-search-suggestion">
                       SHOWING SIMILAR RESULTS FOR &ldquo;{mobileSearchQuery.toUpperCase()}&rdquo;
                     </div>
                   )}
-                  {mobileSearchResults.products.map((product) => (
+                  {mobileSearchResults.results.map((product) => (
                     <a
                       key={product.handle}
                       href={`/products/${product.handle}`}
                       className="mobile-search-result"
                       onClick={closeMobileSearch}
                     >
-                      <img src={product.colors[0].image} alt={product.title} className="mobile-search-result-img" />
+                      {product.image && <img src={product.image} alt={product.title} className="mobile-search-result-img" />}
                       <div className="mobile-search-result-info">
                         <span className="mobile-search-result-title">{product.title}</span>
-                        <span className="mobile-search-result-price">{product.price}</span>
+                        {product.price && (
+                          <span className="mobile-search-result-price">
+                            {new Intl.NumberFormat(undefined, {style: 'currency', currency: product.price.currencyCode, minimumFractionDigits: 0}).format(parseFloat(product.price.amount))}
+                          </span>
+                        )}
                       </div>
                     </a>
                   ))}
@@ -380,7 +388,7 @@ export function HeaderMenu({
   );
 }
 
-function HeaderSearch() {
+function HeaderSearch({catalog}: {catalog: CatalogProduct[]}) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -388,46 +396,10 @@ function HeaderSearch() {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const {results, suggestion} = useMemo(() => {
-    if (!query.trim()) return {results: [] as typeof STATIC_PRODUCTS, suggestion: ''};
-    const q = query.toLowerCase();
-    const exact = STATIC_PRODUCTS.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        p.handle.toLowerCase().includes(q) ||
-        p.category.replace(/-/g, ' ').toLowerCase().includes(q),
-    ).slice(0, 6);
-    if (exact.length > 0) return {results: exact, suggestion: ''};
-
-    // Fuzzy fallback
-    const allWords = new Set<string>();
-    STATIC_PRODUCTS.forEach((p) => {
-      p.title.toLowerCase().split(/\s+/).forEach((w) => allWords.add(w));
-      p.category.replace(/-/g, ' ').split(/\s+/).forEach((w) => allWords.add(w));
-    });
-    let bestWord = '';
-    let bestDist = Infinity;
-    let bestLenDiff = Infinity;
-    for (const word of allWords) {
-      const d = levenshtein(q, word);
-      const lenDiff = Math.abs(q.length - word.length);
-      if (d <= Math.max(2, Math.ceil(q.length / 2)) && (d < bestDist || (d === bestDist && lenDiff < bestLenDiff))) {
-        bestDist = d;
-        bestWord = word;
-        bestLenDiff = lenDiff;
-      }
-    }
-    if (bestWord) {
-      const fuzzy = STATIC_PRODUCTS.filter(
-        (p) =>
-          p.title.toLowerCase().includes(bestWord) ||
-          p.handle.toLowerCase().includes(bestWord) ||
-          p.category.replace(/-/g, ' ').toLowerCase().includes(bestWord),
-      ).slice(0, 6);
-      if (fuzzy.length > 0) return {results: fuzzy, suggestion: bestWord};
-    }
-    return {results: [] as typeof STATIC_PRODUCTS, suggestion: ''};
-  }, [query]);
+  const {results, suggestion} = useMemo(
+    () => fuzzySearch(catalog, query),
+    [catalog, query],
+  );
 
   const showDropdown = open && query.trim().length > 0;
 
@@ -546,14 +518,20 @@ function HeaderSearch() {
                   role="option"
                   aria-selected={i === activeIndex}
                 >
-                  <img
-                    src={product.colors[0].image}
-                    alt={product.title}
-                    className="header-search-result-img"
-                  />
+                  {product.image && (
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="header-search-result-img"
+                    />
+                  )}
                   <div className="header-search-result-info">
                     <span className="header-search-result-title">{product.title}</span>
-                    <span className="header-search-result-price">{product.price}</span>
+                    {product.price && (
+                      <span className="header-search-result-price">
+                        {new Intl.NumberFormat(undefined, {style: 'currency', currency: product.price.currencyCode, minimumFractionDigits: 0}).format(parseFloat(product.price.amount))}
+                      </span>
+                    )}
                   </div>
                 </a>
               ))}

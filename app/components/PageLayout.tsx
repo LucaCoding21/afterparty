@@ -9,12 +9,15 @@ import {Footer} from '~/components/Footer';
 import {Header, ShopSubnav} from '~/components/Header';
 import {CartMain} from '~/components/CartMain';
 
+type SearchCatalogItem = {handle: string; title: string; image: string; price?: {amount: string; currencyCode: string}};
+
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
   footer?: unknown;
   header: HeaderQuery;
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
+  searchCatalog?: SearchCatalogItem[];
   children?: React.ReactNode;
 }
 
@@ -24,6 +27,7 @@ export function PageLayout({
   header,
   isLoggedIn,
   publicStoreDomain,
+  searchCatalog = [],
 }: PageLayoutProps) {
   const location = useLocation();
   const isCollectionPage = location.pathname.startsWith('/collections');
@@ -37,6 +41,7 @@ export function PageLayout({
           cart={cart}
           isLoggedIn={isLoggedIn}
           publicStoreDomain={publicStoreDomain}
+          searchCatalog={searchCatalog}
         />
       )}
       {isCollectionPage && <ShopSubnav />}
