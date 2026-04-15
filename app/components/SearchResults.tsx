@@ -116,7 +116,7 @@ function SearchResultsProducts({
                   term,
                 }) + (item.colorName ? `&Color=${encodeURIComponent(item.colorName)}` : '');
                 return (
-                  <Link key={item.id} prefetch="intent" to={productUrl} className="product-item">
+                  <Link key={item.id} prefetch="intent" to={productUrl} className="product-item" data-handle={item.handle}>
                     <div className="product-item-img">
                       {item.image && <img src={item.image} alt={item.title} />}
                     </div>

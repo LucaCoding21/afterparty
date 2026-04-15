@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import type {Route} from './+types/collections.accessories';
 import {Link, useLoaderData} from 'react-router';
 import {Money} from '@shopify/hydrogen';
@@ -39,6 +40,11 @@ const COLLECTION_QUERY = `#graphql
 
 export default function Accessories() {
   const {items} = useLoaderData<typeof loader>();
+  useEffect(() => {
+    sessionStorage.setItem('lastCategoryPath', '/collections/accessories');
+    sessionStorage.setItem('lastCategoryName', 'Accessories');
+    sessionStorage.setItem('lastCategoryProducts', JSON.stringify(items.map((i) => i.handle)));
+  }, [items]);
   return (
     <div className="collection">
       <h1 className="collection-title">Accessories</h1>

@@ -23,7 +23,6 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
           )}
         </span>
       </div>
-      <p className="cart-taxes-note">Taxes and shipping calculated at checkout</p>
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
     </div>
   );

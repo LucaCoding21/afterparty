@@ -47,7 +47,7 @@ function fuzzySearch(catalog: CatalogProduct[], query: string): {results: Catalo
   for (const word of allWords) {
     const d = levenshtein(q, word);
     const lenDiff = Math.abs(q.length - word.length);
-    if (d <= Math.max(2, Math.ceil(q.length / 2)) && (d < bestDist || (d === bestDist && lenDiff < bestLenDiff))) {
+    if (d <= Math.max(3, Math.ceil(q.length / 2)) && (d < bestDist || (d === bestDist && lenDiff < bestLenDiff))) {
       bestDist = d;
       bestWord = word;
       bestLenDiff = lenDiff;

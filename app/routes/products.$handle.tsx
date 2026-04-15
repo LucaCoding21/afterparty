@@ -1,8 +1,9 @@
-import {useState, useEffect, useRef} from 'react';
+import {useState, useEffect, useRef, useMemo} from 'react';
 import {
   useLoaderData,
   Link,
   useNavigate,
+  useRouteLoaderData,
 } from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {
@@ -17,6 +18,32 @@ import {
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+
+type CatalogProduct = {handle: string; title: string; image: string; price?: {amount: string; currencyCode: string}};
+
+function useRecentlyViewed(currentHandle: string, currentTitle: string, currentImage: string, currentPrice?: {amount: string; currencyCode: string}) {
+  const [recentlyViewed, setRecentlyViewed] = useState<CatalogProduct[]>([]);
+
+  useEffect(() => {
+    const KEY = 'recentlyViewed';
+    let items: CatalogProduct[] = [];
+    try {
+      items = JSON.parse(sessionStorage.getItem(KEY) || '[]') as CatalogProduct[];
+    } catch {}
+
+    // Show previously viewed products (excluding current)
+    setRecentlyViewed(items.filter((p) => p.handle !== currentHandle).slice(0, 4));
+
+    // Add current product to the list
+    const updated = [
+      {handle: currentHandle, title: currentTitle, image: currentImage, price: currentPrice},
+      ...items.filter((p) => p.handle !== currentHandle),
+    ].slice(0, 10);
+    sessionStorage.setItem(KEY, JSON.stringify(updated));
+  }, [currentHandle, currentTitle, currentImage, currentPrice]);
+
+  return recentlyViewed;
+}
 
 // Maps both static and Shopify handles to size guide assets
 const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = {
@@ -165,6 +192,49 @@ function Breadcrumb() {
   );
 }
 
+function ProductNav({handle, catalog}: {handle: string; catalog: CatalogProduct[]}) {
+  const [categoryName, setCategoryName] = useState('Shop All');
+  const [categoryPath, setCategoryPath] = useState('/collections/all');
+  const [nextProductPath, setNextProductPath] = useState('');
+
+  useEffect(() => {
+    const name = sessionStorage.getItem('lastCategoryName') || 'Shop All';
+    const path = sessionStorage.getItem('lastCategoryPath') || '/collections/all';
+    setCategoryName(name);
+    setCategoryPath(path);
+
+    let handles: string[] = [];
+    try {
+      handles = JSON.parse(sessionStorage.getItem('lastCategoryProducts') || '[]') as string[];
+    } catch {}
+
+    // Fall back to full catalog if no category products stored
+    if (handles.length === 0 && catalog.length > 0) {
+      handles = catalog.map((p) => p.handle);
+    }
+
+    if (handles.length > 0) {
+      const unique = [...new Set(handles)];
+      const currentIndex = unique.indexOf(handle);
+      const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % unique.length : 0;
+      setNextProductPath(`/products/${unique[nextIndex]}`);
+    }
+  }, [handle, catalog]);
+
+  return (
+    <nav className="product-nav">
+      <Link to={categoryPath} className="product-nav-btn">
+        <span className="nav-arrow">&lsaquo;</span> Back to {categoryName}
+      </Link>
+      {nextProductPath && (
+        <Link to={nextProductPath} className="product-nav-btn">
+          Next Product <span className="nav-arrow">&rsaquo;</span>
+        </Link>
+      )}
+    </nav>
+  );
+}
+
 function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>; sizeGuideInfo?: {sizeGuide: string; sizePhoto?: string} | null}) {
   const navigate = useNavigate();
   const {open} = useAside();
@@ -179,6 +249,33 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
     ...product,
     selectedOrFirstAvailableVariant: selectedVariant,
   });
+
+  // Catalog from root loader for Shop Others
+  const rootData = useRouteLoaderData('root') as {searchCatalog?: CatalogProduct[]} | undefined;
+  const catalog = rootData?.searchCatalog ?? [];
+
+  // Recently viewed tracking
+  const recentlyViewed = useRecentlyViewed(
+    product.handle,
+    product.title,
+    selectedVariant?.image?.url || '',
+    selectedVariant?.price,
+  );
+
+  // Shop Others: deterministic pick based on product handle
+  const shopOthers = useMemo(() => {
+    const others = catalog.filter((p) => p.handle !== product.handle);
+    if (others.length === 0) return [];
+    // Seed from handle so the selection is stable across re-renders
+    let seed = 0;
+    for (let i = 0; i < product.handle.length; i++) seed += product.handle.charCodeAt(i);
+    const start = seed % others.length;
+    const picked: typeof others = [];
+    for (let i = 0; i < Math.min(4, others.length); i++) {
+      picked.push(others[(start + i) % others.length]);
+    }
+    return picked;
+  }, [catalog, product.handle]);
 
   const {title, descriptionHtml} = product;
   const {formRef, showSticky} = useStickyAddToCart();
@@ -224,6 +321,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
   return (
     <div className="product-page">
       <Breadcrumb />
+      <ProductNav handle={product.handle} catalog={catalog} />
 
       <div className="product">
         <ImageCarousel
@@ -393,11 +491,12 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
       </div>
 
       {/* Sticky add to cart — matching static design */}
-      {showSticky && !isSoldOut && (
+      {showSticky && (
         <div className="sticky-add-to-cart">
           <AddToCartButton
             disabled={isSoldOut}
             onClick={() => {
+              if (isSoldOut) return;
               if (!selectedSizeName && sizeOption) {
                 setSizeWarning(true);
                 setTimeout(() => setSizeWarning(false), 1500);
@@ -411,7 +510,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
                 : []
             }
           >
-            {sizeWarning ? 'Select a Size' : 'Add to Cart'}
+            {isSoldOut ? 'Sold Out' : sizeWarning ? 'Select a Size' : 'Add to Cart'}
           </AddToCartButton>
         </div>
       )}
@@ -431,6 +530,50 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
           ],
         }}
       />
+
+      {/* Shop Others */}
+      {shopOthers.length > 0 && (
+        <div className="product-related-section">
+          <h2 className="product-related-heading">Shop Others</h2>
+          <div className="product-related-grid">
+            {shopOthers.map((item) => (
+              <Link key={item.handle} className="product-item" prefetch="intent" to={`/products/${item.handle}`} data-handle={item.handle}>
+                <div className="product-item-img">
+                  {item.image && <img src={item.image} alt={item.title} loading="lazy" />}
+                </div>
+                <h4>{item.title}</h4>
+                {item.price && (
+                  <small>
+                    <Money data={item.price as any} />
+                  </small>
+                )}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recently Viewed */}
+      {recentlyViewed.length > 0 && (
+        <div className="product-related-section">
+          <h2 className="product-related-heading">Recently Viewed</h2>
+          <div className="product-related-grid">
+            {recentlyViewed.map((item) => (
+              <Link key={item.handle} className="product-item" prefetch="intent" to={`/products/${item.handle}`} data-handle={item.handle}>
+                <div className="product-item-img">
+                  {item.image && <img src={item.image} alt={item.title} loading="lazy" />}
+                </div>
+                <h4>{item.title}</h4>
+                {item.price && (
+                  <small>
+                    <Money data={item.price as any} />
+                  </small>
+                )}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
     </div>
   );

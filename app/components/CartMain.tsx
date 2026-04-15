@@ -1,5 +1,5 @@
 import {useOptimisticCart, type OptimisticCartLine} from '@shopify/hydrogen';
-import {Link} from 'react-router';
+import {Link, useNavigate} from 'react-router';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
@@ -76,6 +76,9 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
               );
             })}
           </ul>
+          {cartHasItems && (
+            <p className="cart-taxes-note">Taxes and shipping calculated at checkout</p>
+          )}
         </div>
         {cartHasItems && <CartSummary cart={cart} layout={layout} />}
       </div>
@@ -90,11 +93,24 @@ function CartEmpty({
   layout?: CartMainProps['layout'];
 }) {
   const {close} = useAside();
+  const navigate = useNavigate();
   if (hidden) return null;
   return (
     <div className="cart-empty">
       <p className="cart-empty-msg">Your cart is empty.</p>
-      <button onClick={close} className="cart-empty-link">
+      <button
+        onClick={() => {
+          close();
+          const lastCategory =
+            typeof sessionStorage !== 'undefined'
+              ? sessionStorage.getItem('lastCategoryPath')
+              : null;
+          if (lastCategory) {
+            navigate(lastCategory);
+          }
+        }}
+        className="cart-empty-link"
+      >
         Continue Shopping
       </button>
     </div>

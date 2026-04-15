@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import type {Route} from './+types/collections.all';
 import {Link, useLoaderData} from 'react-router';
 import {Money} from '@shopify/hydrogen';
@@ -53,6 +54,11 @@ const CATALOG_QUERY = `#graphql
 
 export default function ShopAll() {
   const {items} = useLoaderData<typeof loader>();
+  useEffect(() => {
+    sessionStorage.setItem('lastCategoryPath', '/collections/all');
+    sessionStorage.setItem('lastCategoryName', 'All');
+    sessionStorage.setItem('lastCategoryProducts', JSON.stringify(items.map((i) => i.handle)));
+  }, [items]);
 
   return (
     <div className="collection">

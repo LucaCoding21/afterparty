@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import {redirect, useLoaderData} from 'react-router';
 import type {Route} from './+types/collections.$handle';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
@@ -67,6 +68,12 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 export default function Collection() {
   const {collection} = useLoaderData<typeof loader>();
+  useEffect(() => {
+    sessionStorage.setItem('lastCategoryPath', `/collections/${collection.handle}`);
+    sessionStorage.setItem('lastCategoryName', collection.title);
+    const handles = collection.products.nodes.map((p: any) => p.handle);
+    sessionStorage.setItem('lastCategoryProducts', JSON.stringify(handles));
+  }, [collection.handle, collection.title, collection.products.nodes]);
 
   return (
     <div className="collection">
