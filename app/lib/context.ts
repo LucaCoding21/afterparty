@@ -2,6 +2,21 @@ import {createHydrogenContext} from '@shopify/hydrogen';
 import {AppSession} from '~/lib/session';
 import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
 
+/**
+ * Detect visitor's country from request headers.
+ * - Oxygen hosting provides `Oxygen-Buyer-Country` from IP geolocation.
+ * - Falls back to VN (Vietnam) as the primary market.
+ * - Vietnamese visitors get VND prices, everyone else gets their local currency.
+ */
+function getLocaleFromRequest(request: Request): {language: string; country: string} {
+  const buyerCountry = (request.headers.get('Oxygen-Buyer-Country') ?? '').toUpperCase();
+  // Vietnam gets VND prices. Everyone else gets treated as US (USD).
+  if (buyerCountry === 'VN') {
+    return {language: 'VI', country: 'VN'};
+  }
+  return {language: 'EN', country: 'US'};
+}
+
 // Define the additional context object
 const additionalContext = {
   // Additional context for custom properties, CMS clients, 3P SDKs, etc.
@@ -47,8 +62,7 @@ export async function createHydrogenRouterContext(
       cache,
       waitUntil,
       session,
-      // Or detect from URL path based on locale subpath, cookies, or any other strategy
-      i18n: {language: 'EN', country: 'US'},
+      i18n: getLocaleFromRequest(request),
       cart: {
         queryFragment: CART_QUERY_FRAGMENT,
       },
