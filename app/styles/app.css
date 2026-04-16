@@ -3480,3 +3480,15 @@ body.home-page .header-wrapper {
   z-index: 10;
 }
 
+/* Home-only: lock scroll (mobile + desktop). Scoped strictly via body.home-page. */
+html:has(body.home-page),
+body.home-page {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body.home-page footer {
+  display: none;
+}
+
