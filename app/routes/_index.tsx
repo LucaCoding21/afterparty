@@ -1,3 +1,4 @@
+import {Link} from 'react-router';
 import {useEffect, useRef, useState} from 'react';
 import type {Route} from './+types/_index';
 
@@ -32,15 +33,22 @@ export default function Homepage() {
 
   return (
     <div className="home-hero">
-      <video
-        ref={videoRef}
-        className="home-hero-video"
-        src={videoSrc}
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-      />
+      <Link
+        to="/collections/all"
+        prefetch="intent"
+        aria-label="Shop the catalog"
+        className="home-hero-link"
+      >
+        <video
+          ref={videoRef}
+          className="home-hero-video"
+          src={videoSrc}
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+        />
+      </Link>
     </div>
   );
 }

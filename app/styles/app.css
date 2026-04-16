@@ -1780,6 +1780,7 @@ aside main {
   letter-spacing: 0;
   @media (max-width: 45em) {
     font-size: 0.75rem;
+    display: block;
   }
 }
 
@@ -3465,6 +3466,13 @@ Home hero — full-screen intro video (desktop)
   overflow: hidden;
   background: var(--color-light, #fff);
   z-index: 0;
+}
+
+.home-hero-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
 }
 
 .home-hero-video {
