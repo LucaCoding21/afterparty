@@ -152,7 +152,7 @@ aside li {
   transition: opacity 400ms ease-in-out;
   transition: opacity 400ms;
   visibility: hidden;
-  z-index: 10;
+  z-index: 50;
 }
 
 .overlay .close-outside {
@@ -2493,11 +2493,11 @@ html:has(.overlay.expanded) .sticky-add-to-cart {
 
 /* Related product sections (Shop Others / Recently Viewed) */
 .product-related-section {
-  padding: 3rem 2.5rem 1.5rem;
+  padding: 80px 2.5rem 1.5rem;
   border-top: none;
   margin-top: 0.5rem;
   @media (max-width: 45em) {
-    padding: 1.5rem 0.1rem 2rem;
+    padding: 80px 0.1rem 2rem;
   }
 }
 

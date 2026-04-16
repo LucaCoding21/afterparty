@@ -531,12 +531,12 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
         }}
       />
 
-      {/* Shop Others */}
-      {shopOthers.length > 0 && (
+      {/* Recently Viewed */}
+      {recentlyViewed.length > 0 && (
         <div className="product-related-section">
-          <h2 className="product-related-heading">Shop Others</h2>
+          <h2 className="product-related-heading">Recently Viewed</h2>
           <div className="product-related-grid">
-            {shopOthers.map((item) => (
+            {recentlyViewed.map((item) => (
               <Link key={item.handle} className="product-item" prefetch="intent" to={`/products/${item.handle}`} data-handle={item.handle}>
                 <div className="product-item-img">
                   {item.image && <img src={item.image} alt={item.title} loading="lazy" />}
@@ -553,12 +553,12 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
         </div>
       )}
 
-      {/* Recently Viewed */}
-      {recentlyViewed.length > 0 && (
+      {/* Shop Others */}
+      {shopOthers.length > 0 && (
         <div className="product-related-section">
-          <h2 className="product-related-heading">Recently Viewed</h2>
+          <h2 className="product-related-heading">Shop Others</h2>
           <div className="product-related-grid">
-            {recentlyViewed.map((item) => (
+            {shopOthers.map((item) => (
               <Link key={item.handle} className="product-item" prefetch="intent" to={`/products/${item.handle}`} data-handle={item.handle}>
                 <div className="product-item-img">
                   {item.image && <img src={item.image} alt={item.title} loading="lazy" />}
