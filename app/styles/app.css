@@ -3452,3 +3452,31 @@ html:has(.overlay.expanded) .sticky-add-to-cart {
     object-position: top center;
   }
 }
+
+/*
+==========================================================================
+Home hero — full-screen intro video (desktop)
+==========================================================================
+*/
+
+.home-hero {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--color-light, #fff);
+  z-index: 0;
+}
+
+.home-hero-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* On the homepage, let the hero video show through the nav bar */
+body.home-page .header-wrapper {
+  background: transparent;
+  z-index: 10;
+}
+
