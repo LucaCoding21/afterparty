@@ -215,9 +215,13 @@ function ProductNav({handle, catalog}: {handle: string; catalog: CatalogProduct[
 
     if (handles.length > 0) {
       const unique = [...new Set(handles)];
-      const currentIndex = unique.indexOf(handle);
-      const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % unique.length : 0;
-      setNextProductPath(`/products/${unique[nextIndex]}`);
+      if (unique.length > 1) {
+        const currentIndex = unique.indexOf(handle);
+        const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % unique.length : 0;
+        setNextProductPath(`/products/${unique[nextIndex]}`);
+      } else {
+        setNextProductPath('');
+      }
     }
   }, [handle, catalog]);
 
@@ -374,7 +378,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
           )}
 
           {/* Size selector — matching static design */}
-          {sizeOption && (
+          {sizeOption ? (
             <div className="product-options">
               <h5>
                 Size{selectedSizeName ? ': ' : ''}
@@ -402,6 +406,10 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
                   </button>
                 ))}
               </div>
+            </div>
+          ) : (
+            <div className="product-options">
+              <h5>Size: <span style={{color: '#000', fontWeight: 500, textTransform: 'none', letterSpacing: 0}}>One Size</span></h5>
             </div>
           )}
 

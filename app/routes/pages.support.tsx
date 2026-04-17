@@ -74,7 +74,7 @@ export default function SupportPage() {
 
         {/* ── Shipping ── */}
         <Section title="Shipping">
-          <p className="support-body-text">All orders are packed by hand in Ho Chi Minh City and dispatched within 1–3 business days. You'll receive tracking as soon as your parcel is on its way.</p>
+          <p className="support-body-text support-body-text--no-mb">All orders are packed by hand in Ho Chi Minh City and dispatched within 1–3 business days. You'll receive tracking as soon as your parcel is on its way.</p>
 
           <div className="support-faq-item">
             <p className="support-faq-q">Southeast Asia</p>
@@ -92,7 +92,7 @@ export default function SupportPage() {
 
         {/* ── Returns & Exchanges ── */}
         <Section title="Returns & Exchanges">
-          <p className="support-body-text">We accept returns and exchanges on unworn, unwashed, unaltered items with original tags attached within <strong>14 days</strong> of delivery. Sale items and limited drops are final sale.</p>
+          <p className="support-body-text support-body-text--no-mb">We accept returns and exchanges on unworn, unwashed, unaltered items with original tags attached within <strong>14 days</strong> of delivery. Sale items and limited drops are final sale.</p>
           <div className="support-faq-item">
             <p className="support-faq-q">Returns</p>
             <p className="support-faq-a">Email minh@afterparty.space with your order number and reason. We'll send you a return authorisation and instructions. Return shipping is the customer's responsibility unless the item is defective.</p>
@@ -105,7 +105,7 @@ export default function SupportPage() {
 
         {/* ── Warranty ── */}
         <Section title="Warranty">
-          <p className="support-body-text">All garments are inspected before dispatch. Normal wear and tear, improper washing, and accidental damage are not covered. Our warranty applies only to the original purchaser and is non-transferable.</p>
+          <p className="support-body-text support-body-text--no-mb">All garments are inspected before dispatch. Normal wear and tear, improper washing, and accidental damage are not covered. Our warranty applies only to the original purchaser and is non-transferable.</p>
           <div className="support-faq-item">
             <p className="support-faq-q">Defective items</p>
             <p className="support-faq-a">If you receive a defective item or experience a manufacturing fault within <strong>30 days</strong> of purchase, we will replace or refund it in full at no cost to you. Faults reported after 30 days are assessed case by case.</p>

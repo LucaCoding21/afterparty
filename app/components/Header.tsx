@@ -159,7 +159,7 @@ export function Header({
         <nav className="header-nav-left">
           <NavLink
             to="/collections/all"
-            className={() => 'header-nav-link'}
+            className={({isActive}) => `header-nav-link${isActive ? ' active' : ''}`}
             prefetch="intent"
           >
             Shop All
