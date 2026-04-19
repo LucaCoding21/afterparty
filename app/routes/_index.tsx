@@ -8,12 +8,12 @@ export const meta: Route.MetaFunction = () => {
 
 export default function Homepage() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoSrc, setVideoSrc] = useState('/hero-anim.mp4');
+  const [videoSrc, setVideoSrc] = useState('/Desktop_grey.mp4');
 
   useEffect(() => {
     document.body.classList.add('home-page');
     const isMobile = window.matchMedia('(max-width: 48em)').matches;
-    setVideoSrc(isMobile ? '/hero-anim-vertical.mp4' : '/hero-anim.mp4');
+    setVideoSrc(isMobile ? '/Mobile_grey.mp4' : '/Desktop_grey.mp4');
     return () => {
       document.body.classList.remove('home-page');
     };
