@@ -18,7 +18,12 @@ import {
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import {shopifyImg, preloadCartThumbnail} from '~/lib/images';
+import {shopifyImg, preloadCartThumbnail, shopifySrcSet, preloadImage} from '~/lib/images';
+
+const CAROUSEL_WIDTHS = [600, 900, 1200, 1600, 2000];
+const CAROUSEL_SIZES = '(min-width: 45em) 50vw, 100vw';
+const GRID_WIDTHS = [400, 600, 800, 1200];
+const GRID_SIZES = '(min-width: 45em) 25vw, 50vw';
 
 type CatalogProduct = {handle: string; title: string; image: string; price?: {amount: string; currencyCode: string}};
 
@@ -126,13 +131,25 @@ const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = 
 
 export const meta: Route.MetaFunction = ({data}) => {
   const title = data?.product?.title ?? '';
-  return [
+  const heroUrl = (data?.product as any)?.selectedOrFirstAvailableVariant?.image?.url;
+  const tags: any[] = [
     {title: `afterparty | ${title}`},
     {
       rel: 'canonical',
       href: `/products/${data?.product?.handle}`,
     },
   ];
+  if (heroUrl) {
+    tags.push({
+      tagName: 'link',
+      rel: 'preload',
+      as: 'image',
+      imageSrcSet: shopifySrcSet(heroUrl, [600, 900, 1200, 1600, 2000]),
+      imageSizes: '(min-width: 45em) 50vw, 100vw',
+      fetchPriority: 'high',
+    });
+  }
+  return tags;
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -657,7 +674,7 @@ function ImageZoomOverlay({src, alt, onClose}: {src: string; alt: string; onClos
       </button>
       <img
         ref={imgRef}
-        src={shopifyImg(src, {width: 2400, format: 'webp'})}
+        src={shopifyImg(src, {width: 1800, format: 'webp'})}
         alt={alt}
         className="zoom-image"
         onLoad={handleImageLoad}
@@ -685,6 +702,15 @@ function ImageCarousel({
   const prev = () => setIndex((i) => (i - 1 + images.length) % images.length);
   const next = () => setIndex((i) => (i + 1) % images.length);
 
+  // Warm the neighbors so arrow/swipe feels instant.
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const prevUrl = images[(index - 1 + images.length) % images.length]?.url;
+    const nextUrl = images[(index + 1) % images.length]?.url;
+    preloadImage(prevUrl, 1200);
+    preloadImage(nextUrl, 1200);
+  }, [index, images]);
+
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
   }
@@ -708,11 +734,15 @@ function ImageCarousel({
       >
         <div className={`product-image product-image-zoomable${current?.isModel ? ' product-image-model' : ''}`} onClick={() => setZoomed(true)}>
           <img
-            src={shopifyImg(current?.url, {width: 1400, format: 'webp'})}
+            src={shopifyImg(current?.url, {width: 1200})}
+            srcSet={shopifySrcSet(current?.url, CAROUSEL_WIDTHS)}
+            sizes={CAROUSEL_SIZES}
             alt={alt}
             key={current?.url}
             width={current?.width}
             height={current?.height}
+            fetchPriority={index === 0 ? 'high' : 'auto'}
+            decoding="async"
           />
         </div>
         {images.length > 1 && (

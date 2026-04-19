@@ -40,3 +40,41 @@ export function preloadCartThumbnail(url: string | undefined | null): void {
     // noop — preload is best-effort
   }
 }
+
+/**
+ * Builds a responsive srcset string for a Shopify CDN image. The browser picks
+ * the smallest candidate that matches the rendered size × device DPR, so a
+ * phone downloads ~600px and a 4K desktop downloads 2000px from the same tag.
+ */
+export function shopifySrcSet(
+  url: string | undefined | null,
+  widths: number[],
+): string {
+  if (!url || !url.includes('cdn.shopify.com')) return '';
+  try {
+    return widths
+      .map((w) => {
+        const u = new URL(url);
+        u.searchParams.set('width', String(w));
+        return `${u.toString()} ${w}w`;
+      })
+      .join(', ');
+  } catch {
+    return '';
+  }
+}
+
+/** Warm the browser/CDN cache for an image at a given width. Best-effort. */
+export function preloadImage(
+  url: string | undefined | null,
+  width: number,
+): void {
+  if (!url || typeof window === 'undefined') return;
+  if (!url.includes('cdn.shopify.com')) return;
+  try {
+    const u = new URL(url);
+    u.searchParams.set('width', String(width));
+    const img = new window.Image();
+    img.src = u.toString();
+  } catch {}
+}

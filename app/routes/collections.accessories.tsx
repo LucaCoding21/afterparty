@@ -3,7 +3,7 @@ import type {Route} from './+types/collections.accessories';
 import {Link, useLoaderData} from 'react-router';
 import {Money} from '@shopify/hydrogen';
 import {flattenToColorVariants, buildProductUrl} from '~/lib/collections';
-import {shopifyImg} from '~/lib/images';
+import {shopifyImg, shopifySrcSet} from '~/lib/images';
 
 export async function loader({context}: Route.LoaderArgs) {
   const {collection} = await context.storefront.query(COLLECTION_QUERY, {
@@ -60,7 +60,14 @@ export default function Accessories() {
           >
             <div className="product-item-img">
               {item.image && (
-                <img src={shopifyImg(item.image, {width: 800, format: 'webp'})} alt={item.title} loading={index < 4 ? 'eager' : 'lazy'} />
+                <img
+                  src={shopifyImg(item.image, {width: 800})}
+                  srcSet={shopifySrcSet(item.image, [400, 600, 800, 1200])}
+                  sizes="(min-width: 45em) 25vw, 50vw"
+                  alt={item.title}
+                  loading={index < 4 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
               )}
             </div>
             <h4>{item.title}</h4>
