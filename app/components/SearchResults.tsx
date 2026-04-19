@@ -2,6 +2,7 @@ import {Link} from 'react-router';
 import {Money, Pagination} from '@shopify/hydrogen';
 import {urlWithTrackingParams, type RegularSearchReturn} from '~/lib/search';
 import {flattenToColorVariants} from '~/lib/collections';
+import {shopifyImg} from '~/lib/images';
 
 type SearchItems = RegularSearchReturn['result']['items'];
 type PartialSearchResult<ItemType extends keyof SearchItems> = Pick<
@@ -110,15 +111,23 @@ function SearchResultsProducts({
           <div>
             <div className="search-results-grid">
               {items.map((item) => {
-                const productUrl = urlWithTrackingParams({
+                const baseUrl = urlWithTrackingParams({
                   baseUrl: `/products/${item.handle}`,
                   trackingParams: item.trackingParameters,
                   term,
-                }) + (item.colorName ? `&Color=${encodeURIComponent(item.colorName)}` : '');
+                });
+                const optionParams = new URLSearchParams();
+                if (item.selectedOptions?.length) {
+                  for (const opt of item.selectedOptions) optionParams.set(opt.name, opt.value);
+                } else if (item.colorName) {
+                  optionParams.set('Color', item.colorName);
+                }
+                const optionQs = optionParams.toString();
+                const productUrl = optionQs ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${optionQs}` : baseUrl;
                 return (
                   <Link key={item.id} prefetch="intent" to={productUrl} className="product-item" data-handle={item.handle}>
                     <div className="product-item-img">
-                      {item.image && <img src={item.image} alt={item.title} />}
+                      {item.image && <img src={shopifyImg(item.image, {width: 800, format: 'webp'})} alt={item.title} loading="lazy" />}
                     </div>
                     <h4>{item.title}</h4>
                     <small>

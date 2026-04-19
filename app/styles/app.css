@@ -1917,6 +1917,7 @@ aside main {
 
 .product-image {
   width: 100%;
+  overflow: hidden;
 }
 
 .product-image img {
@@ -1925,6 +1926,12 @@ aside main {
   display: block;
   object-fit: contain;
   object-position: top center;
+  transform: scale(1);
+  transform-origin: center center;
+}
+
+.product-image.product-image-model img {
+  transform: scale(1);
 }
 
 /* On desktop, image fits within viewport (leave room for dot indicators) */

@@ -1,4 +1,4 @@
-import {createHydrogenContext} from '@shopify/hydrogen';
+import {createHydrogenContext, type I18nBase} from '@shopify/hydrogen';
 import {AppSession} from '~/lib/session';
 import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
 
@@ -8,9 +8,8 @@ import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
  * - Falls back to VN (Vietnam) as the primary market.
  * - Vietnamese visitors get VND prices, everyone else gets their local currency.
  */
-function getLocaleFromRequest(request: Request): {language: string; country: string} {
+function getLocaleFromRequest(request: Request): I18nBase {
   const buyerCountry = (request.headers.get('Oxygen-Buyer-Country') ?? '').toUpperCase();
-  // Vietnam gets VND prices. Everyone else gets treated as US (USD).
   if (buyerCountry === 'VN') {
     return {language: 'VI', country: 'VN'};
   }

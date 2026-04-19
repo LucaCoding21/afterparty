@@ -2,7 +2,8 @@ import {useEffect} from 'react';
 import type {Route} from './+types/collections.all';
 import {Link, useLoaderData} from 'react-router';
 import {Money} from '@shopify/hydrogen';
-import {flattenToColorVariants} from '~/lib/collections';
+import {flattenToColorVariants, buildProductUrl} from '~/lib/collections';
+import {shopifyImg} from '~/lib/images';
 
 export async function loader({context}: Route.LoaderArgs) {
   const {products} = await context.storefront.query(CATALOG_QUERY);
@@ -69,17 +70,13 @@ export default function ShopAll() {
             key={item.id}
             className="product-item"
             prefetch="intent"
-            to={
-              item.colorName
-                ? `/products/${item.handle}?Color=${encodeURIComponent(item.colorName)}&from=all`
-                : `/products/${item.handle}?from=all`
-            }
+            to={buildProductUrl(item, 'all')}
             data-handle={item.handle}
           >
             <div className="product-item-img">
               {item.image && (
                 <img
-                  src={item.image}
+                  src={shopifyImg(item.image, {width: 800, format: 'webp'})}
                   alt={item.title}
                   loading={index < 4 ? 'eager' : 'lazy'}
                 />

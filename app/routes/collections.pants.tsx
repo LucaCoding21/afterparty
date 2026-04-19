@@ -2,7 +2,8 @@ import {useEffect} from 'react';
 import type {Route} from './+types/collections.pants';
 import {Link, useLoaderData} from 'react-router';
 import {Money} from '@shopify/hydrogen';
-import {flattenToColorVariants} from '~/lib/collections';
+import {flattenToColorVariants, buildProductUrl} from '~/lib/collections';
+import {shopifyImg} from '~/lib/images';
 
 export async function loader({context}: Route.LoaderArgs) {
   const {collection} = await context.storefront.query(COLLECTION_QUERY, {
@@ -54,16 +55,12 @@ export default function Pants() {
             key={item.id}
             className="product-item"
             prefetch="intent"
-            to={
-              item.colorName
-                ? `/products/${item.handle}?Color=${encodeURIComponent(item.colorName)}`
-                : `/products/${item.handle}`
-            }
+            to={buildProductUrl(item)}
             data-handle={item.handle}
           >
             <div className="product-item-img">
               {item.image && (
-                <img src={item.image} alt={item.title} loading={index < 4 ? 'eager' : 'lazy'} />
+                <img src={shopifyImg(item.image, {width: 800, format: 'webp'})} alt={item.title} loading={index < 4 ? 'eager' : 'lazy'} />
               )}
             </div>
             <h4>{item.title}</h4>

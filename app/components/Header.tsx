@@ -8,6 +8,7 @@ import {
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {SEARCH_ENDPOINT} from '~/components/SearchFormPredictive';
+import {shopifyImg} from '~/lib/images';
 
 type CatalogProduct = {handle: string; title: string; image: string; price?: {amount: string; currencyCode: string}};
 
@@ -266,7 +267,7 @@ export function Header({
                       className="mobile-search-result"
                       onClick={closeMobileSearch}
                     >
-                      {product.image && <img src={product.image} alt={product.title} className="mobile-search-result-img" />}
+                      {product.image && <img src={shopifyImg(product.image, {width: 200, format: 'webp'})} alt={product.title} className="mobile-search-result-img" loading="lazy" />}
                       <div className="mobile-search-result-info">
                         <span className="mobile-search-result-title">{product.title}</span>
                         {product.price && (

@@ -46,7 +46,7 @@ export function CartLineItem({
               aspectRatio="1/1"
               data={image}
               height={120}
-              loading="lazy"
+              loading="eager"
               width={120}
             />
           </Link>

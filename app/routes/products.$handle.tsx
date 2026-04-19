@@ -18,6 +18,7 @@ import {
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {shopifyImg, preloadCartThumbnail} from '~/lib/images';
 
 type CatalogProduct = {handle: string; title: string; image: string; price?: {amount: string; currencyCode: string}};
 
@@ -155,6 +156,7 @@ async function loadCriticalData({
   const [{product}] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
       variables: {handle, selectedOptions: getSelectedProductOptions(request)},
+      cache: storefront.CacheLong(),
     }),
   ]);
 
@@ -286,24 +288,42 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
   const isSoldOut = !selectedVariant?.availableForSale;
   const [sizeWarning, setSizeWarning] = useState(false);
 
-  // Build carousel images: variant flat-lay first, then matching lookbook photos
-  const images: string[] = [];
+  type CarouselImage = {url: string; isModel: boolean};
+  const images: CarouselImage[] = [];
+  const altByUrl = new Map<string, string>(
+    (product.images?.nodes ?? []).map((img: any) => [img.url, (img.altText ?? '').toLowerCase()]),
+  );
+  const isModelAlt = (url: string) => (altByUrl.get(url) ?? '').includes('model');
   if (selectedVariant?.image?.url) {
-    images.push(selectedVariant.image.url);
+    images.push({url: selectedVariant.image.url, isModel: isModelAlt(selectedVariant.image.url)});
   }
-  // Add lookbook/extra product images that match the selected color (by alt text)
   const selectedColorName = selectedVariant?.selectedOptions?.find(
     (o: any) => o.name.toLowerCase() === 'color',
   )?.value;
-  if (product.images?.nodes) {
-    const variantImageUrl = selectedVariant?.image?.url;
-    for (const img of product.images.nodes) {
-      if (img.url === variantImageUrl) continue; // skip the flat-lay already added
-      // Match by alt text containing the color name
-      if (selectedColorName && img.altText?.toLowerCase().includes(selectedColorName.toLowerCase())) {
-        images.push(img.url);
-      }
-    }
+  // Exclude every variant-linked image from the extras pool so other colors'
+  // flat-lays don't leak into the current color's carousel. Only non-variant
+  // media (lookbooks, detail shots) goes through the color-alt filter.
+  const variantImageUrls = new Set<string>(
+    (product.variants?.nodes ?? [])
+      .map((v: any) => v.image?.url)
+      .filter((u: string | undefined): u is string => Boolean(u)),
+  );
+  const extras = (product.images?.nodes ?? []).filter(
+    (img: any) => !variantImageUrls.has(img.url),
+  );
+  // Only strict-filter when there's more than one color to choose between.
+  // Single-color products (even ones that technically have a Color option) show all extras.
+  const colorValues = product.options?.find(
+    (o: any) => o.name.toLowerCase() === 'color',
+  )?.optionValues;
+  const hasMultipleColors = (colorValues?.length ?? 0) > 1;
+  const picked = selectedColorName && hasMultipleColors
+    ? extras.filter((img: any) =>
+        img.altText?.toLowerCase().includes(selectedColorName.toLowerCase()),
+      )
+    : extras;
+  for (const img of picked) {
+    images.push({url: img.url, isModel: (img.altText ?? '').toLowerCase().includes('model')});
   }
 
   // Separate color and size options for custom rendering
@@ -329,7 +349,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
 
       <div className="product">
         <ImageCarousel
-          images={images.length > 0 ? images : ['']}
+          images={images.length > 0 ? images : [{url: '', isModel: false}]}
           alt={`${title}${selectedColorName ? ` — ${selectedColorName}` : ''}`}
         />
 
@@ -369,7 +389,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
                         }
                       }}
                     >
-                      {variantImage && <img src={variantImage} alt={value.name} />}
+                      {variantImage && <img src={shopifyImg(variantImage, {width: 200, format: 'webp'})} alt={value.name} />}
                     </button>
                   );
                 })}
@@ -484,6 +504,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
                   setTimeout(() => setSizeWarning(false), 1500);
                   return;
                 }
+                preloadCartThumbnail(selectedVariant?.image?.url);
                 open('cart');
               }}
               lines={
@@ -510,6 +531,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
                 setTimeout(() => setSizeWarning(false), 1500);
                 return;
               }
+              preloadCartThumbnail(selectedVariant?.image?.url);
               open('cart');
             }}
             lines={
@@ -547,7 +569,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
             {recentlyViewed.map((item) => (
               <Link key={item.handle} className="product-item" prefetch="intent" to={`/products/${item.handle}`} data-handle={item.handle}>
                 <div className="product-item-img">
-                  {item.image && <img src={item.image} alt={item.title} loading="lazy" />}
+                  {item.image && <img src={shopifyImg(item.image, {width: 800, format: 'webp'})} alt={item.title} loading="lazy" />}
                 </div>
                 <h4>{item.title}</h4>
                 {item.price && (
@@ -569,7 +591,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
             {shopOthers.map((item) => (
               <Link key={item.handle} className="product-item" prefetch="intent" to={`/products/${item.handle}`} data-handle={item.handle}>
                 <div className="product-item-img">
-                  {item.image && <img src={item.image} alt={item.title} loading="lazy" />}
+                  {item.image && <img src={shopifyImg(item.image, {width: 800, format: 'webp'})} alt={item.title} loading="lazy" />}
                 </div>
                 <h4>{item.title}</h4>
                 {item.price && (
@@ -621,7 +643,7 @@ function ImageZoomOverlay({src, alt, onClose}: {src: string; alt: string; onClos
       </button>
       <img
         ref={imgRef}
-        src={src}
+        src={shopifyImg(src, {width: 2400, format: 'webp'})}
         alt={alt}
         className="zoom-image"
         onLoad={handleImageLoad}
@@ -631,14 +653,14 @@ function ImageZoomOverlay({src, alt, onClose}: {src: string; alt: string; onClos
   );
 }
 
-function ImageCarousel({images, alt}: {images: string[]; alt: string}) {
+function ImageCarousel({images, alt}: {images: {url: string; isModel: boolean}[]; alt: string}) {
   const [index, setIndex] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     setIndex(0);
-  }, [images[0]]);
+  }, [images[0]?.url]);
 
   const prev = () => setIndex((i) => (i - 1 + images.length) % images.length);
   const next = () => setIndex((i) => (i + 1) % images.length);
@@ -656,6 +678,7 @@ function ImageCarousel({images, alt}: {images: string[]; alt: string}) {
     touchStartX.current = null;
   }
 
+  const current = images[index];
   return (
     <div className="product-image-carousel">
       <div
@@ -663,8 +686,8 @@ function ImageCarousel({images, alt}: {images: string[]; alt: string}) {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className={`product-image product-image-zoomable${index > 0 ? ' product-image-model' : ''}`} onClick={() => setZoomed(true)}>
-          <img src={images[index]} alt={alt} key={images[index]} />
+        <div className={`product-image product-image-zoomable${current?.isModel ? ' product-image-model' : ''}`} onClick={() => setZoomed(true)}>
+          <img src={shopifyImg(current?.url, {width: 1400, format: 'webp'})} alt={alt} key={current?.url} />
         </div>
         {images.length > 1 && (
           <>
@@ -695,7 +718,7 @@ function ImageCarousel({images, alt}: {images: string[]; alt: string}) {
       )}
       {zoomed && (
         <ImageZoomOverlay
-          src={images[index]}
+          src={current?.url ?? ''}
           alt={alt}
           onClose={() => setZoomed(false)}
         />
@@ -799,6 +822,13 @@ const PRODUCT_FRAGMENT = `#graphql
       nodes {
         url
         altText
+      }
+    }
+    variants(first: 50) {
+      nodes {
+        image {
+          url
+        }
       }
     }
     seo {
