@@ -288,14 +288,19 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
   const isSoldOut = !selectedVariant?.availableForSale;
   const [sizeWarning, setSizeWarning] = useState(false);
 
-  type CarouselImage = {url: string; isModel: boolean};
+  type CarouselImage = {url: string; isModel: boolean; width?: number; height?: number};
   const images: CarouselImage[] = [];
   const altByUrl = new Map<string, string>(
     (product.images?.nodes ?? []).map((img: any) => [img.url, (img.altText ?? '').toLowerCase()]),
   );
   const isModelAlt = (url: string) => (altByUrl.get(url) ?? '').includes('model');
   if (selectedVariant?.image?.url) {
-    images.push({url: selectedVariant.image.url, isModel: isModelAlt(selectedVariant.image.url)});
+    images.push({
+      url: selectedVariant.image.url,
+      isModel: isModelAlt(selectedVariant.image.url),
+      width: selectedVariant.image.width ?? undefined,
+      height: selectedVariant.image.height ?? undefined,
+    });
   }
   const selectedColorName = selectedVariant?.selectedOptions?.find(
     (o: any) => o.name.toLowerCase() === 'color',
@@ -323,7 +328,12 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
       )
     : extras;
   for (const img of picked) {
-    images.push({url: img.url, isModel: (img.altText ?? '').toLowerCase().includes('model')});
+    images.push({
+      url: img.url,
+      isModel: (img.altText ?? '').toLowerCase().includes('model'),
+      width: img.width ?? undefined,
+      height: img.height ?? undefined,
+    });
   }
 
   // Separate color and size options for custom rendering
@@ -349,7 +359,11 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
 
       <div className="product">
         <ImageCarousel
-          images={images.length > 0 ? images : [{url: '', isModel: false}]}
+          images={
+            images.length > 0
+              ? images
+              : [{url: '', isModel: false, width: undefined, height: undefined}]
+          }
           alt={`${title}${selectedColorName ? ` — ${selectedColorName}` : ''}`}
         />
 
@@ -653,7 +667,13 @@ function ImageZoomOverlay({src, alt, onClose}: {src: string; alt: string; onClos
   );
 }
 
-function ImageCarousel({images, alt}: {images: {url: string; isModel: boolean}[]; alt: string}) {
+function ImageCarousel({
+  images,
+  alt,
+}: {
+  images: {url: string; isModel: boolean; width?: number; height?: number}[];
+  alt: string;
+}) {
   const [index, setIndex] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -687,7 +707,13 @@ function ImageCarousel({images, alt}: {images: {url: string; isModel: boolean}[]
         onTouchEnd={handleTouchEnd}
       >
         <div className={`product-image product-image-zoomable${current?.isModel ? ' product-image-model' : ''}`} onClick={() => setZoomed(true)}>
-          <img src={shopifyImg(current?.url, {width: 1400, format: 'webp'})} alt={alt} key={current?.url} />
+          <img
+            src={shopifyImg(current?.url, {width: 1400, format: 'webp'})}
+            alt={alt}
+            key={current?.url}
+            width={current?.width}
+            height={current?.height}
+          />
         </div>
         {images.length > 1 && (
           <>
@@ -822,6 +848,8 @@ const PRODUCT_FRAGMENT = `#graphql
       nodes {
         url
         altText
+        width
+        height
       }
     }
     variants(first: 50) {
