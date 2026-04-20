@@ -117,7 +117,7 @@ const SEARCH_PRODUCT_FRAGMENT = `#graphql
       name
       values
     }
-    variants(first: 50) {
+    variants(first: 20) {
       nodes {
         id
         availableForSale

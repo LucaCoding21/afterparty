@@ -6,7 +6,9 @@ import {flattenToColorVariants, buildProductUrl} from '~/lib/collections';
 import {shopifyImg, shopifySrcSet} from '~/lib/images';
 
 export async function loader({context}: Route.LoaderArgs) {
-  const {products} = await context.storefront.query(CATALOG_QUERY);
+  const {products} = await context.storefront.query(CATALOG_QUERY, {
+    cache: context.storefront.CacheLong(),
+  });
   return {items: flattenToColorVariants(products.nodes)};
 }
 
@@ -31,7 +33,7 @@ const CATALOG_QUERY = `#graphql
             currencyCode
           }
         }
-        variants(first: 50) {
+        variants(first: 20) {
           nodes {
             id
             availableForSale

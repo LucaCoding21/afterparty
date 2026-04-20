@@ -8,6 +8,7 @@ import {shopifyImg, shopifySrcSet} from '~/lib/images';
 export async function loader({context}: Route.LoaderArgs) {
   const {collection} = await context.storefront.query(COLLECTION_QUERY, {
     variables: {handle: 'accessories'},
+    cache: context.storefront.CacheLong(),
   });
   return {items: flattenToColorVariants(collection?.products?.nodes ?? [])};
 }
@@ -24,7 +25,7 @@ const COLLECTION_QUERY = `#graphql
           featuredImage { url }
           options { name values }
           priceRange { minVariantPrice { amount currencyCode } }
-          variants(first: 50) {
+          variants(first: 20) {
             nodes {
               id
               availableForSale

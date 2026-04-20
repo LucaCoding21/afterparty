@@ -882,7 +882,7 @@ const PRODUCT_FRAGMENT = `#graphql
         height
       }
     }
-    variants(first: 50) {
+    variants(first: 20) {
       nodes {
         image {
           url
