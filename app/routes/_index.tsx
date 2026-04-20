@@ -26,8 +26,16 @@ export default function Homepage() {
     const isMobile = window.matchMedia('(max-width: 48em)').matches;
     const correct = isMobile ? '/Mobile_grey.mp4' : '/Desktop_grey.mp4';
     if (correct !== videoSrc) setVideoSrc(correct);
+
+    // In-app browsers (Instagram, TikTok, FB) ignore CSS scroll-lock and
+    // bubble touchmove up to their native chrome. Killing the default on
+    // touchmove is the only reliable way to stop it across every WebView.
+    const blockTouch = (e: TouchEvent) => e.preventDefault();
+    document.addEventListener('touchmove', blockTouch, {passive: false});
+
     return () => {
       document.body.classList.remove('home-page');
+      document.removeEventListener('touchmove', blockTouch);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -3499,12 +3499,21 @@ body.home-page .header-wrapper {
   z-index: 10;
 }
 
-/* Home-only: lock scroll (mobile + desktop). Scoped strictly via body.home-page. */
-html:has(body.home-page),
-body.home-page {
+/* Home-only: lock scroll (mobile + desktop, incl. in-app browsers like
+   Instagram/TikTok which ignore plain overflow:hidden). Scoped via body.home-page. */
+html:has(body.home-page) {
   height: 100%;
   overflow: hidden;
+}
+body.home-page {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
   overscroll-behavior: none;
+  touch-action: none;
 }
 
 body.home-page footer {
