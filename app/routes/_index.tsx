@@ -49,21 +49,40 @@ export default function Homepage() {
   // play() explicitly on mount and again on canplay/loadedmetadata
   // covers the cases where the attribute didn't fire. In Low Power
   // Mode the call rejects silently and the poster stays visible — no
-  // detection needed because the 'playing' event simply never fires.
+  // detection needed because playback simply never starts.
+  //
+  // Visibility is driven by native event listeners (not React's
+  // synthetic onPlaying) because React can attach its handler after
+  // the 'playing' event has already fired on fast devices, leaving us
+  // stuck on the poster forever. We also check the video's current
+  // state on mount to catch the case where playback started before
+  // this effect ran.
   useEffect(() => {
     if (!isMobile) return;
     const video = mobileVideoRef.current;
     if (!video) return;
 
+    const markPlaying = () => {
+      if (!video.paused && video.currentTime > 0) setVideoPlaying(true);
+    };
+
+    // If the video is already advancing by the time we mount, flip on.
+    markPlaying();
+
+    const onPlaying = () => setVideoPlaying(true);
     const tryPlay = () => {
       video.play().catch(() => {});
     };
 
     tryPlay();
+    video.addEventListener('playing', onPlaying);
+    video.addEventListener('timeupdate', markPlaying);
     video.addEventListener('canplay', tryPlay);
     video.addEventListener('loadedmetadata', tryPlay);
 
     return () => {
+      video.removeEventListener('playing', onPlaying);
+      video.removeEventListener('timeupdate', markPlaying);
       video.removeEventListener('canplay', tryPlay);
       video.removeEventListener('loadedmetadata', tryPlay);
     };
@@ -127,7 +146,6 @@ export default function Homepage() {
               playsInline
               preload="auto"
               disableRemotePlayback
-              onPlaying={() => setVideoPlaying(true)}
               data-playing={videoPlaying ? 'true' : 'false'}
             />
           </>
