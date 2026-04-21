@@ -18,6 +18,7 @@ export default function Homepage() {
   const {initialIsMobile} = useLoaderData<typeof loader>();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMobile, setIsMobile] = useState(initialIsMobile);
+  const [replayKey, setReplayKey] = useState(0);
 
   useEffect(() => {
     document.body.classList.add('home-page');
@@ -32,9 +33,19 @@ export default function Homepage() {
     const blockTouch = (e: TouchEvent) => e.preventDefault();
     document.addEventListener('touchmove', blockTouch, {passive: false});
 
+    // Back/forward cache (aggressive on iOS) restores the DOM — including
+    // the <img>/<video> — in its final-frame paused state. Bumping the key
+    // forces React to remount the element so the browser replays it from
+    // frame 0, matching the behavior of a fresh page load.
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) setReplayKey((k) => k + 1);
+    };
+    window.addEventListener('pageshow', onPageShow);
+
     return () => {
       document.body.classList.remove('home-page');
       document.removeEventListener('touchmove', blockTouch);
+      window.removeEventListener('pageshow', onPageShow);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -68,7 +79,7 @@ export default function Homepage() {
       document.removeEventListener('click', onGesture);
       document.removeEventListener('keydown', onGesture);
     };
-  }, [isMobile]);
+  }, [isMobile, replayKey]);
 
   return (
     <div className="home-hero">
@@ -80,6 +91,7 @@ export default function Homepage() {
       >
         {isMobile ? (
           <img
+            key={replayKey}
             className="home-hero-video"
             src="/Mobile_grey.webp"
             alt=""
@@ -89,6 +101,7 @@ export default function Homepage() {
           />
         ) : (
           <video
+            key={replayKey}
             ref={videoRef}
             className="home-hero-video"
             src="/Desktop_grey.mp4"
