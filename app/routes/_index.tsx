@@ -40,6 +40,11 @@ export default function Homepage() {
   const mobileVideoRef = useRef<HTMLVideoElement>(null);
   const [isMobile, setIsMobile] = useState(initialIsMobile);
   const [autoplay, setAutoplay] = useState<AutoplayState>('unknown');
+  // True only once the 'playing' event has actually fired. Visibility of
+  // the video element is gated on this — never on cache or promise
+  // resolution — so iOS can never show a "tap to play" overlay on a
+  // visible-but-paused video.
+  const [videoPlaying, setVideoPlaying] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('home-page');
@@ -61,19 +66,23 @@ export default function Homepage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mobile autoplay detection. Try to play the video; if it rejects, the
-  // device is in Low Power Mode (or otherwise blocking autoplay) and we
-  // fall back to the last-frame poster. Result is memoized in
-  // localStorage so future visits skip the detection.
+  // Mobile autoplay detection. iOS Low Power Mode is the tricky case: it
+  // sometimes rejects video.play() (easy — catch fires), but it also
+  // sometimes *resolves* the promise successfully while leaving the video
+  // paused and never firing the 'playing' event. So we listen for the
+  // 'playing' event as the definitive success signal, treat play()
+  // rejection as definitive failure, and use a short timer as a fallback
+  // for the silent-fail case. Result is cached in localStorage so future
+  // visits skip the detection entirely.
   useEffect(() => {
-    if (!isMobile || autoplay !== 'unknown') return;
+    if (!isMobile) return;
     const video = mobileVideoRef.current;
     if (!video) return;
 
-    let cancelled = false;
-    const commit = (state: 'ok' | 'blocked') => {
-      if (cancelled) return;
-      setAutoplay(state);
+    let alive = true;
+    let confirmed: 'ok' | 'blocked' | null = null;
+
+    const writeCache = (state: 'ok' | 'blocked') => {
       try {
         window.localStorage.setItem(AUTOPLAY_CACHE_KEY, state === 'ok' ? '1' : '0');
       } catch {
@@ -81,14 +90,40 @@ export default function Homepage() {
       }
     };
 
-    void Promise.resolve(video.play())
-      .then(() => commit('ok'))
-      .catch(() => commit('blocked'));
+    const markOk = () => {
+      if (!alive || confirmed === 'ok') return;
+      confirmed = 'ok';
+      setAutoplay('ok');
+      setVideoPlaying(true);
+      writeCache('ok');
+    };
+
+    // Blocked is "soft" — a later 'playing' event can still upgrade us
+    // to 'ok'. This handles the slow-network case where the timeout
+    // fires before the video has buffered enough to start playing.
+    const markBlocked = () => {
+      if (!alive || confirmed) return;
+      setAutoplay('blocked');
+      writeCache('blocked');
+    };
+
+    const onPlaying = () => markOk();
+    video.addEventListener('playing', onPlaying);
+
+    void Promise.resolve(video.play()).catch(() => markBlocked());
+
+    // Failsafe: iOS LPM can resolve play() and falsely report
+    // !video.paused while never actually playing. The only reliable
+    // signal is the 'playing' event — if it hasn't fired by now,
+    // assume autoplay is blocked.
+    const timer = window.setTimeout(() => markBlocked(), 400);
 
     return () => {
-      cancelled = true;
+      alive = false;
+      video.removeEventListener('playing', onPlaying);
+      window.clearTimeout(timer);
     };
-  }, [isMobile, autoplay]);
+  }, [isMobile]);
 
   // Desktop video: same autoplay-with-gesture-fallback pattern as before.
   useEffect(() => {
@@ -142,8 +177,8 @@ export default function Homepage() {
               preload="auto"
               disableRemotePlayback
               style={{
-                opacity: autoplay === 'ok' ? 1 : 0,
-                pointerEvents: autoplay === 'ok' ? 'auto' : 'none',
+                opacity: videoPlaying ? 1 : 0,
+                pointerEvents: videoPlaying ? 'auto' : 'none',
               }}
             />
             {autoplay === 'blocked' && (
