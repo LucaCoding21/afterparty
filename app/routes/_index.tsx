@@ -11,21 +11,20 @@ export async function loader({request}: Route.LoaderArgs) {
   const isMobile = /Mobi|Android|iPhone|iPad|iPod|webOS|BlackBerry|Windows Phone/i.test(
     ua,
   );
-  return {initialVideoSrc: isMobile ? '/Mobile_grey.mp4' : '/Desktop_grey.mp4'};
+  return {initialIsMobile: isMobile};
 }
 
 export default function Homepage() {
-  const {initialVideoSrc} = useLoaderData<typeof loader>();
+  const {initialIsMobile} = useLoaderData<typeof loader>();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoSrc, setVideoSrc] = useState(initialVideoSrc);
+  const [isMobile, setIsMobile] = useState(initialIsMobile);
 
   useEffect(() => {
     document.body.classList.add('home-page');
     // Correct the UA guess if the client viewport disagrees (e.g. narrow
     // desktop window, tablet in landscape). Only swap if the pick is wrong.
-    const isMobile = window.matchMedia('(max-width: 48em)').matches;
-    const correct = isMobile ? '/Mobile_grey.mp4' : '/Desktop_grey.mp4';
-    if (correct !== videoSrc) setVideoSrc(correct);
+    const matches = window.matchMedia('(max-width: 48em)').matches;
+    if (matches !== isMobile) setIsMobile(matches);
 
     // In-app browsers (Instagram, TikTok, FB) ignore CSS scroll-lock and
     // bubble touchmove up to their native chrome. Killing the default on
@@ -41,47 +40,35 @@ export default function Homepage() {
   }, []);
 
   useEffect(() => {
+    // Mobile uses an animated WebP (<img>) — browsers play it automatically
+    // and iOS Low Power Mode / in-app browsers can't block it.
+    if (isMobile) return;
     const video = videoRef.current;
     if (!video) return;
     video.muted = true;
-
-    // iOS Low Power Mode can block autoplay even with the muted/inline
-    // contract. If play() rejects, resume on the first user gesture so the
-    // hero starts playing the moment the visitor interacts with the page.
-    let gestureHandler: (() => void) | null = null;
-    const removeGesture = () => {
-      if (!gestureHandler) return;
-      document.removeEventListener('touchstart', gestureHandler);
-      document.removeEventListener('click', gestureHandler);
-      document.removeEventListener('scroll', gestureHandler);
-      document.removeEventListener('keydown', gestureHandler);
-      gestureHandler = null;
-    };
+    video.defaultMuted = true;
+    video.playsInline = true;
 
     const tryPlay = () => {
-      const p = video.play();
-      if (p && typeof p.catch === 'function') {
-        p.catch(() => {
-          if (gestureHandler) return;
-          gestureHandler = () => {
-            video.play().catch(() => {});
-            removeGesture();
-          };
-          document.addEventListener('touchstart', gestureHandler, {passive: true});
-          document.addEventListener('click', gestureHandler);
-          document.addEventListener('scroll', gestureHandler, {passive: true});
-          document.addEventListener('keydown', gestureHandler);
-        });
-      }
+      video.play().catch(() => {});
+    };
+    const onGesture = () => {
+      if (video.paused) tryPlay();
     };
 
     tryPlay();
-    video.addEventListener('loadedmetadata', tryPlay, {once: true});
+    video.addEventListener('canplay', tryPlay);
+    video.addEventListener('loadedmetadata', tryPlay);
+    document.addEventListener('click', onGesture);
+    document.addEventListener('keydown', onGesture);
+
     return () => {
+      video.removeEventListener('canplay', tryPlay);
       video.removeEventListener('loadedmetadata', tryPlay);
-      removeGesture();
+      document.removeEventListener('click', onGesture);
+      document.removeEventListener('keydown', onGesture);
     };
-  }, [videoSrc]);
+  }, [isMobile]);
 
   return (
     <div className="home-hero">
@@ -91,15 +78,27 @@ export default function Homepage() {
         aria-label="Shop the catalog"
         className="home-hero-link"
       >
-        <video
-          ref={videoRef}
-          className="home-hero-video"
-          src={videoSrc}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-        />
+        {isMobile ? (
+          <img
+            className="home-hero-video"
+            src="/Mobile_grey.webp"
+            alt=""
+            decoding="async"
+            fetchPriority="high"
+            draggable={false}
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            className="home-hero-video"
+            src="/Desktop_grey.mp4"
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+            disableRemotePlayback
+          />
+        )}
       </Link>
     </div>
   );
