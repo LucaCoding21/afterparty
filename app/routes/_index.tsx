@@ -17,8 +17,10 @@ export async function loader({request}: Route.LoaderArgs) {
 export default function Homepage() {
   const {initialIsMobile} = useLoaderData<typeof loader>();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const blobUrlRef = useRef<string | null>(null);
   const [isMobile, setIsMobile] = useState(initialIsMobile);
   const [replayKey, setReplayKey] = useState(0);
+  const [mobileBlobSrc, setMobileBlobSrc] = useState<string | null>(null);
 
   useEffect(() => {
     document.body.classList.add('home-page');
@@ -33,26 +35,68 @@ export default function Homepage() {
     const blockTouch = (e: TouchEvent) => e.preventDefault();
     document.addEventListener('touchmove', blockTouch, {passive: false});
 
-    // Back/forward cache (aggressive on iOS) restores the DOM — including
-    // the <img>/<video> — in its final-frame paused state. Bumping the key
-    // forces React to remount the element so the browser replays it from
-    // frame 0, matching the behavior of a fresh page load.
+    // Bfcache restore — iOS is aggressive about preserving the DOM, so
+    // the <img>/<video> come back frozen on their final frame.
     const onPageShow = (e: PageTransitionEvent) => {
       if (e.persisted) setReplayKey((k) => k + 1);
     };
     window.addEventListener('pageshow', onPageShow);
 
+    // iOS Safari caches the animated-WebP end-state per URL. On repeat
+    // visits (refresh, back-nav, bfcache) a new <img> pointing at the
+    // same /Mobile_grey.webp re-shows the last frame instead of replaying.
+    // Detecting "this is a repeat visit in this tab" via sessionStorage
+    // lets us swap in a blob URL (unique identity, bytes pulled from HTTP
+    // cache) which iOS treats as a fresh animation.
+    try {
+      const wasVisited = sessionStorage.getItem('home_visited') === '1';
+      sessionStorage.setItem('home_visited', '1');
+      if (wasVisited) setReplayKey((k) => k + 1);
+    } catch {
+      // sessionStorage may be unavailable (private mode, sandboxed iframe)
+    }
+
     return () => {
       document.body.classList.remove('home-page');
       document.removeEventListener('touchmove', blockTouch);
       window.removeEventListener('pageshow', onPageShow);
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Mobile: on every replay (replayKey > 0), fetch the WebP bytes from the
+  // browser's HTTP cache and wrap them in a fresh blob URL. The new URL
+  // has a unique identity iOS Safari hasn't seen, so it re-decodes and
+  // animates from frame 0. No re-download.
   useEffect(() => {
-    // Mobile uses an animated WebP (<img>) — browsers play it automatically
-    // and iOS Low Power Mode / in-app browsers can't block it.
+    if (!isMobile || replayKey === 0) return;
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const res = await fetch('/Mobile_grey.webp');
+        if (!res.ok || cancelled) return;
+        const blob = await res.blob();
+        if (cancelled) return;
+        const blobUrl = URL.createObjectURL(blob);
+        if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = blobUrl;
+        setMobileBlobSrc(blobUrl);
+      } catch {
+        // Fall back to the static URL (already rendered).
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isMobile, replayKey]);
+
+  useEffect(() => {
     if (isMobile) return;
     const video = videoRef.current;
     if (!video) return;
@@ -93,7 +137,7 @@ export default function Homepage() {
           <img
             key={replayKey}
             className="home-hero-video"
-            src="/Mobile_grey.webp"
+            src={mobileBlobSrc ?? '/Mobile_grey.webp'}
             alt=""
             decoding="async"
             fetchPriority="high"
