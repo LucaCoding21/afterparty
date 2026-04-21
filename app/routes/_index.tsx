@@ -175,22 +175,12 @@ export default function Homepage() {
         className="home-hero-link"
       >
         {isMobile ? (
-          <>
-            <img
-              className="home-hero-media"
-              src="/Mobile_poster.webp"
-              alt=""
-              decoding="async"
-              fetchPriority="high"
-              draggable={false}
-            />
-            <div
-              ref={spriteRef}
-              className="home-hero-media home-hero-sprite"
-              role="img"
-              aria-hidden="true"
-            />
-          </>
+          <div
+            ref={spriteRef}
+            className="home-hero-media home-hero-sprite"
+            role="img"
+            aria-hidden="true"
+          />
         ) : (
           <video
             ref={desktopVideoRef}

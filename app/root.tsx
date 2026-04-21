@@ -79,13 +79,6 @@ export function links() {
       media: '(max-width: 48em)',
       fetchPriority: 'high',
     },
-    {
-      rel: 'preload',
-      as: 'image',
-      href: '/Mobile_poster.webp',
-      type: 'image/webp',
-      media: '(max-width: 48em)',
-    },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
   ];
 }
