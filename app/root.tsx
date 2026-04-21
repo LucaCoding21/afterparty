@@ -73,11 +73,18 @@ export function links() {
     },
     {
       rel: 'preload',
-      as: 'image',
-      href: '/Mobile_grey.webp',
-      type: 'image/webp',
+      as: 'video',
+      href: '/Mobile_grey.mp4',
+      type: 'video/mp4',
       media: '(max-width: 48em)',
       fetchPriority: 'high',
+    },
+    {
+      rel: 'preload',
+      as: 'image',
+      href: '/Mobile_poster.webp',
+      type: 'image/webp',
+      media: '(max-width: 48em)',
     },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
   ];

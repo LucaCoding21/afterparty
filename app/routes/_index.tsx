@@ -14,21 +14,35 @@ export async function loader({request}: Route.LoaderArgs) {
   return {initialIsMobile: isMobile};
 }
 
+// localStorage key for the cached autoplay-capability result. iOS in Low
+// Power Mode rejects video.play() — we test once per device and remember,
+// so subsequent visits render the right element on first paint with no
+// detection flash.
+const AUTOPLAY_CACHE_KEY = 'mobile_autoplay_ok';
+
+type AutoplayState = 'unknown' | 'ok' | 'blocked';
+
+function readCachedAutoplay(): AutoplayState {
+  if (typeof window === 'undefined') return 'unknown';
+  try {
+    const v = window.localStorage.getItem(AUTOPLAY_CACHE_KEY);
+    if (v === '1') return 'ok';
+    if (v === '0') return 'blocked';
+  } catch {
+    // localStorage unavailable
+  }
+  return 'unknown';
+}
+
 export default function Homepage() {
   const {initialIsMobile} = useLoaderData<typeof loader>();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  // Every blob URL we mint stays alive until the component unmounts —
-  // revoking one while iOS Safari is mid-decode kills the animation and
-  // leaves the <img> blank or stuck on the first few frames.
-  const blobUrlsRef = useRef<string[]>([]);
+  const desktopVideoRef = useRef<HTMLVideoElement>(null);
+  const mobileVideoRef = useRef<HTMLVideoElement>(null);
   const [isMobile, setIsMobile] = useState(initialIsMobile);
-  const [replayKey, setReplayKey] = useState(0);
-  const [mobileBlobSrc, setMobileBlobSrc] = useState<string | null>(null);
+  const [autoplay, setAutoplay] = useState<AutoplayState>('unknown');
 
   useEffect(() => {
     document.body.classList.add('home-page');
-    // Correct the UA guess if the client viewport disagrees (e.g. narrow
-    // desktop window, tablet in landscape). Only swap if the pick is wrong.
     const matches = window.matchMedia('(max-width: 48em)').matches;
     if (matches !== isMobile) setIsMobile(matches);
 
@@ -38,69 +52,48 @@ export default function Homepage() {
     const blockTouch = (e: TouchEvent) => e.preventDefault();
     document.addEventListener('touchmove', blockTouch, {passive: false});
 
-    // Bfcache restore (iOS restores the DOM frozen on the final frame).
-    const onPageShow = (e: PageTransitionEvent) => {
-      if (e.persisted) setReplayKey((k) => k + 1);
-    };
-    window.addEventListener('pageshow', onPageShow);
-
-    // iOS Safari caches the animated-WebP end-state per URL, so repeat
-    // visits to /Mobile_grey.webp show the last frame. sessionStorage
-    // tells us "this tab has seen the homepage before" so we know to
-    // swap in a blob URL (fresh identity) instead of rendering the
-    // static URL again.
-    try {
-      const wasVisited = sessionStorage.getItem('home_visited') === '1';
-      sessionStorage.setItem('home_visited', '1');
-      if (wasVisited) setReplayKey((k) => k + 1);
-    } catch {
-      // sessionStorage unavailable (private mode, sandboxed iframe).
-    }
+    setAutoplay(readCachedAutoplay());
 
     return () => {
       document.body.classList.remove('home-page');
       document.removeEventListener('touchmove', blockTouch);
-      window.removeEventListener('pageshow', onPageShow);
-      blobUrlsRef.current.forEach((u) => URL.revokeObjectURL(u));
-      blobUrlsRef.current = [];
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mobile replay: fetch WebP bytes (HTTP cache hit, no re-download),
-  // mint a fresh blob URL, and render a <img> that has never carried
-  // that URL before. iOS treats it as a new animation and plays from
-  // frame 0. The placeholder <div> in render keeps the img out of the
-  // tree until the blob URL is ready — no src swap mid-decode, which
-  // is what was causing the blank / first-three-frames behavior.
+  // Mobile autoplay detection. Try to play the video; if it rejects, the
+  // device is in Low Power Mode (or otherwise blocking autoplay) and we
+  // fall back to the last-frame poster. Result is memoized in
+  // localStorage so future visits skip the detection.
   useEffect(() => {
-    if (!isMobile || replayKey === 0) return;
-    setMobileBlobSrc(null);
-    let cancelled = false;
+    if (!isMobile || autoplay !== 'unknown') return;
+    const video = mobileVideoRef.current;
+    if (!video) return;
 
-    void (async () => {
+    let cancelled = false;
+    const commit = (state: 'ok' | 'blocked') => {
+      if (cancelled) return;
+      setAutoplay(state);
       try {
-        const res = await fetch('/Mobile_grey.webp');
-        if (!res.ok || cancelled) return;
-        const blob = await res.blob();
-        if (cancelled) return;
-        const blobUrl = URL.createObjectURL(blob);
-        blobUrlsRef.current.push(blobUrl);
-        setMobileBlobSrc(blobUrl);
+        window.localStorage.setItem(AUTOPLAY_CACHE_KEY, state === 'ok' ? '1' : '0');
       } catch {
-        // Network/fetch failure — leave placeholder up; at least not worse
-        // than a broken image.
+        // localStorage unavailable
       }
-    })();
+    };
+
+    void Promise.resolve(video.play())
+      .then(() => commit('ok'))
+      .catch(() => commit('blocked'));
 
     return () => {
       cancelled = true;
     };
-  }, [isMobile, replayKey]);
+  }, [isMobile, autoplay]);
 
+  // Desktop video: same autoplay-with-gesture-fallback pattern as before.
   useEffect(() => {
     if (isMobile) return;
-    const video = videoRef.current;
+    const video = desktopVideoRef.current;
     if (!video) return;
     video.muted = true;
     video.defaultMuted = true;
@@ -125,7 +118,7 @@ export default function Homepage() {
       document.removeEventListener('click', onGesture);
       document.removeEventListener('keydown', onGesture);
     };
-  }, [isMobile, replayKey]);
+  }, [isMobile]);
 
   return (
     <div className="home-hero">
@@ -136,48 +129,37 @@ export default function Homepage() {
         className="home-hero-link"
       >
         {isMobile ? (
-          replayKey === 0 ? (
-            // First visit in this tab — SSR-rendered <img> animates
-            // cleanly from frame 0, no JS intervention.
-            <img
+          <>
+            {/* Always mounted so we can run the autoplay test. Hidden until
+                we know it works — Low Power Mode users never see it. */}
+            <video
+              ref={mobileVideoRef}
               className="home-hero-video"
-              src="/Mobile_grey.webp"
-              alt=""
-              decoding="async"
-              fetchPriority="high"
-              draggable={false}
+              src="/Mobile_grey.mp4"
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
+              disableRemotePlayback
+              style={{
+                opacity: autoplay === 'ok' ? 1 : 0,
+                pointerEvents: autoplay === 'ok' ? 'auto' : 'none',
+              }}
             />
-          ) : mobileBlobSrc ? (
-            // Repeat visit — fresh blob URL identity. Keyed on the URL
-            // so a new blob always mounts a brand-new <img>, never
-            // swaps src on a live element.
-            <img
-              key={mobileBlobSrc}
-              className="home-hero-video"
-              src={mobileBlobSrc}
-              alt=""
-              decoding="async"
-              fetchPriority="high"
-              draggable={false}
-            />
-          ) : (
-            // Blob fetch in flight. Keep the static URL visible so iOS
-            // shows the cached last frame instead of a blank gap; the
-            // blob-keyed <img> above replaces this within ~50ms and
-            // restarts the animation from frame 0.
-            <img
-              className="home-hero-video"
-              src="/Mobile_grey.webp"
-              alt=""
-              decoding="async"
-              fetchPriority="high"
-              draggable={false}
-            />
-          )
+            {autoplay === 'blocked' && (
+              <img
+                className="home-hero-video"
+                src="/Mobile_poster.webp"
+                alt=""
+                decoding="async"
+                fetchPriority="high"
+                draggable={false}
+              />
+            )}
+          </>
         ) : (
           <video
-            key={replayKey}
-            ref={videoRef}
+            ref={desktopVideoRef}
             className="home-hero-video"
             src="/Desktop_grey.mp4"
             autoPlay
