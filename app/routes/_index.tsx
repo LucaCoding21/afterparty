@@ -17,7 +17,10 @@ export async function loader({request}: Route.LoaderArgs) {
 export default function Homepage() {
   const {initialIsMobile} = useLoaderData<typeof loader>();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const blobUrlRef = useRef<string | null>(null);
+  // Every blob URL we mint stays alive until the component unmounts —
+  // revoking one while iOS Safari is mid-decode kills the animation and
+  // leaves the <img> blank or stuck on the first few frames.
+  const blobUrlsRef = useRef<string[]>([]);
   const [isMobile, setIsMobile] = useState(initialIsMobile);
   const [replayKey, setReplayKey] = useState(0);
   const [mobileBlobSrc, setMobileBlobSrc] = useState<string | null>(null);
@@ -35,45 +38,44 @@ export default function Homepage() {
     const blockTouch = (e: TouchEvent) => e.preventDefault();
     document.addEventListener('touchmove', blockTouch, {passive: false});
 
-    // Bfcache restore — iOS is aggressive about preserving the DOM, so
-    // the <img>/<video> come back frozen on their final frame.
+    // Bfcache restore (iOS restores the DOM frozen on the final frame).
     const onPageShow = (e: PageTransitionEvent) => {
       if (e.persisted) setReplayKey((k) => k + 1);
     };
     window.addEventListener('pageshow', onPageShow);
 
-    // iOS Safari caches the animated-WebP end-state per URL. On repeat
-    // visits (refresh, back-nav, bfcache) a new <img> pointing at the
-    // same /Mobile_grey.webp re-shows the last frame instead of replaying.
-    // Detecting "this is a repeat visit in this tab" via sessionStorage
-    // lets us swap in a blob URL (unique identity, bytes pulled from HTTP
-    // cache) which iOS treats as a fresh animation.
+    // iOS Safari caches the animated-WebP end-state per URL, so repeat
+    // visits to /Mobile_grey.webp show the last frame. sessionStorage
+    // tells us "this tab has seen the homepage before" so we know to
+    // swap in a blob URL (fresh identity) instead of rendering the
+    // static URL again.
     try {
       const wasVisited = sessionStorage.getItem('home_visited') === '1';
       sessionStorage.setItem('home_visited', '1');
       if (wasVisited) setReplayKey((k) => k + 1);
     } catch {
-      // sessionStorage may be unavailable (private mode, sandboxed iframe)
+      // sessionStorage unavailable (private mode, sandboxed iframe).
     }
 
     return () => {
       document.body.classList.remove('home-page');
       document.removeEventListener('touchmove', blockTouch);
       window.removeEventListener('pageshow', onPageShow);
-      if (blobUrlRef.current) {
-        URL.revokeObjectURL(blobUrlRef.current);
-        blobUrlRef.current = null;
-      }
+      blobUrlsRef.current.forEach((u) => URL.revokeObjectURL(u));
+      blobUrlsRef.current = [];
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mobile: on every replay (replayKey > 0), fetch the WebP bytes from the
-  // browser's HTTP cache and wrap them in a fresh blob URL. The new URL
-  // has a unique identity iOS Safari hasn't seen, so it re-decodes and
-  // animates from frame 0. No re-download.
+  // Mobile replay: fetch WebP bytes (HTTP cache hit, no re-download),
+  // mint a fresh blob URL, and render a <img> that has never carried
+  // that URL before. iOS treats it as a new animation and plays from
+  // frame 0. The placeholder <div> in render keeps the img out of the
+  // tree until the blob URL is ready — no src swap mid-decode, which
+  // is what was causing the blank / first-three-frames behavior.
   useEffect(() => {
     if (!isMobile || replayKey === 0) return;
+    setMobileBlobSrc(null);
     let cancelled = false;
 
     void (async () => {
@@ -83,11 +85,11 @@ export default function Homepage() {
         const blob = await res.blob();
         if (cancelled) return;
         const blobUrl = URL.createObjectURL(blob);
-        if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
-        blobUrlRef.current = blobUrl;
+        blobUrlsRef.current.push(blobUrl);
         setMobileBlobSrc(blobUrl);
       } catch {
-        // Fall back to the static URL (already rendered).
+        // Network/fetch failure — leave placeholder up; at least not worse
+        // than a broken image.
       }
     })();
 
@@ -134,15 +136,34 @@ export default function Homepage() {
         className="home-hero-link"
       >
         {isMobile ? (
-          <img
-            key={replayKey}
-            className="home-hero-video"
-            src={mobileBlobSrc ?? '/Mobile_grey.webp'}
-            alt=""
-            decoding="async"
-            fetchPriority="high"
-            draggable={false}
-          />
+          replayKey === 0 ? (
+            // First visit in this tab — SSR-rendered <img> animates
+            // cleanly from frame 0, no JS intervention.
+            <img
+              className="home-hero-video"
+              src="/Mobile_grey.webp"
+              alt=""
+              decoding="async"
+              fetchPriority="high"
+              draggable={false}
+            />
+          ) : mobileBlobSrc ? (
+            // Repeat visit — fresh blob URL identity. Keyed on the URL
+            // so a new blob always mounts a brand-new <img>, never
+            // swaps src on a live element.
+            <img
+              key={mobileBlobSrc}
+              className="home-hero-video"
+              src={mobileBlobSrc}
+              alt=""
+              decoding="async"
+              fetchPriority="high"
+              draggable={false}
+            />
+          ) : (
+            // Blob fetch in flight (HTTP cache hit, typically ≤ 50ms).
+            <div className="home-hero-video" />
+          )
         ) : (
           <video
             key={replayKey}
