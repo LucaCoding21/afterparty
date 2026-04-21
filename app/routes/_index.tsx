@@ -14,17 +14,22 @@ export async function loader({request}: Route.LoaderArgs) {
   return {initialIsMobile: isMobile};
 }
 
+// Mobile intro is a WebP sprite sheet stepped through with rAF. Chose
+// this over <video> because iOS Low Power Mode silently blocks autoplay,
+// and we need the intro to play every time — including refresh and LPM.
+const SPRITE_URL = '/Mobile_sprite.webp';
+const SPRITE_FRAMES = 45;
+const SPRITE_FPS = 12;
+const SPRITE_COLS = 9;
+const SPRITE_ROWS = 5;
+const SPRITE_FRAME_W = 540;
+const SPRITE_FRAME_H = 960;
+
 export default function Homepage() {
   const {initialIsMobile} = useLoaderData<typeof loader>();
   const desktopVideoRef = useRef<HTMLVideoElement>(null);
-  const mobileVideoRef = useRef<HTMLVideoElement>(null);
+  const spriteRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(initialIsMobile);
-  // Mobile uses a stacked poster + video. The poster is always visible;
-  // the video lives on top at opacity 0 and crossfades in once it
-  // actually starts playing. iOS Low Power Mode silently blocks
-  // autoplay — those users never see the video fade in, so the poster
-  // stays visible. No detection logic needed.
-  const [videoPlaying, setVideoPlaying] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('home-page');
@@ -44,47 +49,89 @@ export default function Homepage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mobile video: the autoPlay attribute alone isn't reliable on iOS,
-  // especially after client-side navigation (product → home). Calling
-  // play() explicitly on mount and again on canplay/loadedmetadata
-  // covers the cases where the attribute didn't fire. In Low Power
-  // Mode the call rejects silently and the poster stays visible — no
-  // detection needed because playback simply never starts.
+  // Drive the sprite with requestAnimationFrame. Starts at frame 0 on
+  // every mount, so refresh and client-side nav back to home both
+  // replay the intro. The poster stays visible underneath until the
+  // sprite image has decoded, avoiding a flash of empty background.
   //
-  // Visibility is driven by native event listeners (not React's
-  // synthetic onPlaying) because React can attach its handler after
-  // the 'playing' event has already fired on fast devices, leaving us
-  // stuck on the poster forever. We also check the video's current
-  // state on mount to catch the case where playback started before
-  // this effect ran.
+  // Sizing mimics object-fit: cover — we compute a scaled frame size
+  // that fills the container while preserving the source 9:16 aspect,
+  // then center it. Plain % positioning stretches each frame to the
+  // container, which looks wrong on 9:19.5 phones.
   useEffect(() => {
     if (!isMobile) return;
-    const video = mobileVideoRef.current;
-    if (!video) return;
+    const el = spriteRef.current;
+    if (!el) return;
 
-    const markPlaying = () => {
-      if (!video.paused && video.currentTime > 0) setVideoPlaying(true);
+    const interval = 1000 / SPRITE_FPS;
+    let frame = 0;
+    let last = performance.now();
+    let rafId = 0;
+    let cancelled = false;
+    let scaledFrameW = 0;
+    let scaledFrameH = 0;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    const applyFrame = (i: number) => {
+      const col = i % SPRITE_COLS;
+      const row = Math.floor(i / SPRITE_COLS);
+      const x = offsetX - col * scaledFrameW;
+      const y = offsetY - row * scaledFrameH;
+      el.style.backgroundPosition = `${x}px ${y}px`;
     };
 
-    // If the video is already advancing by the time we mount, flip on.
-    markPlaying();
-
-    const onPlaying = () => setVideoPlaying(true);
-    const tryPlay = () => {
-      video.play().catch(() => {});
+    const measure = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (!w || !h) return;
+      const scale = Math.max(w / SPRITE_FRAME_W, h / SPRITE_FRAME_H);
+      scaledFrameW = SPRITE_FRAME_W * scale;
+      scaledFrameH = SPRITE_FRAME_H * scale;
+      offsetX = (w - scaledFrameW) / 2;
+      offsetY = (h - scaledFrameH) / 2;
+      el.style.backgroundSize = `${scaledFrameW * SPRITE_COLS}px ${
+        scaledFrameH * SPRITE_ROWS
+      }px`;
+      applyFrame(frame);
     };
 
-    tryPlay();
-    video.addEventListener('playing', onPlaying);
-    video.addEventListener('timeupdate', markPlaying);
-    video.addEventListener('canplay', tryPlay);
-    video.addEventListener('loadedmetadata', tryPlay);
+    measure();
+    el.dataset.ready = 'true';
+
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+
+    const tick = (now: number) => {
+      if (cancelled) return;
+      if (now - last >= interval) {
+        frame++;
+        if (frame >= SPRITE_FRAMES) {
+          applyFrame(SPRITE_FRAMES - 1);
+          return;
+        }
+        applyFrame(frame);
+        last = now;
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+
+    // Wait for the sprite to decode before starting, so the first few
+    // frames don't get skipped while the browser is still fetching.
+    const img = new Image();
+    img.src = SPRITE_URL;
+    const start = () => {
+      if (cancelled) return;
+      last = performance.now();
+      rafId = requestAnimationFrame(tick);
+    };
+    if (img.complete) start();
+    else img.addEventListener('load', start, {once: true});
 
     return () => {
-      video.removeEventListener('playing', onPlaying);
-      video.removeEventListener('timeupdate', markPlaying);
-      video.removeEventListener('canplay', tryPlay);
-      video.removeEventListener('loadedmetadata', tryPlay);
+      cancelled = true;
+      cancelAnimationFrame(rafId);
+      ro.disconnect();
     };
   }, [isMobile]);
 
@@ -137,16 +184,11 @@ export default function Homepage() {
               fetchPriority="high"
               draggable={false}
             />
-            <video
-              ref={mobileVideoRef}
-              className="home-hero-media home-hero-media--fade"
-              src="/Mobile_grey.mp4"
-              autoPlay
-              muted
-              playsInline
-              preload="auto"
-              disableRemotePlayback
-              data-playing={videoPlaying ? 'true' : 'false'}
+            <div
+              ref={spriteRef}
+              className="home-hero-media home-hero-sprite"
+              role="img"
+              aria-hidden="true"
             />
           </>
         ) : (

@@ -3508,6 +3508,21 @@ Home hero — full-screen intro video (desktop)
   opacity: 1;
 }
 
+/* Mobile intro sprite. 9x5 grid, 45 frames at 540x960. Background-size
+   and -position are set by JS (to mimic object-fit: cover on the source
+   frame). Hidden until the rAF loop measures and paints the first
+   frame, so the un-cropped top-left corner never flashes first. */
+.home-hero-sprite {
+  background-image: url('/Mobile_sprite.webp');
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.home-hero-sprite[data-ready='true'] {
+  opacity: 1;
+}
+
 /* On the homepage, let the hero video show through the nav bar */
 body.home-page .header-wrapper {
   background: transparent;

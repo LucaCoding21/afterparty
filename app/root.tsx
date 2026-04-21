@@ -73,9 +73,9 @@ export function links() {
     },
     {
       rel: 'preload',
-      as: 'video',
-      href: '/Mobile_grey.mp4',
-      type: 'video/mp4',
+      as: 'image',
+      href: '/Mobile_sprite.webp',
+      type: 'image/webp',
       media: '(max-width: 48em)',
       fetchPriority: 'high',
     },
