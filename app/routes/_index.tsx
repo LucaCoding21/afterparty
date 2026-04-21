@@ -17,6 +17,7 @@ export async function loader({request}: Route.LoaderArgs) {
 export default function Homepage() {
   const {initialIsMobile} = useLoaderData<typeof loader>();
   const desktopVideoRef = useRef<HTMLVideoElement>(null);
+  const mobileVideoRef = useRef<HTMLVideoElement>(null);
   const [isMobile, setIsMobile] = useState(initialIsMobile);
   // Mobile uses a stacked poster + video. The poster is always visible;
   // the video lives on top at opacity 0 and crossfades in once it
@@ -42,6 +43,31 @@ export default function Homepage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Mobile video: the autoPlay attribute alone isn't reliable on iOS,
+  // especially after client-side navigation (product → home). Calling
+  // play() explicitly on mount and again on canplay/loadedmetadata
+  // covers the cases where the attribute didn't fire. In Low Power
+  // Mode the call rejects silently and the poster stays visible — no
+  // detection needed because the 'playing' event simply never fires.
+  useEffect(() => {
+    if (!isMobile) return;
+    const video = mobileVideoRef.current;
+    if (!video) return;
+
+    const tryPlay = () => {
+      video.play().catch(() => {});
+    };
+
+    tryPlay();
+    video.addEventListener('canplay', tryPlay);
+    video.addEventListener('loadedmetadata', tryPlay);
+
+    return () => {
+      video.removeEventListener('canplay', tryPlay);
+      video.removeEventListener('loadedmetadata', tryPlay);
+    };
+  }, [isMobile]);
 
   // Desktop video: autoplay with gesture fallback (some browsers block
   // autoplay until the user has interacted with the page).
@@ -93,6 +119,7 @@ export default function Homepage() {
               draggable={false}
             />
             <video
+              ref={mobileVideoRef}
               className="home-hero-media home-hero-media--fade"
               src="/Mobile_grey.mp4"
               autoPlay
