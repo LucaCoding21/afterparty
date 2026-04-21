@@ -71,6 +71,14 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
+    {
+      rel: 'preload',
+      as: 'image',
+      href: '/Mobile_grey.webp',
+      type: 'image/webp',
+      media: '(max-width: 48em)',
+      fetchPriority: 'high',
+    },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
   ];
 }

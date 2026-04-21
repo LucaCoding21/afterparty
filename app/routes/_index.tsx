@@ -161,8 +161,18 @@ export default function Homepage() {
               draggable={false}
             />
           ) : (
-            // Blob fetch in flight (HTTP cache hit, typically ≤ 50ms).
-            <div className="home-hero-video" />
+            // Blob fetch in flight. Keep the static URL visible so iOS
+            // shows the cached last frame instead of a blank gap; the
+            // blob-keyed <img> above replaces this within ~50ms and
+            // restarts the animation from frame 0.
+            <img
+              className="home-hero-video"
+              src="/Mobile_grey.webp"
+              alt=""
+              decoding="async"
+              fetchPriority="high"
+              draggable={false}
+            />
           )
         ) : (
           <video
