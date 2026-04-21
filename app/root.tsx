@@ -1,4 +1,5 @@
 import {Analytics, getShopAnalytics, useNonce} from '@shopify/hydrogen';
+import {useEffect} from 'react';
 import {
   Outlet,
   useRouteError,
@@ -74,10 +75,18 @@ export function links() {
     {
       rel: 'preload',
       as: 'image',
-      href: '/Mobile_sprite.webp',
+      href: '/Mobile_sprite_a.webp',
       type: 'image/webp',
       media: '(max-width: 48em)',
       fetchPriority: 'high',
+    },
+    {
+      rel: 'preload',
+      as: 'image',
+      href: '/Mobile_sprite_b.webp',
+      type: 'image/webp',
+      media: '(max-width: 48em)',
+      fetchPriority: 'low',
     },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
   ];
@@ -195,6 +204,16 @@ export default function App() {
   const data = useRouteLoaderData<RootLoader>('root');
   const location = useLocation();
   const isHome = location.pathname === '/';
+
+  // Mark the document as hydrated so CSS transitions become active. This
+  // is gated in app.css (body.hydrated) to prevent first-paint transition
+  // flashes on slow devices (iOS Low Power Mode in particular): without
+  // this, elements like the mobile menu overlay can briefly render at
+  // their pre-CSS default before the transform rule applies, then visibly
+  // animate to their hidden position when the rule catches up.
+  useEffect(() => {
+    document.body.classList.add('hydrated');
+  }, []);
 
   if (!data) {
     return <Outlet />;

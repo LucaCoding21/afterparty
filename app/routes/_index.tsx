@@ -14,14 +14,22 @@ export async function loader({request}: Route.LoaderArgs) {
   return {initialIsMobile: isMobile};
 }
 
-// Mobile intro is a WebP sprite sheet stepped through with rAF. Chose
-// this over <video> because iOS Low Power Mode silently blocks autoplay,
-// and we need the intro to play every time — including refresh and LPM.
-const SPRITE_URL = '/Mobile_sprite.webp';
-const SPRITE_FRAMES = 45;
+// Mobile intro is a pair of WebP sprite sheets stepped through with rAF.
+// Chose this over <video> because iOS Low Power Mode silently blocks
+// autoplay, and we need the intro to play every time — refresh and LPM.
+// Split into two sprites so the first frame paints ~3x faster on cold
+// loads: sprite A (~34KB) downloads and decodes first, rAF starts, and
+// sprite B (~260KB) streams in during A's playback (1.25s at 12fps).
+const SPRITE_A_URL = '/Mobile_sprite_a.webp';
+const SPRITE_B_URL = '/Mobile_sprite_b.webp';
+const SPRITE_A_FRAMES = 15;
+const SPRITE_A_COLS = 5;
+const SPRITE_A_ROWS = 3;
+const SPRITE_B_FRAMES = 30;
+const SPRITE_B_COLS = 6;
+const SPRITE_B_ROWS = 5;
+const SPRITE_TOTAL_FRAMES = SPRITE_A_FRAMES + SPRITE_B_FRAMES;
 const SPRITE_FPS = 12;
-const SPRITE_COLS = 9;
-const SPRITE_ROWS = 5;
 const SPRITE_FRAME_W = 540;
 const SPRITE_FRAME_H = 960;
 
@@ -49,15 +57,20 @@ export default function Homepage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Drive the sprite with requestAnimationFrame. Starts at frame 0 on
+  // Drive the sprites with requestAnimationFrame. Starts at frame 0 on
   // every mount, so refresh and client-side nav back to home both
-  // replay the intro. The poster stays visible underneath until the
-  // sprite image has decoded, avoiding a flash of empty background.
+  // replay the intro.
   //
   // Sizing mimics object-fit: cover — we compute a scaled frame size
   // that fills the container while preserving the source 9:16 aspect,
   // then center it. Plain % positioning stretches each frame to the
   // container, which looks wrong on 9:19.5 phones.
+  //
+  // Handoff: we start sprite B's download in parallel with A's. When
+  // the global frame counter crosses SPRITE_A_FRAMES, we swap the
+  // background-image and grid dims to B. If B hasn't decoded yet by
+  // then (rare on 4G+), we hold on A's last frame until it's ready —
+  // better a brief pause than a blank or wrong-sprite flash.
   useEffect(() => {
     if (!isMobile) return;
     const el = spriteRef.current;
@@ -68,17 +81,29 @@ export default function Homepage() {
     let last = performance.now();
     let rafId = 0;
     let cancelled = false;
+    let onB = false;
+    let bReady = false;
     let scaledFrameW = 0;
     let scaledFrameH = 0;
     let offsetX = 0;
     let offsetY = 0;
 
-    const applyFrame = (i: number) => {
-      const col = i % SPRITE_COLS;
-      const row = Math.floor(i / SPRITE_COLS);
+    const applyFrame = (global: number) => {
+      const local = onB ? global - SPRITE_A_FRAMES : global;
+      const cols = onB ? SPRITE_B_COLS : SPRITE_A_COLS;
+      const col = local % cols;
+      const row = Math.floor(local / cols);
       const x = offsetX - col * scaledFrameW;
       const y = offsetY - row * scaledFrameH;
       el.style.backgroundPosition = `${x}px ${y}px`;
+    };
+
+    const setBackgroundSize = () => {
+      const cols = onB ? SPRITE_B_COLS : SPRITE_A_COLS;
+      const rows = onB ? SPRITE_B_ROWS : SPRITE_A_ROWS;
+      el.style.backgroundSize = `${scaledFrameW * cols}px ${
+        scaledFrameH * rows
+      }px`;
     };
 
     const measure = () => {
@@ -90,12 +115,30 @@ export default function Homepage() {
       scaledFrameH = SPRITE_FRAME_H * scale;
       offsetX = (w - scaledFrameW) / 2;
       offsetY = (h - scaledFrameH) / 2;
-      el.style.backgroundSize = `${scaledFrameW * SPRITE_COLS}px ${
-        scaledFrameH * SPRITE_ROWS
-      }px`;
+      setBackgroundSize();
       applyFrame(frame);
     };
 
+    const switchToB = () => {
+      onB = true;
+      el.style.backgroundImage = `url(${SPRITE_B_URL})`;
+      setBackgroundSize();
+      applyFrame(frame);
+    };
+
+    // Kick off downloads. A starts immediately; B loads in parallel so
+    // it's usually decoded well before the handoff point.
+    const imgA = new Image();
+    imgA.src = SPRITE_A_URL;
+    const imgB = new Image();
+    imgB.src = SPRITE_B_URL;
+    const onBLoaded = () => {
+      bReady = true;
+    };
+    if (imgB.complete) bReady = true;
+    else imgB.addEventListener('load', onBLoaded, {once: true});
+
+    el.style.backgroundImage = `url(${SPRITE_A_URL})`;
     measure();
     el.dataset.ready = 'true';
 
@@ -105,28 +148,38 @@ export default function Homepage() {
     const tick = (now: number) => {
       if (cancelled) return;
       if (now - last >= interval) {
-        frame++;
-        if (frame >= SPRITE_FRAMES) {
-          applyFrame(SPRITE_FRAMES - 1);
+        const next = frame + 1;
+        if (next >= SPRITE_TOTAL_FRAMES) {
+          // Last frame reached — leave the image on screen, stop looping.
+          applyFrame(SPRITE_TOTAL_FRAMES - 1);
           return;
         }
+        // Need to cross into B? Only advance if B has decoded.
+        if (next >= SPRITE_A_FRAMES && !onB) {
+          if (!bReady) {
+            // Hold on A's last frame. Don't advance `last`, so the loop
+            // retries next rAF without accumulating drift.
+            rafId = requestAnimationFrame(tick);
+            return;
+          }
+          switchToB();
+        }
+        frame = next;
         applyFrame(frame);
         last = now;
       }
       rafId = requestAnimationFrame(tick);
     };
 
-    // Wait for the sprite to decode before starting, so the first few
+    // Wait for sprite A to decode before starting, so the first few
     // frames don't get skipped while the browser is still fetching.
-    const img = new Image();
-    img.src = SPRITE_URL;
-    const start = () => {
+    const startA = () => {
       if (cancelled) return;
       last = performance.now();
       rafId = requestAnimationFrame(tick);
     };
-    if (img.complete) start();
-    else img.addEventListener('load', start, {once: true});
+    if (imgA.complete) startA();
+    else imgA.addEventListener('load', startA, {once: true});
 
     return () => {
       cancelled = true;

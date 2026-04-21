@@ -74,6 +74,13 @@ aside {
   position: fixed;
   right: calc(-1 * var(--aside-width));
   top: 0;
+}
+
+/* Transitions are gated on body.hydrated (added by the App root after
+   mount) so elements with always-on slide/fade animations don't flash
+   through their transition on first paint — a bug that shows up on
+   iOS Low Power Mode where CSS application races with initial render. */
+body.hydrated aside {
   transition: transform 200ms ease-in-out;
 }
 
@@ -149,10 +156,12 @@ aside li {
   position: fixed;
   right: 0;
   top: 0;
-  transition: opacity 400ms ease-in-out;
-  transition: opacity 400ms;
   visibility: hidden;
   z-index: 200;
+}
+
+body.hydrated .overlay {
+  transition: opacity 400ms ease-in-out;
 }
 
 .overlay .close-outside {
@@ -766,6 +775,9 @@ button.reset:hover:not(:has(> *)) {
   height: 1.5px;
   background: #000;
   border-radius: 1px;
+}
+
+body.hydrated .hamburger-icon span {
   transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1),
               transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
               opacity 0.2s ease;
@@ -799,7 +811,6 @@ button.reset:hover:not(:has(> *)) {
   background: #fff;
   z-index: 300;
   transform: translateX(100%);
-  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -807,6 +818,10 @@ button.reset:hover:not(:has(> *)) {
   @media (min-width: 48em) {
     display: none;
   }
+}
+
+body.hydrated .mobile-menu-overlay {
+  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mobile-menu-overlay.is-open {
@@ -3508,12 +3523,13 @@ Home hero — full-screen intro video (desktop)
   opacity: 1;
 }
 
-/* Mobile intro sprite. 9x5 grid, 45 frames at 540x960. Background-size
-   and -position are set by JS (to mimic object-fit: cover on the source
-   frame). Hidden until the rAF loop measures and paints the first
-   frame, so the un-cropped top-left corner never flashes first. */
+/* Mobile intro sprite. Split into two WebP sheets — sprite A (first 15
+   frames, 5x3 grid) and sprite B (next 30 frames, 6x5 grid), both
+   540x960 per frame. background-image, -size, and -position are all
+   set by JS: the starting image is A, swapped to B at the handoff.
+   Hidden until the rAF loop measures and paints, so no flash of the
+   un-cropped top-left corner. */
 .home-hero-sprite {
-  background-image: url('/Mobile_sprite.webp');
   background-repeat: no-repeat;
   opacity: 0;
   transition: opacity 120ms ease;
