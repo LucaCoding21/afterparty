@@ -1,9 +1,10 @@
 import {
   Link,
   useLoaderData,
+  useRouteLoaderData,
 } from 'react-router';
 import type {Route} from './+types/search';
-import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
+import {getPaginationVariables, Analytics, Money} from '@shopify/hydrogen';
 import {SearchForm} from '~/components/SearchForm';
 import {SearchResults} from '~/components/SearchResults';
 import {
@@ -11,6 +12,8 @@ import {
   type PredictiveSearchReturn,
   getEmptyPredictiveSearchResult,
 } from '~/lib/search';
+import {fuzzySearch, type CatalogProduct} from '~/lib/fuzzySearch';
+import {shopifyImg} from '~/lib/images';
 import type {RegularSearchQuery, PredictiveSearchQuery} from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = () => {
@@ -40,9 +43,14 @@ export async function loader({request, context}: Route.LoaderArgs) {
  */
 export default function SearchPage() {
   const {type, term, result, error} = useLoaderData<typeof loader>();
+  const rootData = useRouteLoaderData('root') as {searchCatalog?: CatalogProduct[]} | undefined;
+  const catalog = rootData?.searchCatalog ?? [];
   if (type === 'predictive') return null;
 
   const hasShopifyResults = !!(result?.total);
+  const fallback = !hasShopifyResults && term ? fuzzySearch(catalog, term, 48) : {results: [], suggestion: ''};
+  const hasFallbackResults = fallback.results.length > 0;
+  const displayTerm = fallback.suggestion || term;
 
   return (
     <div className="search-page">
@@ -74,9 +82,9 @@ export default function SearchPage() {
 
       {error && <p className="search-page-error">{error}</p>}
 
-      {term && hasShopifyResults && (
+      {term && (hasShopifyResults || hasFallbackResults) && (
         <p className="search-page-meta">
-          SHOWING SIMILAR RESULTS FOR &ldquo;{term.toUpperCase()}&rdquo;
+          SHOWING SIMILAR RESULTS FOR &ldquo;{displayTerm.toUpperCase()}&rdquo;
         </p>
       )}
 
@@ -90,7 +98,37 @@ export default function SearchPage() {
         </SearchResults>
       )}
 
-      {term && !hasShopifyResults && (
+      {!hasShopifyResults && hasFallbackResults && (
+        <div className="search-results-grid">
+          {fallback.results.map((product) => (
+            <Link
+              key={product.handle}
+              prefetch="intent"
+              to={`/products/${product.handle}`}
+              className="product-item"
+              data-handle={product.handle}
+            >
+              <div className="product-item-img">
+                {product.image && (
+                  <img
+                    src={shopifyImg(product.image, {width: 800, format: 'webp'})}
+                    alt={product.title}
+                    loading="lazy"
+                  />
+                )}
+              </div>
+              <h4>{product.title}</h4>
+              <small>
+                {product.price && (
+                  <Money data={{amount: product.price.amount, currencyCode: product.price.currencyCode as any}} />
+                )}
+              </small>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {term && !hasShopifyResults && !hasFallbackResults && (
         <p className="search-page-meta">No results for "{term}"</p>
       )}
 
@@ -236,7 +274,7 @@ export const SEARCH_QUERY = `#graphql
       query: $term,
       sortKey: RELEVANCE,
       types: [PRODUCT],
-      unavailableProducts: HIDE,
+      unavailableProducts: LAST,
     ) {
       nodes {
         ...on Product {

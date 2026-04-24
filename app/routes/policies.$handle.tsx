@@ -48,7 +48,7 @@ export default function Policy() {
   const {policy} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policy-page">
+    <div className={`policy-page policy-page--${policy.handle}`}>
       <h1 className="policy-title">{policy.title}</h1>
       <div className="policy-body" dangerouslySetInnerHTML={{__html: policy.body}} />
     </div>

@@ -92,27 +92,14 @@ export default function SupportPage() {
 
         {/* ── Returns & Exchanges ── */}
         <Section title="Returns & Exchanges">
-          <p className="support-body-text support-body-text--no-mb">We accept returns and exchanges on unworn, unwashed, unaltered items with original tags attached within <strong>14 days</strong> of delivery. Sale items and limited drops are final sale.</p>
+          <p className="support-body-text support-body-text--no-mb">Please make sure you're happy with your order before purchasing! Once your order ships, we're unable to offer refunds or exchanges. If it hasn't shipped yet, message us as soon as possible and we'll take care of the cancellation and refund for you.</p>
           <div className="support-faq-item">
-            <p className="support-faq-q">Returns</p>
-            <p className="support-faq-a">Email minh@afterparty.space with your order number and reason. We'll send you a return authorisation and instructions. Return shipping is the customer's responsibility unless the item is defective.</p>
+            <p className="support-faq-q">Damaged or incorrect orders</p>
+            <p className="support-faq-a">If your order shows up messed up or we sent the wrong thing, email minh@afterparty.space with your order number and some clear photos and we'll sort it out.</p>
           </div>
           <div className="support-faq-item">
-            <p className="support-faq-q">Exchanges</p>
-            <p className="support-faq-a">Exchanges for sizing are available on full-price items, subject to stock. If your size is unavailable, we'll issue store credit. Email us with your order number and the size you need.</p>
-          </div>
-        </Section>
-
-        {/* ── Warranty ── */}
-        <Section title="Warranty">
-          <p className="support-body-text support-body-text--no-mb">All garments are inspected before dispatch. Normal wear and tear, improper washing, and accidental damage are not covered. Our warranty applies only to the original purchaser and is non-transferable.</p>
-          <div className="support-faq-item">
-            <p className="support-faq-q">Defective items</p>
-            <p className="support-faq-a">If you receive a defective item or experience a manufacturing fault within <strong>30 days</strong> of purchase, we will replace or refund it in full at no cost to you. Faults reported after 30 days are assessed case by case.</p>
-          </div>
-          <div className="support-faq-item">
-            <p className="support-faq-q">How to claim</p>
-            <p className="support-faq-a">Email minh@afterparty.space with your order number, a description of the fault, and clear photos.</p>
+            <p className="support-faq-q">Cancellations</p>
+            <p className="support-faq-a">If your order hasn't shipped yet, reach out to us as soon as possible and we'll get it cancelled and refunded. Once it's on its way, we're unable to make any changes!</p>
           </div>
         </Section>
 

@@ -14,7 +14,7 @@ export function shopifyImg(
   try {
     const u = new URL(url);
     u.searchParams.set('width', String(opts.width));
-    if (opts.format) u.searchParams.set('format', opts.format);
+    u.searchParams.set('format', opts.format ?? 'webp');
     return u.toString();
   } catch {
     return url;
@@ -49,6 +49,7 @@ export function preloadCartThumbnail(url: string | undefined | null): void {
 export function shopifySrcSet(
   url: string | undefined | null,
   widths: number[],
+  opts: {format?: 'webp' | 'jpg' | 'png'} = {},
 ): string {
   if (!url || !url.includes('cdn.shopify.com')) return '';
   try {
@@ -56,6 +57,7 @@ export function shopifySrcSet(
       .map((w) => {
         const u = new URL(url);
         u.searchParams.set('width', String(w));
+        u.searchParams.set('format', opts.format ?? 'webp');
         return `${u.toString()} ${w}w`;
       })
       .join(', ');
@@ -74,6 +76,7 @@ export function preloadImage(
   try {
     const u = new URL(url);
     u.searchParams.set('width', String(width));
+    u.searchParams.set('format', 'webp');
     const img = new window.Image();
     img.src = u.toString();
   } catch {}

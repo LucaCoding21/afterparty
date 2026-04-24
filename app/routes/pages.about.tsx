@@ -22,7 +22,7 @@ export default function AboutPage() {
 
       <div className="about-right">
         <img
-          src="/location-pic.PNG"
+          src="/AboutUs-Afterparty.jpg"
           alt="afterparty"
           className="about-photo"
         />

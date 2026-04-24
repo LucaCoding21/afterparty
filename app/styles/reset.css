@@ -135,10 +135,10 @@ body > main {
   box-sizing: border-box;
   width: 100%;
   overflow-x: hidden;
-  padding: 2.5rem 1rem 0;
+  padding: 2.5rem 0 0;
   margin-bottom: 1rem;
   @media (min-width: 45em) {
-    padding: 2.5rem 5rem 0;
+    padding: 2.5rem 0 0;
     margin-bottom: 2rem;
   }
 }

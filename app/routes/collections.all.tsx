@@ -59,7 +59,7 @@ export default function ShopAll() {
   const {items} = useLoaderData<typeof loader>();
   useEffect(() => {
     sessionStorage.setItem('lastCategoryPath', '/collections/all');
-    sessionStorage.setItem('lastCategoryName', 'All');
+    sessionStorage.setItem('lastCategoryName', 'Shop All');
     sessionStorage.setItem('lastCategoryProducts', JSON.stringify(items.map((i) => i.handle)));
   }, [items]);
 

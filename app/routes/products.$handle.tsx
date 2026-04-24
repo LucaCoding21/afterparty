@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef, useMemo} from 'react';
+import {useState, useEffect, useLayoutEffect, useRef, useMemo} from 'react';
 import {
   useLoaderData,
   Link,
@@ -211,6 +211,24 @@ function Breadcrumb() {
   );
 }
 
+function SizeGuideInline({url}: {url: string}) {
+  const [svg, setSvg] = useState('');
+  useEffect(() => {
+    let cancelled = false;
+    fetch(url)
+      .then((r) => r.text())
+      .then((text) => {
+        if (!cancelled) setSvg(text.replace(/\sfont-size="[^"]*"/g, ''));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+  if (!svg) return null;
+  return <div className="product-size-guide-svg" dangerouslySetInnerHTML={{__html: svg}} />;
+}
+
 function ProductNav({handle, catalog}: {handle: string; catalog: CatalogProduct[]}) {
   const [categoryName, setCategoryName] = useState('Shop All');
   const [categoryPath, setCategoryPath] = useState('/collections/all');
@@ -301,7 +319,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
   }, [catalog, product.handle]);
 
   const {title, descriptionHtml} = product;
-  const {formRef, showSticky} = useStickyAddToCart();
+  const {formRef, showSticky, stickyBox} = useStickyAddToCart();
   const isSoldOut = !selectedVariant?.availableForSale;
   const [sizeWarning, setSizeWarning] = useState(false);
 
@@ -515,7 +533,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
                 </svg>
               </summary>
               <div className="product-size-guide-content">
-                <img src={sizeGuideInfo.sizeGuide} alt="Size Guide" />
+                <SizeGuideInline url={sizeGuideInfo.sizeGuide} />
                 {sizeGuideInfo.sizePhoto && (
                   <div className="product-size-guide-photo">
                     <img src={sizeGuideInfo.sizePhoto} alt="Measurement Reference" />
@@ -552,7 +570,14 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
 
       {/* Sticky add to cart — matching static design */}
       {showSticky && (
-        <div className="sticky-add-to-cart">
+        <div
+          className="sticky-add-to-cart"
+          style={
+            stickyBox
+              ? {left: `${stickyBox.left}px`, width: `${stickyBox.width}px`, right: 'auto'}
+              : undefined
+          }
+        >
           <AddToCartButton
             disabled={isSoldOut}
             onClick={() => {
@@ -640,7 +665,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
   );
 }
 
-function ImageZoomOverlay({src, alt, onClose}: {src: string; alt: string; onClose: () => void}) {
+function ImageZoomOverlay({src, alt, width, height, onClose}: {src: string; alt: string; width?: number; height?: number; onClose: () => void}) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -656,14 +681,13 @@ function ImageZoomOverlay({src, alt, onClose}: {src: string; alt: string; onClos
     };
   }, [onClose]);
 
-  function handleImageLoad() {
+  useLayoutEffect(() => {
     const overlay = overlayRef.current;
     const img = imgRef.current;
-    if (overlay && img) {
-      const scrollTop = (img.offsetHeight - overlay.clientHeight) / 2;
-      if (scrollTop > 0) overlay.scrollTop = scrollTop;
-    }
-  }
+    if (!overlay || !img) return;
+    const scrollTop = (img.offsetHeight - overlay.clientHeight) / 2;
+    if (scrollTop > 0) overlay.scrollTop = scrollTop;
+  }, []);
 
   return (
     <div className="zoom-overlay" onClick={onClose} ref={overlayRef}>
@@ -674,10 +698,15 @@ function ImageZoomOverlay({src, alt, onClose}: {src: string; alt: string; onClos
       </button>
       <img
         ref={imgRef}
-        src={shopifyImg(src, {width: 1800, format: 'webp'})}
+        src={shopifyImg(src, {width: 2000})}
+        srcSet={shopifySrcSet(src, CAROUSEL_WIDTHS)}
+        sizes="100vw"
         alt={alt}
+        width={width}
+        height={height}
         className="zoom-image"
-        onLoad={handleImageLoad}
+        fetchPriority="high"
+        decoding="async"
         onClick={(e) => e.stopPropagation()}
       />
     </div>
@@ -709,6 +738,11 @@ function ImageCarousel({
     const nextUrl = images[(index + 1) % images.length]?.url;
     preloadImage(prevUrl, 1200);
     preloadImage(nextUrl, 1200);
+  }, [index, images]);
+
+  // Warm the zoom-resolution variant so clicking the image feels instant.
+  useEffect(() => {
+    preloadImage(images[index]?.url, 2000);
   }, [index, images]);
 
   function handleTouchStart(e: React.TouchEvent) {
@@ -776,6 +810,8 @@ function ImageCarousel({
         <ImageZoomOverlay
           src={current?.url ?? ''}
           alt={alt}
+          width={current?.width}
+          height={current?.height}
           onClose={() => setZoomed(false)}
         />
       )}
@@ -785,22 +821,28 @@ function ImageCarousel({
 
 function useStickyAddToCart() {
   const formRef = useRef<HTMLDivElement>(null);
-  const [showSticky, setShowSticky] = useState(true);
+  const [showSticky, setShowSticky] = useState(false);
+  const [stickyBox, setStickyBox] = useState<{left: number; width: number} | null>(null);
 
   useEffect(() => {
     function check() {
       const el = formRef.current;
       if (!el) return;
-      const rect = el.getBoundingClientRect();
-      // Only show sticky if the real button is below the viewport
+      const btn = el.querySelector('button');
+      const rect = (btn ?? el).getBoundingClientRect();
       setShowSticky(rect.top > window.innerHeight);
+      setStickyBox({left: rect.left, width: rect.width});
     }
     check();
     window.addEventListener('scroll', check, {passive: true});
-    return () => window.removeEventListener('scroll', check);
+    window.addEventListener('resize', check, {passive: true});
+    return () => {
+      window.removeEventListener('scroll', check);
+      window.removeEventListener('resize', check);
+    };
   }, []);
 
-  return {formRef, showSticky};
+  return {formRef, showSticky, stickyBox};
 }
 
 
