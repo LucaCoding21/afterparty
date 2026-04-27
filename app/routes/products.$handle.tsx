@@ -19,6 +19,7 @@ import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {shopifyImg, preloadCartThumbnail, shopifySrcSet, preloadImage} from '~/lib/images';
+import {seoTags, stripHtml} from '~/lib/seo';
 
 const CAROUSEL_WIDTHS = [600, 900, 1200, 1600, 2000];
 const CAROUSEL_SIZES = '(min-width: 45em) 50vw, 100vw';
@@ -130,15 +131,27 @@ const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = 
 };
 
 export const meta: Route.MetaFunction = ({data}) => {
-  const title = data?.product?.title ?? '';
-  const heroUrl = (data?.product as any)?.selectedOrFirstAvailableVariant?.image?.url;
-  const tags: any[] = [
-    {title: `afterparty | ${title}`},
-    {
-      rel: 'canonical',
-      href: `/products/${data?.product?.handle}`,
-    },
-  ];
+  const product = data?.product as any;
+  if (!product) return [{title: 'afterparty'}];
+
+  const variant = product.selectedOrFirstAvailableVariant;
+  const heroUrl: string | undefined = variant?.image?.url;
+  const url = `/products/${product.handle}`;
+  const title =
+    product.seo?.title || `${product.title} — afterparty`;
+  const description =
+    product.seo?.description ||
+    stripHtml(product.descriptionHtml ?? product.description ?? '') ||
+    `Shop ${product.title} from afterparty — streetwear from Vietnam.`;
+
+  const tags: any[] = seoTags({
+    title,
+    description,
+    image: heroUrl,
+    url,
+    type: 'product',
+  });
+
   if (heroUrl) {
     tags.push({
       tagName: 'link',
@@ -149,6 +162,32 @@ export const meta: Route.MetaFunction = ({data}) => {
       fetchPriority: 'high',
     });
   }
+
+  // Product structured data — lets Google show rich product cards (image,
+  // price, in-stock badge) in search results.
+  tags.push({
+    'script:ld+json': {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: product.title,
+      description,
+      image: heroUrl,
+      sku: variant?.sku || undefined,
+      brand: {'@type': 'Brand', name: 'afterparty'},
+      offers: variant
+        ? {
+            '@type': 'Offer',
+            price: variant.price?.amount,
+            priceCurrency: variant.price?.currencyCode,
+            availability: variant.availableForSale
+              ? 'https://schema.org/InStock'
+              : 'https://schema.org/OutOfStock',
+            url,
+          }
+        : undefined,
+    },
+  });
+
   return tags;
 };
 

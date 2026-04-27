@@ -3,9 +3,21 @@ import {
 } from 'react-router';
 import type {Route} from './+types/pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {seoTags, stripHtml} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.page.title ?? ''}`}];
+  const page = data?.page as any;
+  if (!page) return [{title: 'afterparty'}];
+  const title = page.seo?.title || `${page.title} — afterparty`;
+  const description =
+    page.seo?.description ||
+    stripHtml(page.body ?? '') ||
+    `${page.title} — afterparty.`;
+  return seoTags({
+    title,
+    description,
+    url: `/pages/${page.handle}`,
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {

@@ -6,9 +6,23 @@ import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 import type {ProductItemFragment} from 'storefrontapi.generated';
+import {seoTags} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.collection.title ?? ''} Collection`}];
+  const collection = data?.collection as any;
+  if (!collection) return [{title: 'afterparty'}];
+  const title =
+    collection.seo?.title || `${collection.title} — afterparty`;
+  const description =
+    collection.seo?.description ||
+    collection.description ||
+    `Shop the ${collection.title} collection from afterparty — streetwear from Vietnam.`;
+  return seoTags({
+    title,
+    description,
+    image: collection.image?.url,
+    url: `/collections/${collection.handle}`,
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -148,6 +162,13 @@ const COLLECTION_QUERY = `#graphql
       handle
       title
       description
+      image {
+        url
+      }
+      seo {
+        title
+        description
+      }
       products(
         first: $first,
         last: $last,

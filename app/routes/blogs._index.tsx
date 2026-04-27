@@ -1,6 +1,13 @@
 import {useState, useEffect, useCallback} from 'react';
+import {seoTags} from '~/lib/seo';
 
-export const meta = () => [{title: 'afterparty | Lookbook'}];
+export const meta = () =>
+  seoTags({
+    title: 'Lookbook — afterparty',
+    description:
+      'The afterparty lookbook — see how our streetwear from Vietnam fits and is styled.',
+    url: '/blogs',
+  });
 
 const LOOKBOOK_SECTIONS = [
   {
