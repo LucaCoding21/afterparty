@@ -231,6 +231,20 @@ button.reset:hover:not(:has(> *)) {
   cursor: pointer;
 }
 
+/* button.reset above sets `color: inherit` (specificity 0,1,1), which beats a
+   plain `.foo { color: #000 }` rule. Without re-asserting at the same
+   specificity, iOS Safari in dark mode resolves currentColor to white and the
+   stroke="currentColor" SVG icons (search, cart, mobile-menu close, search-clear)
+   render invisible against the white header. The hamburger isn't affected
+   because its lines use a hardcoded background, not currentColor. */
+button.header-mobile-search-btn,
+button.header-mobile-cart-btn,
+button.mobile-search-clear,
+button.mobile-menu-close,
+button.header-search-link {
+  color: #000;
+}
+
 /*
 * --------------------------------------------------
 * components/Header

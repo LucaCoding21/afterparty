@@ -201,8 +201,11 @@ export default function Homepage() {
     const tryPlay = () => {
       video.play().catch(() => {});
     };
+    // Only kick play() if the video has never started yet — otherwise a click on
+    // a nav link after the video ended would restart it from frame 0 right
+    // before navigation, causing a visible flash.
     const onGesture = () => {
-      if (video.paused) tryPlay();
+      if (video.paused && video.currentTime === 0) tryPlay();
     };
 
     tryPlay();
