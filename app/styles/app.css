@@ -544,11 +544,17 @@ button.reset:hover:not(:has(> *)) {
 }
 
 /* ── Mobile right cluster (cart + hamburger) ── */
+/* Un-nested @media so iOS Safari <16.4 can parse it; nested CSS shipped without
+   a PostCSS pass means older Safari skips the @media block and the cluster
+   stays display: none. Same rule, same breakpoint, same gap. */
 .header-mobile-right {
   display: none;
   align-items: center;
   gap: 1.25rem;
-  @media (max-width: 64em) {
+}
+
+@media (max-width: 64em) {
+  .header-mobile-right {
     display: flex;
   }
 }
