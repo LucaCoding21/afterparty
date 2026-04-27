@@ -779,17 +779,33 @@ function ImageCarousel({
     preloadImage(images[index]?.url, 2000);
   }, [index, images]);
 
+  // Track Y too so we can ignore swipes that are mostly vertical (= page
+  // scroll). Combined with `touch-action: pan-y` on .carousel-main, this stops
+  // accidental image changes while scrolling the product page.
+  const touchStartY = useRef<number | null>(null);
+
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
   }
 
   function handleTouchEnd(e: React.TouchEvent) {
-    if (touchStartX.current === null) return;
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) {
-      diff > 0 ? next() : prev();
-    }
+    const startX = touchStartX.current;
+    const startY = touchStartY.current;
     touchStartX.current = null;
+    touchStartY.current = null;
+    if (startX === null || startY === null) return;
+    const dx = startX - e.changedTouches[0].clientX;
+    const dy = startY - e.changedTouches[0].clientY;
+    // Only count as swipe if it's clearly horizontal AND past the threshold.
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+      dx > 0 ? next() : prev();
+    }
+  }
+
+  function handleTouchCancel() {
+    touchStartX.current = null;
+    touchStartY.current = null;
   }
 
   const current = images[index];
@@ -799,6 +815,7 @@ function ImageCarousel({
         className="carousel-main"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
       >
         <div className={`product-image product-image-zoomable${current?.isModel ? ' product-image-model' : ''}`} onClick={() => setZoomed(true)}>
           <img

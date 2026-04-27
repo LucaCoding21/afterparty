@@ -248,6 +248,11 @@ button.mobile-search-clear,
 button.mobile-menu-close,
 button.header-search-link {
   color: #000;
+  /* Prevent Windows High Contrast / Edge forced-colors mode from re-coloring
+     the SVG icons against the white header. Combined with hardcoded
+     stroke="#000" in the JSX and color-scheme: light on :root, this is the
+     last belt-and-suspenders against any system-color override. */
+  forced-color-adjust: none;
 }
 
 /*
@@ -2085,6 +2090,11 @@ aside main {
 .carousel-main {
   position: relative;
   width: 100%;
+  /* Reserve horizontal gestures for the swipe handler; vertical scrolling
+     stays with the browser. Without this, iOS Safari races scroll vs swipe
+     and the carousel can flicker between images while the user is just
+     scrolling the product page. */
+  touch-action: pan-y;
 }
 
 @media (min-width: 45em) {
