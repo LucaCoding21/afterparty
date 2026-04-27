@@ -14,7 +14,8 @@ export async function loader({context}: Route.LoaderArgs) {
 }
 
 const COLLECTION_QUERY = `#graphql
-  query AccessoriesCollection($handle: String!) {
+  query AccessoriesCollection($handle: String!, $country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
       products(first: 50) {
         nodes {

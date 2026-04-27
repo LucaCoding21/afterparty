@@ -258,7 +258,8 @@ export function ErrorBoundary() {
 }
 
 const SEARCH_CATALOG_QUERY = `#graphql
-  query SearchCatalog {
+  query SearchCatalog($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
     products(first: 50) {
       nodes {
         handle
