@@ -1,4 +1,9 @@
 :root {
+  /* Tell iOS Safari (and any browser) that this site is light-only. Without
+     this, Safari in system dark mode auto-adjusts color inheritance and form
+     controls — which made stroke="currentColor" SVG icons resolve to white
+     against the white header. */
+  color-scheme: light;
   --aside-width: 480px;
   --cart-aside-summary-height-with-discount: 300px;
   --cart-aside-summary-height: 250px;
