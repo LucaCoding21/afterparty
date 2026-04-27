@@ -2039,6 +2039,23 @@ aside main {
   cursor: default;
 }
 
+.zoom-image-stack {
+  position: relative;
+  width: 100%;
+}
+
+.zoom-image-high {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.18s ease-in;
+}
+
+.zoom-image-high.loaded {
+  opacity: 1;
+}
+
 .zoom-close {
   position: fixed;
   top: 1.25rem;

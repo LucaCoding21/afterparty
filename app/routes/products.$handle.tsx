@@ -371,6 +371,22 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
     });
   }
 
+  // Nhim tees: variant images are the back view (used for swatches + shop-all
+  // thumbnails). On the product page itself, show the matching front view first
+  // by swapping it ahead of the variant image.
+  const FRONT_FIRST_HANDLES = new Set([
+    'nhim-short-sleeve-tee',
+    'nhim-long-sleeve-tee',
+  ]);
+  if (
+    FRONT_FIRST_HANDLES.has(product.handle) &&
+    images.length >= 2 &&
+    !images[0].isModel &&
+    !images[1].isModel
+  ) {
+    [images[0], images[1]] = [images[1], images[0]];
+  }
+
   // Separate color and size options for custom rendering
   const colorOption = productOptions.find(
     (o) => o.name.toLowerCase() === 'color',
@@ -667,7 +683,8 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
 
 function ImageZoomOverlay({src, alt, width, height, onClose}: {src: string; alt: string; width?: number; height?: number; onClose: () => void}) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
+  const lowImgRef = useRef<HTMLImageElement>(null);
+  const [highReady, setHighReady] = useState(false);
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -683,7 +700,7 @@ function ImageZoomOverlay({src, alt, width, height, onClose}: {src: string; alt:
 
   useLayoutEffect(() => {
     const overlay = overlayRef.current;
-    const img = imgRef.current;
+    const img = lowImgRef.current;
     if (!overlay || !img) return;
     const scrollTop = (img.offsetHeight - overlay.clientHeight) / 2;
     if (scrollTop > 0) overlay.scrollTop = scrollTop;
@@ -696,19 +713,36 @@ function ImageZoomOverlay({src, alt, width, height, onClose}: {src: string; alt:
           <path d="M4 4l12 12M16 4L4 16" />
         </svg>
       </button>
-      <img
-        ref={imgRef}
-        src={shopifyImg(src, {width: 2000})}
-        srcSet={shopifySrcSet(src, CAROUSEL_WIDTHS)}
-        sizes="100vw"
-        alt={alt}
-        width={width}
-        height={height}
-        className="zoom-image"
-        fetchPriority="high"
-        decoding="async"
-        onClick={(e) => e.stopPropagation()}
-      />
+      {/*
+        Two stacked images. The low layer reuses the carousel's exact srcset/sizes
+        so the browser pulls it from the in-memory cache → paints in the first
+        frame. The high layer (2000w, no srcset) matches the preload kicked off
+        in the carousel, then fades in when ready.
+      */}
+      <div className="zoom-image-stack" onClick={(e) => e.stopPropagation()}>
+        <img
+          ref={lowImgRef}
+          src={shopifyImg(src, {width: 1200})}
+          srcSet={shopifySrcSet(src, CAROUSEL_WIDTHS)}
+          sizes={CAROUSEL_SIZES}
+          alt=""
+          aria-hidden="true"
+          width={width}
+          height={height}
+          className="zoom-image zoom-image-low"
+          decoding="async"
+        />
+        <img
+          src={shopifyImg(src, {width: 2000})}
+          alt={alt}
+          width={width}
+          height={height}
+          className={`zoom-image zoom-image-high${highReady ? ' loaded' : ''}`}
+          fetchPriority="high"
+          decoding="async"
+          onLoad={() => setHighReady(true)}
+        />
+      </div>
     </div>
   );
 }
@@ -825,20 +859,32 @@ function useStickyAddToCart() {
   const [stickyBox, setStickyBox] = useState<{left: number; width: number} | null>(null);
 
   useEffect(() => {
-    function check() {
-      const el = formRef.current;
-      if (!el) return;
-      const btn = el.querySelector('button');
-      const rect = (btn ?? el).getBoundingClientRect();
+    const el = formRef.current;
+    if (!el) return;
+    const btn = (el.querySelector('button') as HTMLElement) ?? el;
+
+    function update() {
+      const rect = btn.getBoundingClientRect();
+      // Only show sticky when the real button is below the viewport. If the
+      // user has scrolled past it (rect.bottom < 0), keep sticky hidden so
+      // related-product sections aren't covered.
       setShowSticky(rect.top > window.innerHeight);
       setStickyBox({left: rect.left, width: rect.width});
     }
-    check();
-    window.addEventListener('scroll', check, {passive: true});
-    window.addEventListener('resize', check, {passive: true});
+
+    update();
+
+    // IntersectionObserver fires on any visibility change — including layout
+    // shifts from expanding <details> (description, size guide), which don't
+    // emit scroll/resize events.
+    const obs = new IntersectionObserver(() => update(), {threshold: [0, 1]});
+    obs.observe(btn);
+    window.addEventListener('scroll', update, {passive: true});
+    window.addEventListener('resize', update, {passive: true});
     return () => {
-      window.removeEventListener('scroll', check);
-      window.removeEventListener('resize', check);
+      obs.disconnect();
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
     };
   }, []);
 
