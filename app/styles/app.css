@@ -619,6 +619,13 @@ button.header-search-link {
   cursor: pointer;
 }
 
+.header-mobile-search-btn svg {
+  display: block;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+
 /* Mobile search overlay */
 .mobile-search-overlay {
   position: fixed;
@@ -776,6 +783,13 @@ button.header-search-link {
   height: 30px;
   color: #000;
   cursor: pointer;
+}
+
+.header-mobile-cart-btn svg {
+  display: block;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
 }
 
 .header-mobile-cart-count {
