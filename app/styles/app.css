@@ -70,11 +70,18 @@ input[type="search"] {
 aside {
   background: var(--color-light);
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
+  /* 100vh on iOS Safari extends behind the bottom toolbar, hiding the
+     checkout button. dvh = visible viewport. Old browsers fall back to vh. */
   height: 100vh;
+  height: 100dvh;
   width: min(var(--aside-width), 100vw);
   position: fixed;
   right: calc(-1 * var(--aside-width));
   top: 0;
+  /* Flex column so the summary footer always sits at the bottom of the
+     visible aside, and the items list scrolls in the middle. */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Transitions are gated on body.hydrated (added by the App root after
@@ -122,6 +129,11 @@ aside header h2 {
 
 aside main {
   margin: 0;
+  /* Take all remaining vertical space and host the cart's flex column. */
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 aside p {
@@ -1177,14 +1189,22 @@ aside main {
 * --------------------------------------------------
 */
 .cart-main {
-  height: 100%;
-  max-height: calc(100vh - var(--cart-aside-summary-height));
-  overflow-y: auto;
+  /* Flex container that fills aside main; cart-details handles its own
+     scrolling, summary footer is a non-shrinking flex child below. */
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   padding: 0 1.25rem;
 }
 
-.cart-main.with-discount {
-  max-height: calc(100vh - var(--cart-aside-summary-height-with-discount));
+.cart-details {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Empty state */
@@ -1399,12 +1419,16 @@ aside main {
 .cart-summary-aside {
   background: #fff;
   border-top: 1px solid #f0f0f0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  position: absolute;
+  /* Pinned to the bottom of the aside via flex layout (was position:absolute,
+     which iOS Safari hid behind the bottom toolbar). Negative margins span
+     the full aside width despite cart-main's 1.25rem horizontal padding. */
+  margin: 0 -1.25rem;
   padding: 1.25rem 1.25rem 1.5rem;
+  /* Honour the iPhone home-indicator inset so the checkout button isn't
+     clipped on devices that have one. */
+  padding-bottom: max(1.5rem, calc(1.5rem + env(safe-area-inset-bottom)));
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .cart-subtotal {
@@ -3053,7 +3077,10 @@ html:has(.overlay.expanded) .sticky-add-to-cart {
   color: #999;
   vertical-align: -0.12em;
   text-decoration: none;
-  @media (max-width: 48em) {
+}
+
+@media (max-width: 48em) {
+  .locations-store-name + .locations-store-name::before {
     display: none;
   }
 }

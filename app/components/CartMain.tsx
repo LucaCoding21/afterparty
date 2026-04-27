@@ -80,8 +80,8 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
             <p className="cart-taxes-note">Taxes and shipping calculated at checkout</p>
           )}
         </div>
-        {cartHasItems && <CartSummary cart={cart} layout={layout} />}
       </div>
+      {cartHasItems && <CartSummary cart={cart} layout={layout} />}
     </div>
   );
 }
