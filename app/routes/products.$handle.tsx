@@ -188,6 +188,25 @@ export const meta: Route.MetaFunction = ({data}) => {
     },
   });
 
+  // Breadcrumb hierarchy — Home > Shop All > Product. Helps AI agents and
+  // Google understand category context.
+  tags.push({
+    'script:ld+json': {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {'@type': 'ListItem', position: 1, name: 'Home', item: '/'},
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Shop All',
+          item: '/collections/all-products',
+        },
+        {'@type': 'ListItem', position: 3, name: product.title, item: url},
+      ],
+    },
+  });
+
   return tags;
 };
 

@@ -12,17 +12,30 @@ export const meta: Route.MetaFunction = ({data}) => {
   const collection = data?.collection as any;
   if (!collection) return [{title: 'afterparty'}];
   const title =
-    collection.seo?.title || `${collection.title} — afterparty`;
+    collection.seo?.title || `${collection.title}, afterparty`;
   const description =
     collection.seo?.description ||
     collection.description ||
-    `Shop the ${collection.title} collection from afterparty — streetwear from Vietnam.`;
-  return seoTags({
+    `Shop the ${collection.title} collection from afterparty, streetwear from Ho Chi Minh City, Vietnam.`;
+  const url = `/collections/${collection.handle}`;
+  const tags: any[] = seoTags({
     title,
     description,
     image: collection.image?.url,
-    url: `/collections/${collection.handle}`,
+    url,
   });
+  // Breadcrumb: Home > [Collection]
+  tags.push({
+    'script:ld+json': {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {'@type': 'ListItem', position: 1, name: 'Home', item: '/'},
+        {'@type': 'ListItem', position: 2, name: collection.title, item: url},
+      ],
+    },
+  });
+  return tags;
 };
 
 export async function loader(args: Route.LoaderArgs) {

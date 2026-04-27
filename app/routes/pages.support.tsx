@@ -1,7 +1,64 @@
 import {useState} from 'react';
+import {seoTags} from '~/lib/seo';
+
+const SUPPORT_FAQS: Array<{q: string; a: string}> = [
+  {
+    q: 'How do I track my order?',
+    a: "Once your order ships you'll receive a confirmation email with a tracking link. Allow 24 to 48 hours for tracking to update.",
+  },
+  {
+    q: 'Can I change or cancel my order?',
+    a: 'Orders can be amended within 2 hours of being placed. After that, they move into fulfilment and can no longer be changed.',
+  },
+  {
+    q: 'My item arrived damaged, what do I do?',
+    a: "Email minh@afterparty.space with your order number and photos of the damage. We'll sort it out immediately.",
+  },
+  {
+    q: 'Where do you ship from?',
+    a: 'All orders are packed by hand in Ho Chi Minh City, Vietnam, and dispatched within 1 to 3 business days.',
+  },
+  {
+    q: 'How long does shipping take to Southeast Asia?',
+    a: '5 to 10 business days, starting from 8 USD.',
+  },
+  {
+    q: 'How long does shipping take to the rest of the world?',
+    a: '10 to 20 business days, starting from 15 USD.',
+  },
+  {
+    q: 'Are duties and taxes included?',
+    a: 'No. Duties and taxes are the responsibility of the recipient and afterparty is not liable for customs delays.',
+  },
+  {
+    q: 'What is your return policy?',
+    a: "We don't offer refunds or exchanges once an order has shipped. If your order has not shipped yet, contact us as soon as possible to cancel.",
+  },
+  {
+    q: 'How do I contact afterparty?',
+    a: 'Email minh@afterparty.space (response within 48 hours) or DM @afterparty.space on Instagram.',
+  },
+];
 
 export const meta = () => {
-  return [{title: 'afterparty | Support'}];
+  const tags: any[] = seoTags({
+    title: 'Support and FAQ, afterparty',
+    description:
+      'Shipping, returns, and order help for afterparty, streetwear from Ho Chi Minh City, Vietnam. Email minh@afterparty.space.',
+    url: '/pages/support',
+  });
+  tags.push({
+    'script:ld+json': {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: SUPPORT_FAQS.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: {'@type': 'Answer', text: f.a},
+      })),
+    },
+  });
+  return tags;
 };
 
 function Section({title, children}: {title: string; children: React.ReactNode}) {

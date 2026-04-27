@@ -1,14 +1,10 @@
-import {Link} from 'react-router';
-import {useState} from 'react';
+import {Link, useFetcher} from 'react-router';
 
 export function Footer() {
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-
-  function handleSubscribe(e: React.FormEvent) {
-    e.preventDefault();
-    if (email) setSubmitted(true);
-  }
+  const fetcher = useFetcher<{ok?: boolean; error?: string}>();
+  const submitted = fetcher.data?.ok === true;
+  const error = fetcher.data?.error;
+  const submitting = fetcher.state !== 'idle';
 
   return (
     <footer className="site-footer">
@@ -21,21 +17,22 @@ export function Footer() {
             ) : (
               <>
                 <p className="footer-newsletter-label">Join our newsletter for releases and updates</p>
-                <form className="footer-newsletter-form" onSubmit={handleSubscribe}>
+                <fetcher.Form method="post" action="/newsletter" className="footer-newsletter-form">
                   <input
+                    name="email"
                     type="email"
                     placeholder="E-MAIL"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
                     required
+                    disabled={submitting}
                     className="footer-newsletter-input"
                   />
-                  <button type="submit" className="footer-newsletter-btn" aria-label="Subscribe">
+                  <button type="submit" disabled={submitting} className="footer-newsletter-btn" aria-label="Subscribe">
                     <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M1 7h12M8 2l5 5-5 5" />
                     </svg>
                   </button>
-                </form>
+                </fetcher.Form>
+                {error && <p className="footer-newsletter-thanks" role="alert">{error}</p>}
               </>
             )}
           </div>

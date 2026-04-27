@@ -43,10 +43,11 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 };
 
 export const meta: Route.MetaFunction = ({data}) => {
-  const origin = (data as {origin?: string} | undefined)?.origin ?? '';
+  const origin = (data as {origin?: string} | undefined)?.origin ?? 'https://afterparty.space';
   const image = `${origin}/AboutUs-Afterparty.jpg`;
   const title = 'afterparty';
-  const description = 'afterparty — streetwear from Vietnam.';
+  const description =
+    'afterparty, streetwear from Ho Chi Minh City (Saigon), Vietnam. Limited drops and signature graphics.';
   return [
     {title},
     {name: 'description', content: description},
@@ -54,10 +55,56 @@ export const meta: Route.MetaFunction = ({data}) => {
     {property: 'og:description', content: description},
     {property: 'og:image', content: image},
     {property: 'og:type', content: 'website'},
+    {property: 'og:site_name', content: 'afterparty'},
+    {property: 'og:locale', content: 'en_US'},
+    {property: 'og:url', content: origin},
+    {tagName: 'link', rel: 'canonical', href: origin},
     {name: 'twitter:card', content: 'summary_large_image'},
     {name: 'twitter:title', content: title},
     {name: 'twitter:description', content: description},
     {name: 'twitter:image', content: image},
+    // Organization schema — anchors the brand to Ho Chi Minh City for Google's
+    // entity graph and powers any future Knowledge Panel.
+    {
+      'script:ld+json': {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'afterparty',
+        alternateName: 'afterparty.space',
+        url: origin,
+        logo: `${origin}/logo.png`,
+        image,
+        description,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Ho Chi Minh City',
+          addressCountry: 'VN',
+        },
+        sameAs: [
+          'https://www.instagram.com/afterparty.space/',
+          'https://www.facebook.com/afterparty.space/',
+        ],
+      },
+    },
+    // WebSite + SearchAction — declares the site's search endpoint to AI
+    // agents and Google so they can deep-link queries (e.g. ChatGPT can
+    // suggest "search afterparty.space for X" with a working URL).
+    {
+      'script:ld+json': {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'afterparty',
+        url: origin,
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: {
+            '@type': 'EntryPoint',
+            urlTemplate: `${origin}/search?q={search_term_string}`,
+          },
+          'query-input': 'required name=search_term_string',
+        },
+      },
+    },
   ];
 };
 

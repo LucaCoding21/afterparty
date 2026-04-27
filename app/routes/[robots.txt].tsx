@@ -54,6 +54,43 @@ Crawl-Delay: 10
 
 User-agent: Pinterest
 Crawl-delay: 1
+
+# AI training and answer-engine crawlers — explicitly allowed so the brand
+# can be cited by ChatGPT, Claude, Perplexity, Gemini AI Overviews, Apple
+# Intelligence, and Common Crawl-derived datasets. Same shop-internal
+# Disallow rules apply.
+User-agent: GPTBot
+${generalDisallowRules({sitemapUrl, shopId})}
+
+User-agent: ChatGPT-User
+${generalDisallowRules({sitemapUrl, shopId})}
+
+User-agent: OAI-SearchBot
+${generalDisallowRules({sitemapUrl, shopId})}
+
+User-agent: ClaudeBot
+${generalDisallowRules({sitemapUrl, shopId})}
+
+User-agent: Claude-Web
+${generalDisallowRules({sitemapUrl, shopId})}
+
+User-agent: PerplexityBot
+${generalDisallowRules({sitemapUrl, shopId})}
+
+User-agent: Perplexity-User
+${generalDisallowRules({sitemapUrl, shopId})}
+
+User-agent: Google-Extended
+${generalDisallowRules({sitemapUrl, shopId})}
+
+User-agent: Applebot-Extended
+${generalDisallowRules({sitemapUrl, shopId})}
+
+User-agent: CCBot
+${generalDisallowRules({sitemapUrl, shopId})}
+
+User-agent: Bytespider
+${generalDisallowRules({sitemapUrl, shopId})}
 `.trim();
 }
 

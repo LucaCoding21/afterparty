@@ -109,6 +109,12 @@ type Pages = {
   "/pages/about": {
     params: {};
   };
+  "/llms.txt": {
+    params: {};
+  };
+  "/newsletter": {
+    params: {};
+  };
   "/account": {
     params: {};
   };
@@ -152,7 +158,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/blogs/:blogHandle/:articleHandle" | "/api/:version/graphql.json" | "/sitemap/:type/:page.xml" | "/blogs/:blogHandle" | "/collections/accessories" | "/collections/tops-shirts" | "/collections/outerwear" | "/collections/:handle" | "/account/authorize" | "/collections" | "/collections/pants" | "/policies/:handle" | "/products/:handle" | "/account/logout" | "/collections/all" | "/pages/stockists" | "/policies" | "/account/login" | "/discount/:code" | "/sitemap.xml" | "/pages/:handle" | "/pages/support" | "/robots.txt" | "/blogs" | "/pages/about" | "/account" | "/account/orders" | "/account/orders/:id" | "/account/addresses" | "/account/profile" | "/account/*" | "/search" | "/cart" | "/cart/:lines" | "/*";
+    page: "/" | "/blogs/:blogHandle/:articleHandle" | "/api/:version/graphql.json" | "/sitemap/:type/:page.xml" | "/blogs/:blogHandle" | "/collections/accessories" | "/collections/tops-shirts" | "/collections/outerwear" | "/collections/:handle" | "/account/authorize" | "/collections" | "/collections/pants" | "/policies/:handle" | "/products/:handle" | "/account/logout" | "/collections/all" | "/pages/stockists" | "/policies" | "/account/login" | "/discount/:code" | "/sitemap.xml" | "/pages/:handle" | "/pages/support" | "/robots.txt" | "/blogs" | "/pages/about" | "/llms.txt" | "/newsletter" | "/account" | "/account/orders" | "/account/orders/:id" | "/account/addresses" | "/account/profile" | "/account/*" | "/search" | "/cart" | "/cart/:lines" | "/*";
   };
   "routes/blogs.$blogHandle.$articleHandle.tsx": {
     id: "routes/blogs.$blogHandle.$articleHandle";
@@ -254,6 +260,14 @@ type RouteFiles = {
     id: "routes/pages.about";
     page: "/pages/about";
   };
+  "routes/[llms.txt].tsx": {
+    id: "routes/[llms.txt]";
+    page: "/llms.txt";
+  };
+  "routes/newsletter.tsx": {
+    id: "routes/newsletter";
+    page: "/newsletter";
+  };
   "routes/account.tsx": {
     id: "routes/account";
     page: "/account" | "/account/orders" | "/account/orders/:id" | "/account/addresses" | "/account/profile" | "/account/*";
@@ -331,6 +345,8 @@ type RouteModules = {
   "routes/[robots.txt]": typeof import("./app/routes/[robots.txt].tsx");
   "routes/blogs._index": typeof import("./app/routes/blogs._index.tsx");
   "routes/pages.about": typeof import("./app/routes/pages.about.tsx");
+  "routes/[llms.txt]": typeof import("./app/routes/[llms.txt].tsx");
+  "routes/newsletter": typeof import("./app/routes/newsletter.tsx");
   "routes/account": typeof import("./app/routes/account.tsx");
   "routes/account.orders._index": typeof import("./app/routes/account.orders._index.tsx");
   "routes/account.orders.$id": typeof import("./app/routes/account.orders.$id.tsx");
