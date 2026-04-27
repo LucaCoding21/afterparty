@@ -622,8 +622,8 @@ button.header-search-link {
 .header-mobile-search-btn svg {
   display: block;
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 /* Mobile search overlay */
@@ -788,8 +788,8 @@ button.header-search-link {
 .header-mobile-cart-btn svg {
   display: block;
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
 }
 
 .header-mobile-cart-count {

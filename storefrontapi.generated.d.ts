@@ -378,7 +378,8 @@ export type FooterQuery = {
 };
 
 export type SearchCatalogQueryVariables = StorefrontAPI.Exact<{
-  [key: string]: never;
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
 }>;
 
 export type SearchCatalogQuery = {
@@ -605,6 +606,8 @@ export type StoreCollectionsQuery = {
 
 export type AccessoriesCollectionQueryVariables = StorefrontAPI.Exact<{
   handle: StorefrontAPI.Scalars['String']['input'];
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
 }>;
 
 export type AccessoriesCollectionQuery = {
@@ -640,7 +643,10 @@ export type AccessoriesCollectionQuery = {
   }>;
 };
 
-export type CatalogQueryVariables = StorefrontAPI.Exact<{[key: string]: never}>;
+export type CatalogQueryVariables = StorefrontAPI.Exact<{
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+}>;
 
 export type CatalogQuery = {
   products: {
@@ -675,6 +681,8 @@ export type CatalogQuery = {
 
 export type OuterwearCollectionQueryVariables = StorefrontAPI.Exact<{
   handle: StorefrontAPI.Scalars['String']['input'];
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
 }>;
 
 export type OuterwearCollectionQuery = {
@@ -712,6 +720,8 @@ export type OuterwearCollectionQuery = {
 
 export type PantsCollectionQueryVariables = StorefrontAPI.Exact<{
   handle: StorefrontAPI.Scalars['String']['input'];
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
 }>;
 
 export type PantsCollectionQuery = {
@@ -749,6 +759,8 @@ export type PantsCollectionQuery = {
 
 export type TopsShirtsCollectionQueryVariables = StorefrontAPI.Exact<{
   handle: StorefrontAPI.Scalars['String']['input'];
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
 }>;
 
 export type TopsShirtsCollectionQuery = {
@@ -1379,7 +1391,7 @@ interface GeneratedQueryTypes {
     return: FooterQuery;
     variables: FooterQueryVariables;
   };
-  '#graphql\n  query SearchCatalog {\n    products(first: 50) {\n      nodes {\n        handle\n        title\n        featuredImage { url }\n        variants(first: 1) {\n          nodes {\n            image { url }\n            price { amount currencyCode }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query SearchCatalog($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    products(first: 50) {\n      nodes {\n        handle\n        title\n        featuredImage { url }\n        variants(first: 1) {\n          nodes {\n            image { url }\n            price { amount currencyCode }\n          }\n        }\n      }\n    }\n  }\n': {
     return: SearchCatalogQuery;
     variables: SearchCatalogQueryVariables;
   };
@@ -1403,23 +1415,23 @@ interface GeneratedQueryTypes {
     return: StoreCollectionsQuery;
     variables: StoreCollectionsQueryVariables;
   };
-  '#graphql\n  query AccessoriesCollection($handle: String!) {\n    collection(handle: $handle) {\n      products(first: 50) {\n        nodes {\n          id\n          handle\n          title\n          availableForSale\n          featuredImage { url }\n          options { name values }\n          priceRange { minVariantPrice { amount currencyCode } }\n          variants(first: 20) {\n            nodes {\n              id\n              availableForSale\n              selectedOptions { name value }\n              image { url }\n              price { amount currencyCode }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query AccessoriesCollection($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      products(first: 50) {\n        nodes {\n          id\n          handle\n          title\n          availableForSale\n          featuredImage { url }\n          options { name values }\n          priceRange { minVariantPrice { amount currencyCode } }\n          variants(first: 20) {\n            nodes {\n              id\n              availableForSale\n              selectedOptions { name value }\n              image { url }\n              price { amount currencyCode }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: AccessoriesCollectionQuery;
     variables: AccessoriesCollectionQueryVariables;
   };
-  '#graphql\n  query Catalog {\n    products(first: 50) {\n      nodes {\n        id\n        handle\n        title\n        availableForSale\n        featuredImage {\n          url\n        }\n        options {\n          name\n          values\n        }\n        priceRange {\n          minVariantPrice {\n            amount\n            currencyCode\n          }\n        }\n        variants(first: 20) {\n          nodes {\n            id\n            availableForSale\n            selectedOptions {\n              name\n              value\n            }\n            image {\n              url\n            }\n            price {\n              amount\n              currencyCode\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query Catalog($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    products(first: 50) {\n      nodes {\n        id\n        handle\n        title\n        availableForSale\n        featuredImage {\n          url\n        }\n        options {\n          name\n          values\n        }\n        priceRange {\n          minVariantPrice {\n            amount\n            currencyCode\n          }\n        }\n        variants(first: 20) {\n          nodes {\n            id\n            availableForSale\n            selectedOptions {\n              name\n              value\n            }\n            image {\n              url\n            }\n            price {\n              amount\n              currencyCode\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: CatalogQuery;
     variables: CatalogQueryVariables;
   };
-  '#graphql\n  query OuterwearCollection($handle: String!) {\n    collection(handle: $handle) {\n      products(first: 50) {\n        nodes {\n          id\n          handle\n          title\n          availableForSale\n          featuredImage { url }\n          options { name values }\n          priceRange { minVariantPrice { amount currencyCode } }\n          variants(first: 20) {\n            nodes {\n              id\n              availableForSale\n              selectedOptions { name value }\n              image { url }\n              price { amount currencyCode }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query OuterwearCollection($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      products(first: 50) {\n        nodes {\n          id\n          handle\n          title\n          availableForSale\n          featuredImage { url }\n          options { name values }\n          priceRange { minVariantPrice { amount currencyCode } }\n          variants(first: 20) {\n            nodes {\n              id\n              availableForSale\n              selectedOptions { name value }\n              image { url }\n              price { amount currencyCode }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: OuterwearCollectionQuery;
     variables: OuterwearCollectionQueryVariables;
   };
-  '#graphql\n  query PantsCollection($handle: String!) {\n    collection(handle: $handle) {\n      products(first: 50) {\n        nodes {\n          id\n          handle\n          title\n          availableForSale\n          featuredImage { url }\n          options { name values }\n          priceRange { minVariantPrice { amount currencyCode } }\n          variants(first: 20) {\n            nodes {\n              id\n              availableForSale\n              selectedOptions { name value }\n              image { url }\n              price { amount currencyCode }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query PantsCollection($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      products(first: 50) {\n        nodes {\n          id\n          handle\n          title\n          availableForSale\n          featuredImage { url }\n          options { name values }\n          priceRange { minVariantPrice { amount currencyCode } }\n          variants(first: 20) {\n            nodes {\n              id\n              availableForSale\n              selectedOptions { name value }\n              image { url }\n              price { amount currencyCode }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: PantsCollectionQuery;
     variables: PantsCollectionQueryVariables;
   };
-  '#graphql\n  query TopsShirtsCollection($handle: String!) {\n    collection(handle: $handle) {\n      products(first: 50) {\n        nodes {\n          id\n          handle\n          title\n          availableForSale\n          featuredImage { url }\n          options { name values }\n          priceRange { minVariantPrice { amount currencyCode } }\n          variants(first: 20) {\n            nodes {\n              id\n              availableForSale\n              selectedOptions { name value }\n              image { url }\n              price { amount currencyCode }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query TopsShirtsCollection($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      products(first: 50) {\n        nodes {\n          id\n          handle\n          title\n          availableForSale\n          featuredImage { url }\n          options { name values }\n          priceRange { minVariantPrice { amount currencyCode } }\n          variants(first: 20) {\n            nodes {\n              id\n              availableForSale\n              selectedOptions { name value }\n              image { url }\n              price { amount currencyCode }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: TopsShirtsCollectionQuery;
     variables: TopsShirtsCollectionQueryVariables;
   };
