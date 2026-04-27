@@ -57,7 +57,23 @@ export default function LocationsPage() {
         <div className="locations-right">
           <div className="locations-section-label">
             Stockists
-            <span className="locations-section-arrow" aria-hidden="true">↗</span>
+            {/* Inline SVG instead of `↗` (U+2197) because iOS Safari renders
+                that Unicode arrow as an emoji. */}
+            <svg
+              className="locations-section-arrow"
+              aria-hidden="true"
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#999"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="7" y1="17" x2="17" y2="7" />
+              <polyline points="9 7 17 7 17 15" />
+            </svg>
           </div>
           <div className="locations-stockists-grid">
             {STOCKISTS.map((location) => (

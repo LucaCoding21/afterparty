@@ -3345,9 +3345,10 @@ html:has(.overlay.expanded) .sticky-add-to-cart {
 .locations-section-arrow {
   display: inline-block;
   margin-left: 0.3em;
-  font-size: 1.2em;
-  color: #999;
-  line-height: 1;
+  vertical-align: middle;
+  /* Nudge up a hair so the arrow sits with the cap-height of the label text
+     rather than the baseline. Matches the previous `↗` glyph alignment. */
+  margin-top: -2px;
 }
 
 /*
