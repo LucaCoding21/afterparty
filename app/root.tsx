@@ -13,7 +13,6 @@ import {
   useLocation,
 } from 'react-router';
 import type {Route} from './+types/root';
-import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
@@ -41,6 +40,25 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
   // line below to `return defaultShouldRevalidate` instead.
   // For more details see: https://remix.run/docs/en/main/route/should-revalidate
   return false;
+};
+
+export const meta: Route.MetaFunction = ({data}) => {
+  const origin = (data as {origin?: string} | undefined)?.origin ?? '';
+  const image = `${origin}/AboutUs-Afterparty.jpg`;
+  const title = 'afterparty';
+  const description = 'afterparty — streetwear from Vietnam.';
+  return [
+    {title},
+    {name: 'description', content: description},
+    {property: 'og:title', content: title},
+    {property: 'og:description', content: description},
+    {property: 'og:image', content: image},
+    {property: 'og:type', content: 'website'},
+    {name: 'twitter:card', content: 'summary_large_image'},
+    {name: 'twitter:title', content: title},
+    {name: 'twitter:description', content: description},
+    {name: 'twitter:image', content: image},
+  ];
 };
 
 /**
@@ -88,7 +106,11 @@ export function links() {
       media: '(max-width: 48em)',
       fetchPriority: 'low',
     },
-    {rel: 'icon', type: 'image/svg+xml', href: favicon},
+    {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico'},
+    {rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png'},
+    {rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png'},
+    {rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png'},
+    {rel: 'manifest', href: '/site.webmanifest'},
   ];
 }
 
@@ -124,8 +146,9 @@ export async function loader(args: Route.LoaderArgs) {
  * Load data necessary for rendering content above the fold. This is the critical data
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
-async function loadCriticalData({context}: Route.LoaderArgs) {
+async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const {storefront} = context;
+  const origin = new URL(request.url).origin;
 
   const [header, {products}] = await Promise.all([
     storefront.query(HEADER_QUERY, {
@@ -147,7 +170,7 @@ async function loadCriticalData({context}: Route.LoaderArgs) {
     price: p.variants?.nodes?.[0]?.price,
   }));
 
-  return {header, searchCatalog};
+  return {header, searchCatalog, origin};
 }
 
 /**
