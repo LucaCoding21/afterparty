@@ -1,64 +1,14 @@
 import {useState} from 'react';
+import {Link} from 'react-router';
 import {seoTags} from '~/lib/seo';
 
-const SUPPORT_FAQS: Array<{q: string; a: string}> = [
-  {
-    q: 'How do I track my order?',
-    a: "Once your order ships you'll receive a confirmation email with a tracking link. Allow 24 to 48 hours for tracking to update.",
-  },
-  {
-    q: 'Can I change or cancel my order?',
-    a: 'Orders can be amended within 2 hours of being placed. After that, they move into fulfilment and can no longer be changed.',
-  },
-  {
-    q: 'My item arrived damaged, what do I do?',
-    a: "Email minh@afterparty.space with your order number and photos of the damage. We'll sort it out immediately.",
-  },
-  {
-    q: 'Where do you ship from?',
-    a: 'All orders are packed by hand in Ho Chi Minh City, Vietnam, and dispatched within 1 to 3 business days.',
-  },
-  {
-    q: 'How long does shipping take to Southeast Asia?',
-    a: '5 to 10 business days, starting from 8 USD.',
-  },
-  {
-    q: 'How long does shipping take to the rest of the world?',
-    a: '10 to 20 business days, starting from 15 USD.',
-  },
-  {
-    q: 'Are duties and taxes included?',
-    a: 'No. Duties and taxes are the responsibility of the recipient and afterparty is not liable for customs delays.',
-  },
-  {
-    q: 'What is your return policy?',
-    a: "We don't offer refunds or exchanges once an order has shipped. If your order has not shipped yet, contact us as soon as possible to cancel.",
-  },
-  {
-    q: 'How do I contact afterparty?',
-    a: 'Email minh@afterparty.space (response within 48 hours) or DM @afterparty.space on Instagram.',
-  },
-];
-
 export const meta = () => {
-  const tags: any[] = seoTags({
+  return seoTags({
     title: 'Support and FAQ, afterparty',
     description:
       'Shipping, returns, and order help for afterparty, streetwear from Ho Chi Minh City, Vietnam. Email minh@afterparty.space.',
     url: '/pages/support',
   });
-  tags.push({
-    'script:ld+json': {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      mainEntity: SUPPORT_FAQS.map((f) => ({
-        '@type': 'Question',
-        name: f.q,
-        acceptedAnswer: {'@type': 'Answer', text: f.a},
-      })),
-    },
-  });
-  return tags;
 };
 
 function Section({title, children}: {title: string; children: React.ReactNode}) {
@@ -116,48 +66,53 @@ export default function SupportPage() {
         {/* ── Orders ── */}
         <Section title="Orders">
           <div className="support-faq-item">
-            <p className="support-faq-q">How do I track my order?</p>
-            <p className="support-faq-a">Once your order ships you'll receive a confirmation email with a tracking link. Allow 24–48 hours for tracking to update.</p>
+            <p className="support-faq-q">When is my order confirmed?</p>
+            <p className="support-faq-a">Placing an order is an offer to purchase. The order is accepted once payment has been processed and a confirmation email is issued.</p>
           </div>
           <div className="support-faq-item">
-            <p className="support-faq-q">Can I change or cancel my order?</p>
-            <p className="support-faq-a">Orders can be amended within 2 hours of being placed. After that, they move into fulfilment and can no longer be changed.</p>
+            <p className="support-faq-q">Can afterparty cancel or reject my order?</p>
+            <p className="support-faq-a">Yes. We may decline, cancel, or limit any order at our discretion, including for suspected resale or fraudulent activity, and to correct pricing or stock errors.</p>
           </div>
           <div className="support-faq-item">
-            <p className="support-faq-q">My item arrived damaged — what do I do?</p>
-            <p className="support-faq-a">Email us with your order number and photos of the damage. We'll sort it out immediately.</p>
+            <p className="support-faq-q">Are taxes and duties included in the price?</p>
+            <p className="support-faq-a">No. Prices do not include taxes, shipping, duties, or import fees. These charges are the responsibility of the customer.</p>
           </div>
+          <div className="support-faq-item">
+            <p className="support-faq-q">Are sales final?</p>
+            <p className="support-faq-a">All sales are final except as expressly stated in our Refund Policy.</p>
+          </div>
+          <p className="support-body-text support-body-text--no-mb">For full terms, see our <Link to="/policies/terms-of-service" className="support-link">Terms of Service</Link>.</p>
         </Section>
 
         {/* ── Shipping ── */}
         <Section title="Shipping">
-          <p className="support-body-text support-body-text--no-mb">All orders are packed by hand in Ho Chi Minh City and dispatched within 1–3 business days. You'll receive tracking as soon as your parcel is on its way.</p>
-
           <div className="support-faq-item">
-            <p className="support-faq-q">Southeast Asia</p>
-            <p className="support-faq-a">5–10 business days · from $8 USD</p>
+            <p className="support-faq-q">Are delivery times guaranteed?</p>
+            <p className="support-faq-a">No. Delivery times are estimates only. afterparty is not responsible for delays caused by carriers, customs, or events outside our control.</p>
           </div>
           <div className="support-faq-item">
-            <p className="support-faq-q">Rest of World</p>
-            <p className="support-faq-a">10–20 business days · from $15 USD</p>
+            <p className="support-faq-q">Who is responsible for the parcel during transit?</p>
+            <p className="support-faq-a">Risk of loss transfers to the customer once the order is handed to the carrier.</p>
           </div>
           <div className="support-faq-item">
-            <p className="support-faq-q">Duties &amp; taxes</p>
-            <p className="support-faq-a">Responsibility of the recipient. We are not liable for customs delays.</p>
+            <p className="support-faq-q">Are duties and taxes included?</p>
+            <p className="support-faq-a">No. Duties, taxes, and import fees are the responsibility of the recipient.</p>
           </div>
+          <p className="support-body-text support-body-text--no-mb">For full terms, see our <Link to="/policies/terms-of-service" className="support-link">Terms of Service</Link>.</p>
         </Section>
 
         {/* ── Returns & Exchanges ── */}
         <Section title="Returns & Exchanges">
-          <p className="support-body-text support-body-text--no-mb">Please make sure you're happy with your order before purchasing! Once your order ships, we're unable to offer refunds or exchanges. If it hasn't shipped yet, message us as soon as possible and we'll take care of the cancellation and refund for you.</p>
+          <p className="support-body-text support-body-text--no-mb">All sales are final except as expressly stated in our Refund Policy.</p>
           <div className="support-faq-item">
-            <p className="support-faq-q">Damaged or incorrect orders</p>
-            <p className="support-faq-a">If your order shows up messed up or we sent the wrong thing, email minh@afterparty.space with your order number and some clear photos and we'll sort it out.</p>
+            <p className="support-faq-q">Can afterparty cancel my order?</p>
+            <p className="support-faq-a">Yes. afterparty may cancel any order at its discretion, including for suspected resale or fraudulent activity, and to correct pricing or stock errors.</p>
           </div>
           <div className="support-faq-item">
-            <p className="support-faq-q">Cancellations</p>
-            <p className="support-faq-a">If your order hasn't shipped yet, reach out to us as soon as possible and we'll get it cancelled and refunded. Once it's on its way, we're unable to make any changes!</p>
+            <p className="support-faq-q">What if there is a pricing or product error?</p>
+            <p className="support-faq-a">We reserve the right to correct errors, update information, or cancel orders at any time without notice.</p>
           </div>
+          <p className="support-body-text support-body-text--no-mb">For full details, see our <Link to="/policies/refund-policy" className="support-link">Refund Policy</Link>.</p>
         </Section>
 
       </div>

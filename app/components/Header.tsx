@@ -1,5 +1,5 @@
 import {Suspense, useState, useRef, useEffect, useMemo} from 'react';
-import {Await, NavLink, useAsyncValue, useNavigate} from 'react-router';
+import {Await, NavLink, useAsyncValue, useLocation, useNavigate} from 'react-router';
 import {
   type CartViewPayload,
   useAnalytics,
@@ -29,6 +29,8 @@ export function Header({
   searchCatalog = [],
 }: HeaderProps) {
   const {shop, menu} = header;
+  const location = useLocation();
+  const isCollectionsRoute = location.pathname.startsWith('/collections');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [mobileSearchQuery, setMobileSearchQuery] = useState('');
@@ -103,7 +105,7 @@ export function Header({
         <nav className="header-nav-left">
           <NavLink
             to="/collections/all"
-            className={({isActive}) => `header-nav-link${isActive ? ' active' : ''}`}
+            className={({isActive}) => `header-nav-link${isActive || isCollectionsRoute ? ' active' : ''}`}
             prefetch="intent"
           >
             Shop All
@@ -119,7 +121,7 @@ export function Header({
           </NavLink>
         </nav>
 
-        <NavLink to="/" className="header-wordmark" prefetch="intent" end>
+        <NavLink to="/" className="header-wordmark" prefetch="intent" end onClick={closeMobile}>
           <img src="/logo.png" alt="afterparty" className="header-logo-img" />
         </NavLink>
 

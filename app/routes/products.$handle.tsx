@@ -377,6 +377,43 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
   }, [catalog, product.handle]);
 
   const {title, descriptionHtml} = product;
+  const cleanedDescriptionHtml = (() => {
+    let html: string = descriptionHtml ?? '';
+    if (html.includes('text-token-text-primary') || html.includes('markdown prose')) {
+      const inner = html.match(/<div class="markdown[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
+      if (inner) html = inner[1];
+    }
+    html = html.replace(/<(section|article|header|footer|aside|main)\b[^>]*>|<\/(section|article|header|footer|aside|main)>/gi, '');
+    html = html.replace(/<meta\b[^>]*>/gi, '');
+    html = html.replace(/<([a-z][a-z0-9]*)\s[^>]*>/gi, '<$1>');
+    // Treat HTML whitespace, every common invisible-char entity, and <br> as "empty" filler.
+    const FILLER =
+      '(?:\\s|&nbsp;|&shy;|&zwnj;|&zwj;|&#160;|&#173;|&#8203;|&#8204;|&#8205;|&#65279;|&#x200B;|&#x200C;|&#x200D;|&#xFEFF;|\\u00A0|\\u00AD|\\u200B|\\u200C|\\u200D|\\u2028|\\u2029|\\uFEFF|<br\\s*\\/?\\s*>)';
+    // Repeat block-level emptiness stripping until stable, since stripping an
+    // empty inner element can leave its parent empty too. Inline wrappers
+    // (<span>, <strong>, <em>) are stripped first so their parent <p>/<li>
+    // collapses on the next pass.
+    for (let i = 0; i < 6; i++) {
+      const before = html;
+      html = html.replace(new RegExp(`<span>${FILLER}*<\\/span>`, 'gi'), '');
+      html = html.replace(new RegExp(`<strong>${FILLER}*<\\/strong>`, 'gi'), '');
+      html = html.replace(new RegExp(`<em>${FILLER}*<\\/em>`, 'gi'), '');
+      html = html.replace(new RegExp(`<b>${FILLER}*<\\/b>`, 'gi'), '');
+      html = html.replace(new RegExp(`<i>${FILLER}*<\\/i>`, 'gi'), '');
+      html = html.replace(new RegExp(`<p>${FILLER}*<\\/p>`, 'gi'), '');
+      html = html.replace(new RegExp(`<li>${FILLER}*<\\/li>`, 'gi'), '');
+      html = html.replace(new RegExp(`<div>${FILLER}*<\\/div>`, 'gi'), '');
+      html = html.replace(new RegExp(`<ul>${FILLER}*<\\/ul>`, 'gi'), '');
+      html = html.replace(new RegExp(`<ol>${FILLER}*<\\/ol>`, 'gi'), '');
+      if (html === before) break;
+    }
+    html = html.replace(new RegExp(`${FILLER}+(<\\/p>)`, 'gi'), '$1');
+    html = html.replace(new RegExp(`(<p>)${FILLER}+`, 'gi'), '$1');
+    html = html.replace(new RegExp(`^${FILLER}+|${FILLER}+$`, 'gi'), '');
+    // Collapse runs of <br> (with whitespace between) to a single <br>.
+    html = html.replace(/(?:<br\s*\/?\s*>\s*){2,}/gi, '<br>');
+    return html;
+  })();
   const {formRef, showSticky, stickyBox} = useStickyAddToCart();
   const isSoldOut = !selectedVariant?.availableForSale;
   const [sizeWarning, setSizeWarning] = useState(false);
@@ -462,7 +499,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
   )?.value;
 
   return (
-    <div className="product-page">
+    <div className="product-page" data-handle={product.handle}>
       <Breadcrumb />
       <ProductNav handle={product.handle} catalog={catalog} />
 
@@ -526,7 +563,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
               <h5>
                 Size{selectedSizeName ? ': ' : ''}
                 {selectedSizeName && (
-                  <span style={{color: '#000', fontWeight: 500, textTransform: 'none', letterSpacing: 0}}>{selectedSizeName}</span>
+                  <span style={{color: '#000', fontWeight: 500, textTransform: 'none', letterSpacing: 0}}>{selectedSizeName.toUpperCase()}</span>
                 )}
               </h5>
               <div className="product-options-grid">
@@ -545,14 +582,19 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
                       }
                     }}
                   >
-                    {value.name}
+                    {value.name.toUpperCase()}
                   </button>
                 ))}
               </div>
             </div>
           ) : (
             <div className="product-options">
-              <h5>Size: <span style={{color: '#000', fontWeight: 500, textTransform: 'none', letterSpacing: 0}}>One Size</span></h5>
+              <h5>Size: <span style={{color: '#000', fontWeight: 500, textTransform: 'none', letterSpacing: 0}}>ONE SIZE</span></h5>
+              <div className="product-options-grid">
+                <button type="button" className="product-options-item selected" disabled>
+                  ONE SIZE
+                </button>
+              </div>
             </div>
           )}
 
@@ -590,8 +632,8 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
           {/* Description — matching static design */}
           <div className="product-description">
             <p className="product-description-label">Description</p>
-            {descriptionHtml ? (
-              <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
+            {cleanedDescriptionHtml ? (
+              <div dangerouslySetInnerHTML={{__html: cleanedDescriptionHtml}} />
             ) : (
               <div><p>Description coming soon.</p></div>
             )}
