@@ -690,7 +690,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
           className="sticky-add-to-cart"
           style={
             stickyBox
-              ? {left: `${stickyBox.left}px`, width: `${stickyBox.width}px`, right: 'auto'}
+              ? {left: `${stickyBox.left}px`, right: `${stickyBox.right}px`, width: 'auto'}
               : undefined
           }
         >
@@ -973,7 +973,7 @@ function ImageCarousel({
 function useStickyAddToCart() {
   const formRef = useRef<HTMLDivElement>(null);
   const [showSticky, setShowSticky] = useState(false);
-  const [stickyBox, setStickyBox] = useState<{left: number; width: number} | null>(null);
+  const [stickyBox, setStickyBox] = useState<{left: number; right: number} | null>(null);
 
   useEffect(() => {
     const el = formRef.current;
@@ -986,7 +986,32 @@ function useStickyAddToCart() {
       // user has scrolled past it (rect.bottom < 0), keep sticky hidden so
       // related-product sections aren't covered.
       setShowSticky(rect.top > window.innerHeight);
-      setStickyBox({left: rect.left, width: rect.width});
+      // Pin both left and right edges to viewport so the sticky exactly
+      // mirrors the column. Using width alone left small offsets visible.
+      setStickyBox({left: rect.left, right: window.innerWidth - rect.right});
+      // TEMP DEBUG — compare button to dividers
+      const desc = document.querySelector('.product-description') as HTMLElement | null;
+      const sg = document.querySelector('.product-size-guide') as HTMLElement | null;
+      const main = document.querySelector('.product-main') as HTMLElement | null;
+      const dr = desc?.getBoundingClientRect();
+      const sgr = sg?.getBoundingClientRect();
+      const mr = main?.getBoundingClientRect();
+      let dbg = document.getElementById('sticky-debug-overlay');
+      if (!dbg) {
+        dbg = document.createElement('div');
+        dbg.id = 'sticky-debug-overlay';
+        dbg.style.cssText =
+          'position:fixed;top:8px;left:8px;z-index:99999;background:#000;color:#0f0;font:12px/1.4 monospace;padding:8px;white-space:pre;pointer-events:none;';
+        document.body.appendChild(dbg);
+      }
+      const fmt = (r?: DOMRect) =>
+        r ? `${r.left.toFixed(1)} → ${r.right.toFixed(1)} (w=${r.width.toFixed(1)})` : 'null';
+      dbg.textContent =
+        `viewport:       ${window.innerWidth}\n` +
+        `regularBtn:     ${fmt(rect)}\n` +
+        `.product-main:  ${fmt(mr ?? undefined)}\n` +
+        `.product-desc:  ${fmt(dr ?? undefined)}\n` +
+        `.size-guide:    ${fmt(sgr ?? undefined)}`;
     }
 
     update();
@@ -996,10 +1021,15 @@ function useStickyAddToCart() {
     // emit scroll/resize events.
     const obs = new IntersectionObserver(() => update(), {threshold: [0, 1]});
     obs.observe(btn);
+    // ResizeObserver catches column-width changes that don't fire window resize
+    // (e.g. images loading above shifting the grid, font swaps reflowing).
+    const ro = new ResizeObserver(() => update());
+    ro.observe(btn);
     window.addEventListener('scroll', update, {passive: true});
     window.addEventListener('resize', update, {passive: true});
     return () => {
       obs.disconnect();
+      ro.disconnect();
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
     };

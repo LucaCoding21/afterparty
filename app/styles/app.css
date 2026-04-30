@@ -2423,7 +2423,7 @@ aside main {
 .product-size-guide-icon {
   display: block;
   flex-shrink: 0;
-  color: #555;
+  color: #999;
   transition: transform 0.2s ease;
 }
 
@@ -2739,6 +2739,7 @@ html:has(.overlay.expanded) .sticky-add-to-cart {
 .sticky-add-to-cart form {
   margin: 0;
   padding: 0;
+  width: 100%;
 }
 
 .sticky-add-to-cart button {
@@ -2762,8 +2763,8 @@ html:has(.overlay.expanded) .sticky-add-to-cart {
 /* Description */
 .product-description {
   margin-top: 0;
-  padding-top: 0.5rem;
-  padding-bottom: 0.25rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
   border-top: 1px solid #e8e8e8;
   width: 100%;
 }
