@@ -105,12 +105,20 @@ export default function SupportPage() {
         <Section title="Returns & Exchanges">
           <p className="support-body-text support-body-text--no-mb">All sales are final except as expressly stated in our Refund Policy.</p>
           <div className="support-faq-item">
-            <p className="support-faq-q">Can afterparty cancel my order?</p>
-            <p className="support-faq-a">Yes. afterparty may cancel any order at its discretion, including for suspected resale or fraudulent activity, and to correct pricing or stock errors.</p>
+            <p className="support-faq-q">How do I report an issue with my order?</p>
+            <p className="support-faq-a">Email <a href="mailto:minh@afterparty.space" className="support-link">minh@afterparty.space</a> within 7 days of receiving your item, including your order number and clear, unedited photos and a video of the issue. Edited, altered, or AI-generated images will not be accepted, and items sent back without first contacting us will not be received.</p>
           </div>
           <div className="support-faq-item">
-            <p className="support-faq-q">What if there is a pricing or product error?</p>
-            <p className="support-faq-a">We reserve the right to correct errors, update information, or cancel orders at any time without notice.</p>
+            <p className="support-faq-q">What items are non-returnable?</p>
+            <p className="support-faq-a">All items are non-returnable and non-exchangeable unless they arrive damaged, defective, or incorrect. We do not accept returns for incorrect size, change of mind, or an incorrect shipping address.</p>
+          </div>
+          <div className="support-faq-item">
+            <p className="support-faq-q">Do you offer exchanges?</p>
+            <p className="support-faq-a">Only if you received the wrong item or a defective product. Once approved, we will provide a return label and ship the correct item after receiving the original. We do not exchange for sizing or preference reasons.</p>
+          </div>
+          <div className="support-faq-item">
+            <p className="support-faq-q">When are refunds issued?</p>
+            <p className="support-faq-a">Refunds apply only if your order is canceled before shipment, or your item arrives damaged, defective, or incorrect and cannot be replaced. Approved refunds are processed to your original payment method within 10 business days. If 15 business days have passed since approval, contact <a href="mailto:minh@afterparty.space" className="support-link">minh@afterparty.space</a>.</p>
           </div>
           <p className="support-body-text support-body-text--no-mb">For full details, see our <Link to="/policies/refund-policy" className="support-link">Refund Policy</Link>.</p>
         </Section>
