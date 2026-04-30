@@ -326,7 +326,7 @@ type RouteFiles = {
     page: "/*";
   };
   "../node_modules/@shopify/hydrogen/dist/vite/virtual-routes/layout.jsx": {
-    id: "/Users/claire/afterparty1/afterparty/node_modules/@shopify/hydrogen/dist/vite/virtual-routes/layout";
+    id: "/Users/williamnguyen/afterparty/node_modules/@shopify/hydrogen/dist/vite/virtual-routes/layout";
     page: "/graphiql" | "/subrequest-profiler" | "/.well-known/appspecific/com.chrome.devtools.json" | "/";
   };
   "../node_modules/@shopify/hydrogen/dist/vite/virtual-routes/routes/graphiql.jsx": {
@@ -388,7 +388,7 @@ type RouteModules = {
   "routes/cart": typeof import("./app/routes/cart.tsx");
   "routes/cart.$lines": typeof import("./app/routes/cart.$lines.tsx");
   "routes/$": typeof import("./app/routes/$.tsx");
-  "/Users/claire/afterparty1/afterparty/node_modules/@shopify/hydrogen/dist/vite/virtual-routes/layout": unknown;
+  "/Users/williamnguyen/afterparty/node_modules/@shopify/hydrogen/dist/vite/virtual-routes/layout": unknown;
   "vite/virtual-routes/routes/graphiql": unknown;
   "vite/virtual-routes/routes/subrequest-profiler": unknown;
   "vite/virtual-routes/routes/[.]well-known.appspecific.com[.]chrome[.]devtools[.]json": unknown;
