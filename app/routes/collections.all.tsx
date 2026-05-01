@@ -15,7 +15,7 @@ export async function loader({context}: Route.LoaderArgs) {
 const CATALOG_QUERY = `#graphql
   query Catalog($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 50) {
+    products(first: 50, sortKey: CREATED_AT, reverse: true) {
       nodes {
         id
         handle
