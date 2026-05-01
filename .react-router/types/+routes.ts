@@ -14,12 +14,6 @@ type Pages = {
   "/": {
     params: {};
   };
-  "/blogs/:blogHandle/:articleHandle": {
-    params: {
-      "blogHandle": string;
-      "articleHandle": string;
-    };
-  };
   "/api/:version/graphql.json": {
     params: {
       "version": string;
@@ -29,11 +23,6 @@ type Pages = {
     params: {
       "type": string;
       "page": string;
-    };
-  };
-  "/blogs/:blogHandle": {
-    params: {
-      "blogHandle": string;
     };
   };
   "/collections/accessories": {
@@ -115,6 +104,9 @@ type Pages = {
   "/newsletter": {
     params: {};
   };
+  "/lookbook": {
+    params: {};
+  };
   "/account": {
     params: {};
   };
@@ -153,25 +145,12 @@ type Pages = {
       "*": string;
     };
   };
-  "/graphiql": {
-    params: {};
-  };
-  "/subrequest-profiler": {
-    params: {};
-  };
-  "/.well-known/appspecific/com.chrome.devtools.json": {
-    params: {};
-  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/blogs/:blogHandle/:articleHandle" | "/api/:version/graphql.json" | "/sitemap/:type/:page.xml" | "/blogs/:blogHandle" | "/collections/accessories" | "/collections/tops-shirts" | "/collections/outerwear" | "/collections/:handle" | "/account/authorize" | "/collections" | "/collections/pants" | "/policies/:handle" | "/products/:handle" | "/account/logout" | "/collections/all" | "/pages/stockists" | "/policies" | "/account/login" | "/discount/:code" | "/sitemap.xml" | "/pages/:handle" | "/pages/support" | "/robots.txt" | "/blogs" | "/pages/about" | "/llms.txt" | "/newsletter" | "/account" | "/account/orders" | "/account/orders/:id" | "/account/addresses" | "/account/profile" | "/account/*" | "/search" | "/cart" | "/cart/:lines" | "/*" | "/graphiql" | "/subrequest-profiler" | "/.well-known/appspecific/com.chrome.devtools.json";
-  };
-  "routes/blogs.$blogHandle.$articleHandle.tsx": {
-    id: "routes/blogs.$blogHandle.$articleHandle";
-    page: "/blogs/:blogHandle/:articleHandle";
+    page: "/" | "/api/:version/graphql.json" | "/sitemap/:type/:page.xml" | "/collections/accessories" | "/collections/tops-shirts" | "/collections/outerwear" | "/collections/:handle" | "/account/authorize" | "/collections" | "/collections/pants" | "/policies/:handle" | "/products/:handle" | "/account/logout" | "/collections/all" | "/pages/stockists" | "/policies" | "/account/login" | "/discount/:code" | "/sitemap.xml" | "/pages/:handle" | "/pages/support" | "/robots.txt" | "/blogs" | "/pages/about" | "/llms.txt" | "/newsletter" | "/lookbook" | "/account" | "/account/orders" | "/account/orders/:id" | "/account/addresses" | "/account/profile" | "/account/*" | "/search" | "/cart" | "/cart/:lines" | "/*";
   };
   "routes/api.$version.[graphql.json].tsx": {
     id: "routes/api.$version.[graphql.json]";
@@ -180,10 +159,6 @@ type RouteFiles = {
   "routes/sitemap.$type.$page[.xml].tsx": {
     id: "routes/sitemap.$type.$page[.xml]";
     page: "/sitemap/:type/:page.xml";
-  };
-  "routes/blogs.$blogHandle._index.tsx": {
-    id: "routes/blogs.$blogHandle._index";
-    page: "/blogs/:blogHandle";
   };
   "routes/collections.accessories.tsx": {
     id: "routes/collections.accessories";
@@ -277,6 +252,10 @@ type RouteFiles = {
     id: "routes/newsletter";
     page: "/newsletter";
   };
+  "routes/lookbook.tsx": {
+    id: "routes/lookbook";
+    page: "/lookbook";
+  };
   "routes/account.tsx": {
     id: "routes/account";
     page: "/account" | "/account/orders" | "/account/orders/:id" | "/account/addresses" | "/account/profile" | "/account/*";
@@ -325,34 +304,12 @@ type RouteFiles = {
     id: "routes/$";
     page: "/*";
   };
-  "../node_modules/@shopify/hydrogen/dist/vite/virtual-routes/layout.jsx": {
-    id: "/Users/claire/afterparty1/afterparty/node_modules/@shopify/hydrogen/dist/vite/virtual-routes/layout";
-    page: "/graphiql" | "/subrequest-profiler" | "/.well-known/appspecific/com.chrome.devtools.json" | "/";
-  };
-  "../node_modules/@shopify/hydrogen/dist/vite/virtual-routes/routes/graphiql.jsx": {
-    id: "vite/virtual-routes/routes/graphiql";
-    page: "/graphiql";
-  };
-  "../node_modules/@shopify/hydrogen/dist/vite/virtual-routes/routes/subrequest-profiler.jsx": {
-    id: "vite/virtual-routes/routes/subrequest-profiler";
-    page: "/subrequest-profiler";
-  };
-  "../node_modules/@shopify/hydrogen/dist/vite/virtual-routes/routes/[.]well-known.appspecific.com[.]chrome[.]devtools[.]json.jsx": {
-    id: "vite/virtual-routes/routes/[.]well-known.appspecific.com[.]chrome[.]devtools[.]json";
-    page: "/.well-known/appspecific/com.chrome.devtools.json";
-  };
-  "../node_modules/@shopify/hydrogen/dist/vite/virtual-routes/routes/index.jsx": {
-    id: "vite/virtual-routes/routes/index";
-    page: "/";
-  };
 };
 
 type RouteModules = {
   "root": typeof import("./app/root.tsx");
-  "routes/blogs.$blogHandle.$articleHandle": typeof import("./app/routes/blogs.$blogHandle.$articleHandle.tsx");
   "routes/api.$version.[graphql.json]": typeof import("./app/routes/api.$version.[graphql.json].tsx");
   "routes/sitemap.$type.$page[.xml]": typeof import("./app/routes/sitemap.$type.$page[.xml].tsx");
-  "routes/blogs.$blogHandle._index": typeof import("./app/routes/blogs.$blogHandle._index.tsx");
   "routes/collections.accessories": typeof import("./app/routes/collections.accessories.tsx");
   "routes/collections.tops-shirts": typeof import("./app/routes/collections.tops-shirts.tsx");
   "routes/collections.outerwear": typeof import("./app/routes/collections.outerwear.tsx");
@@ -376,6 +333,7 @@ type RouteModules = {
   "routes/pages.about": typeof import("./app/routes/pages.about.tsx");
   "routes/[llms.txt]": typeof import("./app/routes/[llms.txt].tsx");
   "routes/newsletter": typeof import("./app/routes/newsletter.tsx");
+  "routes/lookbook": typeof import("./app/routes/lookbook.tsx");
   "routes/account": typeof import("./app/routes/account.tsx");
   "routes/account.orders._index": typeof import("./app/routes/account.orders._index.tsx");
   "routes/account.orders.$id": typeof import("./app/routes/account.orders.$id.tsx");
@@ -388,9 +346,4 @@ type RouteModules = {
   "routes/cart": typeof import("./app/routes/cart.tsx");
   "routes/cart.$lines": typeof import("./app/routes/cart.$lines.tsx");
   "routes/$": typeof import("./app/routes/$.tsx");
-  "/Users/claire/afterparty1/afterparty/node_modules/@shopify/hydrogen/dist/vite/virtual-routes/layout": unknown;
-  "vite/virtual-routes/routes/graphiql": unknown;
-  "vite/virtual-routes/routes/subrequest-profiler": unknown;
-  "vite/virtual-routes/routes/[.]well-known.appspecific.com[.]chrome[.]devtools[.]json": unknown;
-  "vite/virtual-routes/routes/index": unknown;
 };

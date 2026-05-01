@@ -4,7 +4,7 @@ import {seoTags} from '~/lib/seo';
 
 export const meta = () => {
   return seoTags({
-    title: 'Support and FAQ, afterparty',
+    title: 'afterparty | Support',
     description:
       'Shipping, returns, and order help for afterparty, streetwear from Ho Chi Minh City, Vietnam. Email minh@afterparty.space.',
     url: '/pages/support',
@@ -67,19 +67,19 @@ export default function SupportPage() {
         <Section title="Orders">
           <div className="support-faq-item">
             <p className="support-faq-q">When is my order confirmed?</p>
-            <p className="support-faq-a">Placing an order is an offer to purchase. The order is accepted once payment has been processed and a confirmation email is issued.</p>
+            <p className="support-faq-a">Your order is confirmed once payment is processed and you receive a confirmation email.</p>
           </div>
           <div className="support-faq-item">
             <p className="support-faq-q">Can afterparty cancel or reject my order?</p>
-            <p className="support-faq-a">Yes. We may decline, cancel, or limit any order at our discretion, including for suspected resale or fraudulent activity, and to correct pricing or stock errors.</p>
+            <p className="support-faq-a">Yes. We may cancel, decline, or limit orders at our discretion, including for suspected resale, fraudulent activity, or pricing and inventory errors.</p>
           </div>
           <div className="support-faq-item">
             <p className="support-faq-q">Are taxes and duties included in the price?</p>
-            <p className="support-faq-a">No. Prices do not include taxes, shipping, duties, or import fees. These charges are the responsibility of the customer.</p>
+            <p className="support-faq-a">No. Prices do not include shipping, taxes, duties, or import fees. These are the customer’s responsibility.</p>
           </div>
           <div className="support-faq-item">
             <p className="support-faq-q">Are sales final?</p>
-            <p className="support-faq-a">All sales are final except as expressly stated in our Refund Policy.</p>
+            <p className="support-faq-a">All sales are final, except as outlined in our Refund Policy.</p>
           </div>
           <p className="support-body-text support-body-text--no-mb">For full terms, see our <Link to="/policies/terms-of-service" className="support-link">Terms of Service</Link>.</p>
         </Section>
@@ -88,39 +88,38 @@ export default function SupportPage() {
         <Section title="Shipping">
           <div className="support-faq-item">
             <p className="support-faq-q">Are delivery times guaranteed?</p>
-            <p className="support-faq-a">No. Delivery times are estimates only. afterparty is not responsible for delays caused by carriers, customs, or events outside our control.</p>
+            <p className="support-faq-a">No. Delivery times are estimates and may vary. We are not responsible for delays caused by carriers, customs, or other factors outside our control.</p>
           </div>
           <div className="support-faq-item">
             <p className="support-faq-q">Who is responsible for the parcel during transit?</p>
-            <p className="support-faq-a">Risk of loss transfers to the customer once the order is handed to the carrier.</p>
+            <p className="support-faq-a">Responsibility transfers to the customer once the order has been handed to the carrier.</p>
           </div>
           <div className="support-faq-item">
             <p className="support-faq-q">Are duties and taxes included?</p>
-            <p className="support-faq-a">No. Duties, taxes, and import fees are the responsibility of the recipient.</p>
+            <p className="support-faq-a">No. Any applicable duties, taxes, or import fees are the recipient’s responsibility.</p>
           </div>
           <p className="support-body-text support-body-text--no-mb">For full terms, see our <Link to="/policies/terms-of-service" className="support-link">Terms of Service</Link>.</p>
         </Section>
 
         {/* ── Returns & Exchanges ── */}
         <Section title="Returns & Exchanges">
-          <p className="support-body-text support-body-text--no-mb">All sales are final except as expressly stated in our Refund Policy.</p>
+          <p className="support-body-text support-body-text--no-mb">All sales are final, except as outlined in our Refund Policy.</p>
           <div className="support-faq-item">
             <p className="support-faq-q">How do I report an issue with my order?</p>
-            <p className="support-faq-a">Email <a href="mailto:minh@afterparty.space" className="support-link">minh@afterparty.space</a> within 7 days of receiving your item, including your order number and clear, unedited photos and a video of the issue. Edited, altered, or AI-generated images will not be accepted, and items sent back without first contacting us will not be received.</p>
+            <p className="support-faq-a">Please email <a href="mailto:minh@afterparty.space" className="support-link">minh@afterparty.space</a> within 7 days of receiving your item. Include your order number, along with clear, unedited photos and a video of the issue. We do not accept edited or AI-generated images, and returns sent without prior approval will not be accepted.</p>
           </div>
           <div className="support-faq-item">
-            <p className="support-faq-q">What items are non-returnable?</p>
-            <p className="support-faq-a">All items are non-returnable and non-exchangeable unless they arrive damaged, defective, or incorrect. We do not accept returns for incorrect size, change of mind, or an incorrect shipping address.</p>
+            <p className="support-faq-q">What items are eligible for return?</p>
+            <p className="support-faq-a">Items are only eligible if they arrive damaged, defective, or incorrect. We do not accept returns for sizing issues, change of mind, or incorrect shipping information.</p>
           </div>
           <div className="support-faq-item">
             <p className="support-faq-q">Do you offer exchanges?</p>
-            <p className="support-faq-a">Only if you received the wrong item or a defective product. Once approved, we will provide a return label and ship the correct item after receiving the original. We do not exchange for sizing or preference reasons.</p>
+            <p className="support-faq-a">Exchanges are only available for incorrect or defective items. Once approved, we’ll provide a return label and ship the replacement after receiving the original item. We do not offer exchanges for sizing or preference.</p>
           </div>
           <div className="support-faq-item">
             <p className="support-faq-q">When are refunds issued?</p>
-            <p className="support-faq-a">Refunds apply only if your order is canceled before shipment, or your item arrives damaged, defective, or incorrect and cannot be replaced. Approved refunds are processed to your original payment method within 10 business days. If 15 business days have passed since approval, contact <a href="mailto:minh@afterparty.space" className="support-link">minh@afterparty.space</a>.</p>
+            <p className="support-faq-a">Refunds are only issued if your order is canceled before shipment, or if your item arrives damaged, defective, or incorrect and cannot be replaced. Approved refunds are processed to your original payment method within 10 business days. If you haven’t received your refund after 15 business days, please contact <a href="mailto:minh@afterparty.space" className="support-link">minh@afterparty.space</a>.</p>
           </div>
-          <p className="support-body-text support-body-text--no-mb">For full details, see our <Link to="/policies/refund-policy" className="support-link">Refund Policy</Link>.</p>
         </Section>
 
       </div>

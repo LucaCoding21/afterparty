@@ -37,7 +37,12 @@ export default function Homepage() {
   const {initialIsMobile} = useLoaderData<typeof loader>();
   const desktopVideoRef = useRef<HTMLVideoElement>(null);
   const spriteRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(initialIsMobile);
+
+  const showLogo = () => {
+    if (logoRef.current) logoRef.current.dataset.shown = 'true';
+  };
 
   useEffect(() => {
     document.body.classList.add('home-page');
@@ -150,8 +155,9 @@ export default function Homepage() {
       if (now - last >= interval) {
         const next = frame + 1;
         if (next >= SPRITE_TOTAL_FRAMES) {
-          // Last frame reached — leave the image on screen, stop looping.
+          // Last frame reached — leave the image on screen, swap to crisp PNG.
           applyFrame(SPRITE_TOTAL_FRAMES - 1);
+          showLogo();
           return;
         }
         // Need to cross into B? Only advance if B has decoded.
@@ -211,12 +217,14 @@ export default function Homepage() {
     tryPlay();
     video.addEventListener('canplay', tryPlay);
     video.addEventListener('loadedmetadata', tryPlay);
+    video.addEventListener('ended', showLogo);
     document.addEventListener('click', onGesture);
     document.addEventListener('keydown', onGesture);
 
     return () => {
       video.removeEventListener('canplay', tryPlay);
       video.removeEventListener('loadedmetadata', tryPlay);
+      video.removeEventListener('ended', showLogo);
       document.removeEventListener('click', onGesture);
       document.removeEventListener('keydown', onGesture);
     };
@@ -249,6 +257,9 @@ export default function Homepage() {
             disableRemotePlayback
           />
         )}
+        <div ref={logoRef} className="home-hero-logo" aria-hidden="true">
+          <img src={isMobile ? '/Mobile_final.png' : '/Desktop_final.png'} alt="" />
+        </div>
       </Link>
     </div>
   );

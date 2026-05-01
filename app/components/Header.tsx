@@ -110,7 +110,7 @@ export function Header({
           >
             Shop All
           </NavLink>
-          <NavLink to="/blogs" className="header-nav-link" prefetch="intent">
+          <NavLink to="/lookbook" className="header-nav-link" prefetch="intent">
             Lookbook
           </NavLink>
           <NavLink to="/pages/stockists" className="header-nav-link" prefetch="intent">
@@ -292,7 +292,7 @@ export function Header({
               <NavLink to="/pages/about" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
                 About Us
               </NavLink>
-              <NavLink to="/blogs" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
+              <NavLink to="/lookbook" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
                 Lookbook
               </NavLink>
               <NavLink to="/pages/stockists" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
@@ -327,7 +327,7 @@ export function HeaderMenu({
     <nav className="header-menu-mobile" role="navigation">
       <NavLink end onClick={close} prefetch="intent" className="header-mobile-item" to="/">Home</NavLink>
       <NavLink onClick={close} prefetch="intent" className="header-mobile-item" to="/collections/all">Shop All</NavLink>
-      <NavLink onClick={close} prefetch="intent" className="header-mobile-item" to="/blogs">Lookbook</NavLink>
+      <NavLink onClick={close} prefetch="intent" className="header-mobile-item" to="/lookbook">Lookbook</NavLink>
       <NavLink onClick={close} prefetch="intent" className="header-mobile-item" to="/pages/about">About Us</NavLink>
       <NavLink onClick={close} prefetch="intent" className="header-mobile-item" to="/search">Search</NavLink>
     </nav>
