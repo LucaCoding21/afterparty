@@ -1569,6 +1569,10 @@ aside main {
   margin: 0.6rem 0 0;
 }
 
+.cart-details .cart-taxes-note u {
+  text-underline-offset: 2px;
+}
+
 /* Checkout button */
 
 .cart-checkout-btn,
@@ -3571,19 +3575,13 @@ html:has(.overlay.expanded) .sticky-add-to-cart {
 .policy-body h3,
 .policy-body h4,
 .policy-body h5,
-.policy-body h6,
-.policy-body p:has(> strong:only-child) {
+.policy-body h6 {
   font-family: var(--font-sans);
   font-size: 0.875rem;
   font-weight: 600;
-  text-transform: uppercase;
   letter-spacing: 0;
-  margin: 2.5rem 0 1rem;
+  margin: 1.75rem 0 0.5rem;
   color: #000;
-}
-
-.policy-body p:has(> strong:only-child) strong {
-  font-weight: inherit;
 }
 
 .policy-page--terms-of-service .policy-body strong {

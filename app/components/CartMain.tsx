@@ -77,7 +77,10 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
             })}
           </ul>
           {cartHasItems && (
-            <p className="cart-taxes-note">Taxes and shipping calculated at checkout</p>
+            <>
+              <p className="cart-taxes-note">Taxes and shipping calculated at checkout</p>
+              <p className="cart-taxes-note">Free shipping until <u>June 30, 2026</u></p>
+            </>
           )}
         </div>
       </div>
