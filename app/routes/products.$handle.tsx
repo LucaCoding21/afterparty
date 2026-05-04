@@ -58,6 +58,10 @@ const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = 
     sizeGuide: '/products/size-guides/bubble-letter-ringer-tee.svg',
     sizePhoto: '/products/measurements/Ringer%20Short%20Sleeve%20Tee%20Chart%201.png',
   },
+  'alien-cat-ringer-tee': {
+    sizeGuide: '/products/size-guides/bubble-letter-ringer-tee.svg',
+    sizePhoto: '/products/measurements/Ringer%20Short%20Sleeve%20Tee%20Chart%201.png',
+  },
   'leopard-flared-pants': {
     sizeGuide: '/products/size-guides/leopard-flared-pants.svg',
     sizePhoto: '/products/measurements/Leopard%20Flared%20Pants%20Chart%201.png',

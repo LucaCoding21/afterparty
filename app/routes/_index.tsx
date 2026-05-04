@@ -28,7 +28,8 @@ const SPRITE_A_ROWS = 3;
 const SPRITE_B_FRAMES = 30;
 const SPRITE_B_COLS = 6;
 const SPRITE_B_ROWS = 5;
-const SPRITE_TOTAL_FRAMES = SPRITE_A_FRAMES + SPRITE_B_FRAMES;
+// Trim ~0.83s off the tail (final settling frames drag visually).
+const SPRITE_TOTAL_FRAMES = SPRITE_A_FRAMES + SPRITE_B_FRAMES - 10;
 const SPRITE_FPS = 12;
 const SPRITE_FRAME_W = 540;
 const SPRITE_FRAME_H = 960;
@@ -38,6 +39,8 @@ export default function Homepage() {
   const desktopVideoRef = useRef<HTMLVideoElement>(null);
   const spriteRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
+  const shopTargetRef = useRef<HTMLAnchorElement>(null);
+  const shopBoxRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(initialIsMobile);
 
   const showLogo = () => {
@@ -230,37 +233,113 @@ export default function Homepage() {
     };
   }, [isMobile]);
 
+  // Desktop only: size the invisible hover region over the SVG logo using the
+  // same object-fit: cover math as the canvas. Logo bbox in the 2361x1328
+  // canvas: x=857..1503, y=402..958 (36.298% left, 30.271% top, 27.404% wide,
+  // 41.943% tall). Recompute on resize so it stays pinned across viewport
+  // changes.
+  useEffect(() => {
+    if (isMobile) return;
+    const target = shopTargetRef.current;
+    if (!target) return;
+    const compute = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const canvasAspect = 2361 / 1328;
+      const vpAspect = vw / vh;
+      let renderedW: number;
+      let renderedH: number;
+      let offsetX: number;
+      let offsetY: number;
+      if (vpAspect > canvasAspect) {
+        renderedW = vw;
+        renderedH = vw / canvasAspect;
+        offsetX = 0;
+        offsetY = (vh - renderedH) / 2;
+      } else {
+        renderedH = vh;
+        renderedW = vh * canvasAspect;
+        offsetX = (vw - renderedW) / 2;
+        offsetY = 0;
+      }
+      target.style.left = `${offsetX + 0.36298 * renderedW}px`;
+      target.style.top = `${offsetY + 0.30271 * renderedH}px`;
+      target.style.width = `${0.27404 * renderedW}px`;
+      target.style.height = `${0.41943 * renderedH}px`;
+    };
+    compute();
+    window.addEventListener('resize', compute);
+    return () => window.removeEventListener('resize', compute);
+  }, [isMobile]);
+
+  const handleShopMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const box = shopBoxRef.current;
+    if (!box) return;
+    box.style.left = `${e.clientX + 18}px`;
+    box.style.top = `${e.clientY + 18}px`;
+  };
+
+  const innerHero = (
+    <>
+      {isMobile ? (
+        <div
+          ref={spriteRef}
+          className="home-hero-media home-hero-sprite"
+          role="img"
+          aria-hidden="true"
+        />
+      ) : (
+        <video
+          ref={desktopVideoRef}
+          className="home-hero-media"
+          src="/Desktop_grey.mp4"
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+          disableRemotePlayback
+        />
+      )}
+      <div ref={logoRef} className="home-hero-logo" aria-hidden="true">
+        <img src={isMobile ? '/Mobile_final.svg' : '/Desktop_final.svg'} alt="" />
+      </div>
+      <span className="home-hero-cta" aria-hidden="true">Enter →</span>
+      {!isMobile && (
+        <>
+          <Link
+            to="/collections/all"
+            prefetch="intent"
+            ref={shopTargetRef}
+            className="home-hero-shop-target"
+            onMouseMove={handleShopMove}
+            aria-label="Shop the catalog"
+          />
+          <div
+            ref={shopBoxRef}
+            className="home-hero-shop-box"
+            aria-hidden="true"
+          >
+            Shop
+          </div>
+        </>
+      )}
+    </>
+  );
+
   return (
     <div className="home-hero">
-      <Link
-        to="/collections/all"
-        prefetch="intent"
-        aria-label="Shop the catalog"
-        className="home-hero-link"
-      >
-        {isMobile ? (
-          <div
-            ref={spriteRef}
-            className="home-hero-media home-hero-sprite"
-            role="img"
-            aria-hidden="true"
-          />
-        ) : (
-          <video
-            ref={desktopVideoRef}
-            className="home-hero-media"
-            src="/Desktop_grey.mp4"
-            autoPlay
-            muted
-            playsInline
-            preload="auto"
-            disableRemotePlayback
-          />
-        )}
-        <div ref={logoRef} className="home-hero-logo" aria-hidden="true">
-          <img src={isMobile ? '/Mobile_final.png' : '/Desktop_final.png'} alt="" />
-        </div>
-      </Link>
+      {isMobile ? (
+        <Link
+          to="/collections/all"
+          prefetch="intent"
+          aria-label="Shop the catalog"
+          className="home-hero-link"
+        >
+          {innerHero}
+        </Link>
+      ) : (
+        <div className="home-hero-link">{innerHero}</div>
+      )}
     </div>
   );
 }
