@@ -303,7 +303,7 @@ export default function Homepage() {
       <div ref={logoRef} className="home-hero-logo" aria-hidden="true">
         <img src={isMobile ? '/Mobile_final.svg' : '/Desktop_final.svg'} alt="" />
       </div>
-      <span className="home-hero-cta" aria-hidden="true">Enter →</span>
+      <span className="home-hero-cta" aria-hidden="true">Enter</span>
       {!isMobile && (
         <>
           <Link

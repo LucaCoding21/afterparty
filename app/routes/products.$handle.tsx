@@ -132,6 +132,14 @@ const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = 
     sizeGuide: '/products/size-guides/leopard-flared-pants.svg',
     sizePhoto: '/products/measurements/Velour%20Track%20Pants%20Chart%201.png',
   },
+  'star-letter-raglan-tee': {
+    sizeGuide: '/products/size-guides/raglan-tee.svg',
+    sizePhoto: '/products/measurements/2026%20Raglan%20Long%20Sleeve%20Tee%20Chart%20(1).png',
+  },
+  'script-letter-raglan-tee': {
+    sizeGuide: '/products/size-guides/raglan-tee.svg',
+    sizePhoto: '/products/measurements/2026%20Raglan%20Long%20Sleeve%20Tee%20Chart%20(1).png',
+  },
 };
 
 export const meta: Route.MetaFunction = ({data}) => {
