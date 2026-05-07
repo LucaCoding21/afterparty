@@ -125,11 +125,11 @@ const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = 
     sizePhoto: '/products/measurements/2026-nhim-short-sleeve-tee-chart-1.png',
   },
   'velour-track-jacket': {
-    sizeGuide: '/products/size-guides/leopard-jacket.svg',
+    sizeGuide: '/products/size-guides/velour-track-jacket.svg',
     sizePhoto: '/products/measurements/Velour%20Track%20Jacket%20Chart%201.png',
   },
   'velour-track-pants': {
-    sizeGuide: '/products/size-guides/leopard-flared-pants.svg',
+    sizeGuide: '/products/size-guides/velour-track-pants.svg',
     sizePhoto: '/products/measurements/Velour%20Track%20Pants%20Chart%201.png',
   },
   'star-letter-raglan-tee': {
