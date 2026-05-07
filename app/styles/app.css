@@ -4149,24 +4149,27 @@ Home hero — full-screen intro video (desktop)
 /* CTA — sits under the logo and fades in once the SVG logo is shown.
    Uses a sibling combinator so no extra JS is needed. */
 .home-hero-cta {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
   position: absolute;
   left: 50%;
-  top: 63%;
+  top: 67%;
   transform: translateX(-50%);
-  background: #fff;
-  border: 1.5px solid #000;
-  border-radius: 0;
-  padding: 0.35rem 0.8rem;
   font-family: var(--font-sans);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #000;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
+}
+
+.home-hero-cta-arrow {
+  display: inline-block;
+  font-weight: 600;
 }
 
 .home-hero-logo[data-shown='true'] ~ .home-hero-cta {
