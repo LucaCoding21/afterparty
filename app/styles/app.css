@@ -4155,11 +4155,13 @@ Home hero — full-screen intro video (desktop)
   position: absolute;
   left: 50%;
   top: 67%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -21px);
   font-family: var(--font-sans);
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: 19px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: #000;
   white-space: nowrap;
@@ -4168,8 +4170,17 @@ Home hero — full-screen intro video (desktop)
 }
 
 .home-hero-cta-arrow {
-  display: inline-block;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+}
+
+.home-hero-cta-arrow svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .home-hero-logo[data-shown='true'] ~ .home-hero-cta {
