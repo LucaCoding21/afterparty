@@ -4155,7 +4155,7 @@ Home hero — full-screen intro video (desktop)
   position: absolute;
   left: 50%;
   top: 67%;
-  transform: translate(calc(-50% + 10px), -21px);
+  transform: translate(calc(-50% + 5px), -21px);
   font-family: var(--font-sans);
   font-size: 0.8rem;
   font-weight: 500;
