@@ -56,11 +56,11 @@ function useRecentlyViewed(currentHandle: string, currentTitle: string, currentI
 const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = {
   'bubble-letter-ringer-tee': {
     sizeGuide: '/products/size-guides/bubble-letter-ringer-tee.svg',
-    sizePhoto: '/products/measurements/Ringer%20Short%20Sleeve%20Tee%20Chart%201.png',
+    sizePhoto: '/products/measurements/Ringer%20Short%20Sleeve%20Tee%20Chart%202.png',
   },
   'alien-cat-ringer-tee': {
     sizeGuide: '/products/size-guides/bubble-letter-ringer-tee.svg',
-    sizePhoto: '/products/measurements/Ringer%20Short%20Sleeve%20Tee%20Chart%201.png',
+    sizePhoto: '/products/measurements/Ringer%20Short%20Sleeve%20Tee%20Chart%202.png',
   },
   'leopard-flared-pants': {
     sizeGuide: '/products/size-guides/leopard-flared-pants.svg',
@@ -335,11 +335,17 @@ function ProductNav({handle, catalog}: {handle: string; catalog: CatalogProduct[
   return (
     <nav className="product-nav">
       <Link to={categoryPath} className="product-nav-btn">
-        <span className="nav-arrow">&lsaquo;</span> Back to {categoryName}
+        <svg className="nav-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M7.5 2l-4 4 4 4" />
+        </svg>
+        Back to {categoryName}
       </Link>
       {nextProductPath && (
         <Link to={nextProductPath} className="product-nav-btn">
-          Next Product <span className="nav-arrow">&rsaquo;</span>
+          Next Product
+          <svg className="nav-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4.5 2l4 4-4 4" />
+          </svg>
         </Link>
       )}
     </nav>

@@ -68,7 +68,16 @@ export function flattenToColorVariants(products: any[]): VariantItem[] {
       });
     }
   }
-  return items;
+  // Push sold-out items to the bottom while preserving the source order within each group.
+  return items
+    .map((item, index) => ({item, index}))
+    .sort((a, b) => {
+      const aOut = a.item.availableForSale ? 0 : 1;
+      const bOut = b.item.availableForSale ? 0 : 1;
+      if (aOut !== bOut) return aOut - bOut;
+      return a.index - b.index;
+    })
+    .map(({item}) => item);
 }
 
 /**

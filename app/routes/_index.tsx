@@ -39,7 +39,7 @@ export default function Homepage() {
   const desktopVideoRef = useRef<HTMLVideoElement>(null);
   const spriteRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
-  const shopTargetRef = useRef<HTMLAnchorElement>(null);
+  const shopTargetRef = useRef<HTMLDivElement>(null);
   const shopBoxRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(initialIsMobile);
 
@@ -272,7 +272,7 @@ export default function Homepage() {
     return () => window.removeEventListener('resize', compute);
   }, [isMobile]);
 
-  const handleShopMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleShopMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const box = shopBoxRef.current;
     if (!box) return;
     box.style.left = `${e.clientX + 18}px`;
@@ -319,13 +319,11 @@ export default function Homepage() {
       </span>
       {!isMobile && (
         <>
-          <Link
-            to="/collections/all"
-            prefetch="intent"
+          <div
             ref={shopTargetRef}
             className="home-hero-shop-target"
             onMouseMove={handleShopMove}
-            aria-label="Shop the catalog"
+            aria-hidden="true"
           />
           <div
             ref={shopBoxRef}
@@ -341,18 +339,14 @@ export default function Homepage() {
 
   return (
     <div className="home-hero">
-      {isMobile ? (
-        <Link
-          to="/collections/all"
-          prefetch="intent"
-          aria-label="Shop the catalog"
-          className="home-hero-link"
-        >
-          {innerHero}
-        </Link>
-      ) : (
-        <div className="home-hero-link">{innerHero}</div>
-      )}
+      <Link
+        to="/collections/all"
+        prefetch="intent"
+        aria-label="Shop the catalog"
+        className="home-hero-link"
+      >
+        {innerHero}
+      </Link>
     </div>
   );
 }
