@@ -2517,6 +2517,55 @@ aside main {
   }
 }
 
+/* Click-to-zoom for size guide SVG + photo — desktop only */
+@media (min-width: 45em) {
+  .product-size-guide-zoomable {
+    cursor: zoom-in;
+  }
+}
+
+.size-guide-zoom-content {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  box-sizing: border-box;
+  cursor: default;
+}
+
+.zoom-overlay-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.zoom-overlay-centered .size-guide-zoom-content {
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.size-guide-zoom-img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 4rem);
+  width: auto;
+  height: auto;
+}
+
+.size-guide-zoom-svg {
+  width: 75%;
+  margin: 0 auto;
+}
+
+.size-guide-zoom-svg svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .product-main {
   align-self: start;
   position: sticky;

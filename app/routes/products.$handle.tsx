@@ -281,8 +281,49 @@ function Breadcrumb() {
   );
 }
 
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 45em)');
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return isDesktop;
+}
+
+function SizeGuideZoomOverlay({children, onClose, variant}: {children: React.ReactNode; onClose: () => void; variant?: 'svg' | 'photo'}) {
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [onClose]);
+
+  return (
+    <div className={`zoom-overlay${variant === 'photo' ? ' zoom-overlay-centered' : ''}`} onClick={onClose}>
+      <button className="zoom-close" onClick={onClose} aria-label="Close zoom">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <path d="M4 4l12 12M16 4L4 16" />
+        </svg>
+      </button>
+      <div className="size-guide-zoom-content" onClick={(e) => e.stopPropagation()}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function SizeGuideInline({url}: {url: string}) {
   const [svg, setSvg] = useState('');
+  const [zoomed, setZoomed] = useState(false);
+  const isDesktop = useIsDesktop();
   useEffect(() => {
     let cancelled = false;
     fetch(url)
@@ -296,7 +337,47 @@ function SizeGuideInline({url}: {url: string}) {
     };
   }, [url]);
   if (!svg) return null;
-  return <div className="product-size-guide-svg" dangerouslySetInnerHTML={{__html: svg}} />;
+  return (
+    <>
+      <div
+        className={`product-size-guide-svg${isDesktop ? ' product-size-guide-zoomable' : ''}`}
+        onClick={() => {
+          if (isDesktop) setZoomed(true);
+        }}
+        dangerouslySetInnerHTML={{__html: svg}}
+      />
+      {zoomed && (
+        <SizeGuideZoomOverlay onClose={() => setZoomed(false)}>
+          <div
+            className="product-size-guide-svg size-guide-zoom-svg"
+            dangerouslySetInnerHTML={{__html: svg}}
+          />
+        </SizeGuideZoomOverlay>
+      )}
+    </>
+  );
+}
+
+function SizeGuidePhoto({src}: {src: string}) {
+  const [zoomed, setZoomed] = useState(false);
+  const isDesktop = useIsDesktop();
+  return (
+    <>
+      <div
+        className={`product-size-guide-photo${isDesktop ? ' product-size-guide-zoomable' : ''}`}
+        onClick={() => {
+          if (isDesktop) setZoomed(true);
+        }}
+      >
+        <img src={src} alt="Measurement Reference" />
+      </div>
+      {zoomed && (
+        <SizeGuideZoomOverlay onClose={() => setZoomed(false)} variant="photo">
+          <img src={src} alt="Measurement Reference" className="size-guide-zoom-img" />
+        </SizeGuideZoomOverlay>
+      )}
+    </>
+  );
 }
 
 function ProductNav({handle, catalog}: {handle: string; catalog: CatalogProduct[]}) {
@@ -669,9 +750,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
               <div className="product-size-guide-content">
                 <SizeGuideInline url={sizeGuideInfo.sizeGuide} />
                 {sizeGuideInfo.sizePhoto && (
-                  <div className="product-size-guide-photo">
-                    <img src={sizeGuideInfo.sizePhoto} alt="Measurement Reference" />
-                  </div>
+                  <SizeGuidePhoto src={sizeGuideInfo.sizePhoto} />
                 )}
               </div>
             </details>
