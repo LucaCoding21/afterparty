@@ -1,4 +1,5 @@
 import {useState, useEffect, useLayoutEffect, useRef, useMemo} from 'react';
+import {createPortal} from 'react-dom';
 import {
   useLoaderData,
   Link,
@@ -293,8 +294,10 @@ function useIsDesktop() {
   return isDesktop;
 }
 
-function SizeGuideZoomOverlay({children, onClose, variant}: {children: React.ReactNode; onClose: () => void; variant?: 'svg' | 'photo'}) {
+function SizeGuideZoomOverlay({children, onClose}: {children: React.ReactNode; onClose: () => void}) {
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
+    setMounted(true);
     function handleKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
     }
@@ -306,8 +309,13 @@ function SizeGuideZoomOverlay({children, onClose, variant}: {children: React.Rea
     };
   }, [onClose]);
 
-  return (
-    <div className={`zoom-overlay${variant === 'photo' ? ' zoom-overlay-centered' : ''}`} onClick={onClose}>
+  if (!mounted) return null;
+
+  // Render at document.body so the overlay escapes the .product-main sticky
+  // stacking context — otherwise the page header (z-index 100 at body level)
+  // sits above the overlay even though the overlay sets z-index: 1000.
+  return createPortal(
+    <div className="zoom-overlay" onClick={onClose}>
       <button className="zoom-close" onClick={onClose} aria-label="Close zoom">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <path d="M4 4l12 12M16 4L4 16" />
@@ -316,17 +324,18 @@ function SizeGuideZoomOverlay({children, onClose, variant}: {children: React.Rea
       <div className="size-guide-zoom-content" onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
-function SizeGuideInline({url}: {url: string}) {
+function SizeGuide({sizeGuideUrl, sizePhotoSrc}: {sizeGuideUrl: string; sizePhotoSrc?: string}) {
   const [svg, setSvg] = useState('');
   const [zoomed, setZoomed] = useState(false);
   const isDesktop = useIsDesktop();
   useEffect(() => {
     let cancelled = false;
-    fetch(url)
+    fetch(sizeGuideUrl)
       .then((r) => r.text())
       .then((text) => {
         if (!cancelled) setSvg(text.replace(/\sfont-size="[^"]*"/g, ''));
@@ -335,45 +344,37 @@ function SizeGuideInline({url}: {url: string}) {
     return () => {
       cancelled = true;
     };
-  }, [url]);
+  }, [sizeGuideUrl]);
   if (!svg) return null;
+  const openZoom = () => {
+    if (isDesktop) setZoomed(true);
+  };
   return (
     <>
       <div
         className={`product-size-guide-svg${isDesktop ? ' product-size-guide-zoomable' : ''}`}
-        onClick={() => {
-          if (isDesktop) setZoomed(true);
-        }}
+        onClick={openZoom}
         dangerouslySetInnerHTML={{__html: svg}}
       />
+      {sizePhotoSrc && (
+        <div
+          className={`product-size-guide-photo${isDesktop ? ' product-size-guide-zoomable' : ''}`}
+          onClick={openZoom}
+        >
+          <img src={sizePhotoSrc} alt="Measurement Reference" />
+        </div>
+      )}
       {zoomed && (
         <SizeGuideZoomOverlay onClose={() => setZoomed(false)}>
           <div
             className="product-size-guide-svg size-guide-zoom-svg"
             dangerouslySetInnerHTML={{__html: svg}}
           />
-        </SizeGuideZoomOverlay>
-      )}
-    </>
-  );
-}
-
-function SizeGuidePhoto({src}: {src: string}) {
-  const [zoomed, setZoomed] = useState(false);
-  const isDesktop = useIsDesktop();
-  return (
-    <>
-      <div
-        className={`product-size-guide-photo${isDesktop ? ' product-size-guide-zoomable' : ''}`}
-        onClick={() => {
-          if (isDesktop) setZoomed(true);
-        }}
-      >
-        <img src={src} alt="Measurement Reference" />
-      </div>
-      {zoomed && (
-        <SizeGuideZoomOverlay onClose={() => setZoomed(false)} variant="photo">
-          <img src={src} alt="Measurement Reference" className="size-guide-zoom-img" />
+          {sizePhotoSrc && (
+            <div className="product-size-guide-photo">
+              <img src={sizePhotoSrc} alt="Measurement Reference" />
+            </div>
+          )}
         </SizeGuideZoomOverlay>
       )}
     </>
@@ -416,7 +417,7 @@ function ProductNav({handle, catalog}: {handle: string; catalog: CatalogProduct[
   return (
     <nav className="product-nav">
       <Link to={categoryPath} className="product-nav-btn">
-        <svg className="nav-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <svg className="nav-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.15" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M7.5 2l-4 4 4 4" />
         </svg>
         Back to {categoryName}
@@ -424,7 +425,7 @@ function ProductNav({handle, catalog}: {handle: string; catalog: CatalogProduct[
       {nextProductPath && (
         <Link to={nextProductPath} className="product-nav-btn">
           Next Product
-          <svg className="nav-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg className="nav-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.15" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M4.5 2l4 4-4 4" />
           </svg>
         </Link>
@@ -743,15 +744,15 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
             <details className="product-size-guide">
               <summary>
                 Size Guide
-                <svg className="product-size-guide-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                <svg className="product-size-guide-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.15" strokeLinecap="round">
                   <path d="M2 4.5l4 4 4-4" />
                 </svg>
               </summary>
               <div className="product-size-guide-content">
-                <SizeGuideInline url={sizeGuideInfo.sizeGuide} />
-                {sizeGuideInfo.sizePhoto && (
-                  <SizeGuidePhoto src={sizeGuideInfo.sizePhoto} />
-                )}
+                <SizeGuide
+                  sizeGuideUrl={sizeGuideInfo.sizeGuide}
+                  sizePhotoSrc={sizeGuideInfo.sizePhoto}
+                />
               </div>
             </details>
           )}
@@ -882,8 +883,10 @@ function ImageZoomOverlay({src, alt, width, height, onClose}: {src: string; alt:
   const overlayRef = useRef<HTMLDivElement>(null);
   const lowImgRef = useRef<HTMLImageElement>(null);
   const [highReady, setHighReady] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     function handleKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
     }
@@ -895,15 +898,21 @@ function ImageZoomOverlay({src, alt, width, height, onClose}: {src: string; alt:
     };
   }, [onClose]);
 
+  // Depends on `mounted` because the JSX (and refs) only exist after the
+  // portal mounts on the second render.
   useLayoutEffect(() => {
     const overlay = overlayRef.current;
     const img = lowImgRef.current;
     if (!overlay || !img) return;
     const scrollTop = (img.offsetHeight - overlay.clientHeight) / 2;
     if (scrollTop > 0) overlay.scrollTop = scrollTop;
-  }, []);
+  }, [mounted]);
 
-  return (
+  if (!mounted) return null;
+
+  // Portal to document.body to escape the .product-main sticky stacking
+  // context — see the matching note in SizeGuideZoomOverlay.
+  return createPortal(
     <div className="zoom-overlay" onClick={onClose} ref={overlayRef}>
       <button className="zoom-close" onClick={onClose} aria-label="Close zoom">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -940,7 +949,8 @@ function ImageZoomOverlay({src, alt, width, height, onClose}: {src: string; alt:
           onLoad={() => setHighReady(true)}
         />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

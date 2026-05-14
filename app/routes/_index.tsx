@@ -272,11 +272,12 @@ export default function Homepage() {
     return () => window.removeEventListener('resize', compute);
   }, [isMobile]);
 
-  const handleShopMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleShopMove = (e: React.MouseEvent<HTMLElement>) => {
     const box = shopBoxRef.current;
     if (!box) return;
-    box.style.left = `${e.clientX + 18}px`;
-    box.style.top = `${e.clientY + 18}px`;
+    box.style.left = `${e.clientX + 15}px`;
+    box.style.top = `${e.clientY + 15}px`;
+    if (!box.dataset.cursorActive) box.dataset.cursorActive = 'true';
   };
 
   const innerHero = (
@@ -322,7 +323,6 @@ export default function Homepage() {
           <div
             ref={shopTargetRef}
             className="home-hero-shop-target"
-            onMouseMove={handleShopMove}
             aria-hidden="true"
           />
           <div
@@ -344,6 +344,7 @@ export default function Homepage() {
         prefetch="intent"
         aria-label="Shop the catalog"
         className="home-hero-link"
+        onMouseMove={isMobile ? undefined : handleShopMove}
       >
         {innerHero}
       </Link>
