@@ -315,13 +315,13 @@ function SizeGuideZoomOverlay({children, onClose}: {children: React.ReactNode; o
   // stacking context — otherwise the page header (z-index 100 at body level)
   // sits above the overlay even though the overlay sets z-index: 1000.
   return createPortal(
-    <div className="zoom-overlay" onClick={onClose}>
-      <button className="zoom-close" onClick={onClose} aria-label="Close zoom">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <path d="M4 4l12 12M16 4L4 16" />
-        </svg>
-      </button>
+    <div className="zoom-overlay zoom-overlay--dim" onClick={onClose}>
       <div className="size-guide-zoom-content" onClick={(e) => e.stopPropagation()}>
+        <button className="zoom-close zoom-close--inset" onClick={onClose} aria-label="Close zoom">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M4 4l12 12M16 4L4 16" />
+          </svg>
+        </button>
         {children}
       </div>
     </div>,

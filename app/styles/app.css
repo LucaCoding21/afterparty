@@ -2534,6 +2534,34 @@ aside main {
   cursor: default;
 }
 
+/* Dimmed-background variant: shows the size guide as a centered popup card
+   with the rest of the page visible (but greyed out) behind it. */
+.zoom-overlay--dim {
+  background: rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.zoom-overlay--dim .size-guide-zoom-content {
+  position: relative;
+  background: var(--color-light);
+  max-width: 860px;
+  max-height: 92vh;
+  padding: 3.5rem 3rem 3rem;
+  overflow: auto;
+  margin: 0;
+}
+
+.zoom-close--inset {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+}
+
 .size-guide-zoom-svg {
   width: 65%;
   margin: 0 auto;
