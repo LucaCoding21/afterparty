@@ -2107,7 +2107,7 @@ aside main {
   flex-shrink: 0;
   width: 12px;
   height: 12px;
-  transform: translateY(0);
+  transform: translateY(-1px);
 }
 
 /* Product page wrapper */
