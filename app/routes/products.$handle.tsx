@@ -992,6 +992,13 @@ function ImageCarousel({
   const touchStartY = useRef<number | null>(null);
 
   function handleTouchStart(e: React.TouchEvent) {
+    // Ignore multi-touch so a pinch-zoom gesture is never interpreted as a
+    // swipe when one finger lifts before the other.
+    if (e.touches.length > 1) {
+      touchStartX.current = null;
+      touchStartY.current = null;
+      return;
+    }
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
   }

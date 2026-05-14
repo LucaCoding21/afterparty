@@ -2171,10 +2171,11 @@ aside main {
   position: relative;
   width: 100%;
   /* Reserve horizontal gestures for the swipe handler; vertical scrolling
-     stays with the browser. Without this, iOS Safari races scroll vs swipe
-     and the carousel can flicker between images while the user is just
-     scrolling the product page. */
-  touch-action: pan-y;
+     stays with the browser. `pinch-zoom` is kept so users can pinch-zoom
+     directly on the product image without first opening the lightbox.
+     Without `pan-y`, iOS Safari races scroll vs swipe and the carousel
+     flickers between images during normal page scrolling. */
+  touch-action: pan-y pinch-zoom;
 }
 
 @media (min-width: 45em) {
