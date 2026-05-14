@@ -676,7 +676,8 @@ button.header-search-link {
   border-bottom: 1px solid #000;
   border-radius: 0;
   padding: 6px 0 6px 0;
-  font-size: 0.75rem;
+  /* 16px to prevent iOS focus auto-zoom (since the page is now pinch-zoomable). */
+  font-size: 16px;
   font-family: var(--font-sans);
   font-weight: 500;
   text-transform: uppercase;
@@ -1199,6 +1200,8 @@ aside main {
   .footer-newsletter-input {
     flex: 1;
     width: auto;
+    /* 16px to prevent iOS focus auto-zoom on mobile. */
+    font-size: 16px;
   }
 }
 
@@ -1648,6 +1651,13 @@ aside main {
   appearance: none;
 }
 
+@media (max-width: 48em) {
+  /* 16px to prevent iOS focus auto-zoom on mobile. */
+  .predictive-search-form input[type="search"] {
+    font-size: 16px;
+  }
+}
+
 .predictive-search-result {
   margin-bottom: 2rem;
 }
@@ -1728,6 +1738,13 @@ aside main {
 .search-page-input::-webkit-search-cancel-button {
   -webkit-appearance: none;
   appearance: none;
+}
+
+@media (max-width: 48em) {
+  /* 16px to prevent iOS focus auto-zoom on mobile. */
+  .search-page-input {
+    font-size: 16px;
+  }
 }
 
 .search-page-meta {
