@@ -420,11 +420,11 @@ function ProductNav({handle, catalog}: {handle: string; catalog: CatalogProduct[
         <svg className="nav-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.15" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M7.5 2l-4 4 4 4" />
         </svg>
-        Back to {categoryName}
+        <span className="product-nav-btn-text">Back to {categoryName}</span>
       </Link>
       {nextProductPath && (
         <Link to={nextProductPath} className="product-nav-btn">
-          Next Product
+          <span className="product-nav-btn-text">Next Product</span>
           <svg className="nav-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.15" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M4.5 2l4 4-4 4" />
           </svg>
