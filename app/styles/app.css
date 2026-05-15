@@ -2423,6 +2423,10 @@ aside main {
   border-color: #ccc;
 }
 
+.product-color-swatch.sold-out img {
+  opacity: 0.4;
+}
+
 /* Size guide accordion */
 .product-size-guide {
   margin-top: 0.5rem;
@@ -2747,6 +2751,26 @@ aside main {
 .product-options-item.size-warning {
   border-color: #e00 !important;
   animation: shake 0.4s ease;
+}
+
+.product-options-item.sold-out,
+.product-options-item.sold-out:hover:not(:disabled) {
+  border-color: #e0e0e0 !important;
+  color: #bbb;
+  background-color: transparent;
+  background-image: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 0.5px),
+    #e0e0e0 calc(50% - 0.5px),
+    #e0e0e0 calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
+}
+
+.product-options-item.selected.sold-out {
+  border-color: #e0e0e0 !important;
+  background-color: transparent;
+  color: #bbb;
 }
 
 @keyframes shake {

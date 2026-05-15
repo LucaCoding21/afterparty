@@ -598,6 +598,28 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
     (o: any) => o.name.toLowerCase() === 'size',
   )?.value;
 
+  // Colors whose every variant is sold out
+  const soldOutColorNames = (() => {
+    const out = new Set<string>();
+    if (!colorOption) return out;
+    const variants = (product.variants?.nodes ?? []) as any[];
+    for (const colorValue of colorOption.optionValues) {
+      const variantsForColor = variants.filter((v) =>
+        v.selectedOptions?.some(
+          (o: any) =>
+            o.name.toLowerCase() === 'color' && o.value === colorValue.name,
+        ),
+      );
+      if (
+        variantsForColor.length > 0 &&
+        variantsForColor.every((v) => !v.availableForSale)
+      ) {
+        out.add(colorValue.name);
+      }
+    }
+    return out;
+  })();
+
   return (
     <div className="product-page" data-handle={product.handle}>
       <Breadcrumb />
@@ -636,7 +658,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
                     <button
                       key={value.name}
                       type="button"
-                      className={`product-color-swatch${value.selected ? ' selected' : ''}`}
+                      className={`product-color-swatch${value.selected ? ' selected' : ''}${soldOutColorNames.has(value.name) ? ' sold-out' : ''}`}
                       aria-label={value.name}
                       title={value.name}
                       disabled={!value.exists}
@@ -671,7 +693,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
                   <button
                     key={value.name}
                     type="button"
-                    className={`product-options-item${value.selected ? ' selected' : ''}${sizeWarning ? ' size-warning' : ''}`}
+                    className={`product-options-item${value.selected ? ' selected' : ''}${sizeWarning ? ' size-warning' : ''}${!value.available ? ' sold-out' : ''}`}
                     onClick={() => {
                       setSizeWarning(false);
                       if (!value.selected) {
@@ -691,7 +713,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
             <div className="product-options">
               <h5>Size: <span style={{color: '#000', fontWeight: 500, textTransform: 'none', letterSpacing: 0}}>ONE SIZE</span></h5>
               <div className="product-options-grid">
-                <button type="button" className="product-options-item selected" disabled>
+                <button type="button" className={`product-options-item selected${isSoldOut ? ' sold-out' : ''}`} disabled>
                   ONE SIZE
                 </button>
               </div>
@@ -1208,8 +1230,13 @@ const PRODUCT_FRAGMENT = `#graphql
         height
       }
     }
-    variants(first: 20) {
+    variants(first: 100) {
       nodes {
+        availableForSale
+        selectedOptions {
+          name
+          value
+        }
         image {
           url
         }
