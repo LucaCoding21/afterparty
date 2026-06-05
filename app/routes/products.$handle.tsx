@@ -55,6 +55,24 @@ function useRecentlyViewed(currentHandle: string, currentTitle: string, currentI
 
 // Maps both static and Shopify handles to size guide assets
 const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = {
+  // afterparty x MEGAHERTZ collab. The logo tee is a short-sleeve tee; the
+  // raglan tee shares the existing raglan long-sleeve fit (same as the other
+  // raglan tees).
+  'afterparty-x-megahertz-logo-t-shirt': {
+    sizeGuide: '/products/size-guides/megahertz-tee.svg',
+    sizePhoto: '/products/measurements/MHZ%20Short%20Sleeve%20Tee%20Chart%20(1).png',
+  },
+  'afterparty-x-megahertz-raglan-tee': {
+    sizeGuide: '/products/size-guides/raglan-tee.svg',
+    sizePhoto: '/products/measurements/2026%20Raglan%20Long%20Sleeve%20Tee%20Chart%20(1).png',
+  },
+  'afterparty-x-megahertz-zip-hoodie': {
+    sizeGuide: '/products/size-guides/megahertz-zip-hoodie.svg',
+    sizePhoto: '/products/measurements/MHZ%20Zip%20Hoodie%20Chart%20(1).png',
+  },
+  'afterparty-x-megahertz-trucker-hat': {
+    sizeGuide: '/products/size-guides/horse-trucker-hat.svg',
+  },
   'bubble-letter-ringer-tee': {
     sizeGuide: '/products/size-guides/bubble-letter-ringer-tee.svg',
     sizePhoto: '/products/measurements/Ringer%20Short%20Sleeve%20Tee%20Chart%202.png',
@@ -572,6 +590,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
   const FRONT_FIRST_HANDLES = new Set([
     'nhim-short-sleeve-tee',
     'nhim-long-sleeve-tee',
+    'afterparty-x-megahertz-logo-t-shirt',
   ]);
   if (
     FRONT_FIRST_HANDLES.has(product.handle) &&

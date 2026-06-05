@@ -1,0 +1,27 @@
+<svg viewBox="0 0 441 196" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <line y1="0.5" x2="441" y2="0.5" stroke="#D8D8D8" stroke-opacity="0.4"/>
+  <line y1="41" x2="441" y2="41" stroke="#D8D8D8" stroke-opacity="0.4"/>
+  <line y1="92" x2="441" y2="92" stroke="#D8D8D8" stroke-opacity="0.4"/>
+  <line y1="144" x2="441" y2="144" stroke="#D8D8D8" stroke-opacity="0.4"/>
+  <line y1="195.5" x2="441" y2="195.5" stroke="#D8D8D8" stroke-opacity="0.4"/>
+  <text x="14" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11">SIZE</text>
+  <text x="161" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11" text-anchor="middle">S</text>
+  <text x="241" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11" text-anchor="middle">M</text>
+  <text x="321" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11" text-anchor="middle">L</text>
+  <text x="401" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11" text-anchor="middle">XL</text>
+  <text x="14" y="70" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="12">WIDTH</text>
+  <text x="161" y="70" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">61 cm</text>
+  <text x="241" y="70" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">63 cm</text>
+  <text x="321" y="70" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">65 cm</text>
+  <text x="401" y="70" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">67 cm</text>
+  <text x="14" y="121.5" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="12">LENGTH</text>
+  <text x="161" y="121.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">52 cm</text>
+  <text x="241" y="121.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">54 cm</text>
+  <text x="321" y="121.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">56 cm</text>
+  <text x="401" y="121.5" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">58 cm</text>
+  <text x="14" y="173.3" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="12">SLEEVE LENGTH</text>
+  <text x="161" y="173.3" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">51 cm</text>
+  <text x="241" y="173.3" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">52 cm</text>
+  <text x="321" y="173.3" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">53 cm</text>
+  <text x="401" y="173.3" fill="#000" font-family="'Inter var', 'Inter', sans-serif" font-size="12" text-anchor="middle">54 cm</text>
+</svg>
