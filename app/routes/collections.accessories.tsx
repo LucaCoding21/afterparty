@@ -17,7 +17,7 @@ const COLLECTION_QUERY = `#graphql
   query AccessoriesCollection($handle: String!, $country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
-      products(first: 50) {
+      products(first: 50, sortKey: CREATED, reverse: true) {
         nodes {
           id
           handle
