@@ -11,6 +11,26 @@ export const meta = () =>
 
 const LOOKBOOK_SECTIONS = [
   {
+    title: 'afterparty x MEGAHERTZ',
+    images: [
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 1 - buwan.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 2 - nguyen.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 3 - buwan.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 4 - nguyen.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 5 - buwan.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 6 - nguyen.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 7 - buwan.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 8 - nguyen.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 9 - buwan.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 10 - nguyen.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 11 - buwan.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 12 - nguyen.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 13 - nguyen.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 14 - buwan.jpg',
+      '/Lookbook/afterparty x MEGAHERTZ/Copy of 15 - buwan.jpg',
+    ],
+  },
+  {
     title: 'Hater Oversized Tee',
     images: [
       '/Lookbook/Hater Oversized Tee/Copy of 1.jpg',
