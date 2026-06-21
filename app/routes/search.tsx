@@ -80,7 +80,10 @@ export default function SearchPage() {
                   to="/search"
                   className="search-page-clear"
                   aria-label="Clear search"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (inputRef.current) inputRef.current.value = '';
+                  }}
                 >
                   <span className="search-page-clear-x" aria-hidden="true">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
