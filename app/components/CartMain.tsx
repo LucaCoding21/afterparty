@@ -108,9 +108,7 @@ function CartEmpty({
             typeof sessionStorage !== 'undefined'
               ? sessionStorage.getItem('lastCategoryPath')
               : null;
-          if (lastCategory) {
-            navigate(lastCategory);
-          }
+          navigate(lastCategory || '/collections/all');
         }}
         className="cart-empty-link"
       >
