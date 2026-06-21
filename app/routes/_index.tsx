@@ -2,9 +2,11 @@ import {Link, useLoaderData} from 'react-router';
 import {useEffect, useRef, useState} from 'react';
 import type {Route} from './+types/_index';
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'afterparty'}];
-};
+// No `meta` export here on purpose: in React Router 7 a route's meta REPLACES
+// its parent's, so a homepage override would drop root's Open Graph tags
+// (og:image, og:description, Twitter, JSON-LD) from the most-shared URL.
+// Letting root's meta apply keeps the share preview image working on the home
+// page. Root already sets the title to 'afterparty'.
 
 export async function loader({request}: Route.LoaderArgs) {
   const ua = request.headers.get('user-agent') ?? '';
