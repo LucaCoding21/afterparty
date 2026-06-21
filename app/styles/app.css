@@ -1526,7 +1526,7 @@ aside main {
 
 @media (max-width: 45em) {
   .cart-qty-btn {
-    transform: translateY(-1px);
+    transform: translateY(-0.5px);
   }
 }
 
