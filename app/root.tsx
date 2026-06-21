@@ -44,7 +44,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 
 export const meta: Route.MetaFunction = ({data}) => {
   const origin = (data as {origin?: string} | undefined)?.origin ?? 'https://afterparty.space';
-  const image = `${origin}/AboutUs-Afterparty.jpg`;
+  const image = `${origin}/OG-afterparty.png`;
   const title = 'afterparty';
   const description =
     'afterparty, streetwear from Ho Chi Minh City (Saigon), Vietnam. Limited drops and signature graphics.';

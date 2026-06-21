@@ -60,7 +60,7 @@ function renderLlmsTxt({
 
 ## About
 - [About](${origin}/pages/about): Brand story
-- [Locations](${origin}/pages/stockists): Where to find us in person
+- [Locations](${origin}/pages/locations): Where to find us in person
 - [Support and FAQ](${origin}/pages/support): Shipping, returns, contact
 
 ## Collections

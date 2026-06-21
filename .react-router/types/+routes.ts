@@ -64,7 +64,7 @@ type Pages = {
   "/collections/all": {
     params: {};
   };
-  "/pages/stockists": {
+  "/pages/locations": {
     params: {};
   };
   "/policies": {
@@ -159,7 +159,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/api/:version/graphql.json" | "/sitemap/:type/:page.xml" | "/collections/accessories" | "/collections/tops-shirts" | "/collections/outerwear" | "/collections/:handle" | "/account/authorize" | "/collections" | "/collections/pants" | "/policies/:handle" | "/products/:handle" | "/account/logout" | "/collections/all" | "/pages/stockists" | "/policies" | "/account/login" | "/discount/:code" | "/sitemap.xml" | "/pages/:handle" | "/pages/support" | "/robots.txt" | "/blogs" | "/pages/about" | "/llms.txt" | "/newsletter" | "/lookbook" | "/account" | "/account/orders" | "/account/orders/:id" | "/account/addresses" | "/account/profile" | "/account/*" | "/search" | "/cart" | "/cart/:lines" | "/*" | "/graphiql" | "/subrequest-profiler" | "/.well-known/appspecific/com.chrome.devtools.json";
+    page: "/" | "/api/:version/graphql.json" | "/sitemap/:type/:page.xml" | "/collections/accessories" | "/collections/tops-shirts" | "/collections/outerwear" | "/collections/:handle" | "/account/authorize" | "/collections" | "/collections/pants" | "/policies/:handle" | "/products/:handle" | "/account/logout" | "/collections/all" | "/pages/locations" | "/policies" | "/account/login" | "/discount/:code" | "/sitemap.xml" | "/pages/:handle" | "/pages/support" | "/robots.txt" | "/blogs" | "/pages/about" | "/llms.txt" | "/newsletter" | "/lookbook" | "/account" | "/account/orders" | "/account/orders/:id" | "/account/addresses" | "/account/profile" | "/account/*" | "/search" | "/cart" | "/cart/:lines" | "/*" | "/graphiql" | "/subrequest-profiler" | "/.well-known/appspecific/com.chrome.devtools.json";
   };
   "routes/api.$version.[graphql.json].tsx": {
     id: "routes/api.$version.[graphql.json]";
@@ -213,9 +213,9 @@ type RouteFiles = {
     id: "routes/collections.all";
     page: "/collections/all";
   };
-  "routes/pages.stockists.tsx": {
-    id: "routes/pages.stockists";
-    page: "/pages/stockists";
+  "routes/pages.locations.tsx": {
+    id: "routes/pages.locations";
+    page: "/pages/locations";
   };
   "routes/policies._index.tsx": {
     id: "routes/policies._index";
@@ -350,7 +350,7 @@ type RouteModules = {
   "routes/products.$handle": typeof import("./app/routes/products.$handle.tsx");
   "routes/account_.logout": typeof import("./app/routes/account_.logout.tsx");
   "routes/collections.all": typeof import("./app/routes/collections.all.tsx");
-  "routes/pages.stockists": typeof import("./app/routes/pages.stockists.tsx");
+  "routes/pages.locations": typeof import("./app/routes/pages.locations.tsx");
   "routes/policies._index": typeof import("./app/routes/policies._index.tsx");
   "routes/account_.login": typeof import("./app/routes/account_.login.tsx");
   "routes/discount.$code": typeof import("./app/routes/discount.$code.tsx");

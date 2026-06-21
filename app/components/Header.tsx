@@ -113,7 +113,7 @@ export function Header({
           <NavLink to="/lookbook" className="header-nav-link" prefetch="intent">
             Lookbook
           </NavLink>
-          <NavLink to="/pages/stockists" className="header-nav-link" prefetch="intent">
+          <NavLink to="/pages/locations" className="header-nav-link" prefetch="intent">
             Locations
           </NavLink>
           <NavLink to="/pages/about" className="header-nav-link" prefetch="intent">
@@ -295,7 +295,7 @@ export function Header({
               <NavLink to="/lookbook" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
                 Lookbook
               </NavLink>
-              <NavLink to="/pages/stockists" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
+              <NavLink to="/pages/locations" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
                 Locations
               </NavLink>
               <NavLink to="/pages/support" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">

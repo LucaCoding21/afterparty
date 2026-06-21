@@ -1524,6 +1524,12 @@ aside main {
   color: #000;
 }
 
+@media (max-width: 45em) {
+  .cart-qty-btn {
+    transform: translateY(-0.5px);
+  }
+}
+
 .cart-qty-num {
   font-size: 0.75rem;
   min-width: 32px;
@@ -1712,10 +1718,16 @@ aside main {
   margin: 0 0 1.25rem;
 }
 
+.search-page-header form {
+  width: 100%;
+  max-width: none;
+}
+
 .search-page-input-wrap {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .search-page-icon {
@@ -1753,6 +1765,59 @@ aside main {
   /* 16px to prevent iOS focus auto-zoom on mobile. */
   .search-page-input {
     font-size: 16px;
+  }
+}
+
+.search-page-clear {
+  flex-shrink: 0;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  position: relative;
+  top: -1.5px;
+  background: none;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  color: #999999;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  transition: color 0.15s;
+}
+
+.search-page-clear:visited {
+  color: #999999;
+}
+
+.search-page-clear:hover {
+  color: #111;
+}
+
+/* Desktop: show the "Clear" label, hide the "x". */
+.search-page-clear-x {
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-page-clear-text {
+  display: inline;
+  font-size: 0.8rem;
+  letter-spacing: 0;
+}
+
+/* Mobile: show the "x", hide the "Clear" label. */
+@media (max-width: 48em) {
+  .search-page-clear {
+    top: -0.5px;
+  }
+
+  .search-page-clear-x {
+    display: inline-flex;
+  }
+
+  .search-page-clear-text {
+    display: none;
   }
 }
 

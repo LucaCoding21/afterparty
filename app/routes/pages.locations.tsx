@@ -1,4 +1,4 @@
-import type {Route} from './+types/pages.stockists';
+import type {Route} from './+types/pages.locations';
 
 export const meta: Route.MetaFunction = () => {
   return [{title: 'afterparty | Locations'}];
@@ -12,6 +12,7 @@ const STOCKISTS = [
       {name: '11 Garmentory', url: 'https://www.google.com/maps/search/?api=1&query=11%20Garmentory%2C%20117B%20Nguy%E1%BB%85n%20%C4%90%C3%ACnh%20Ch%C3%ADnh%2C%20Ph%C6%B0%E1%BB%9Dng%2015%2C%20C%E1%BA%A7u%20Ki%E1%BB%87u%2C%20H%E1%BB%93%20Ch%C3%AD%20Minh%2070000%2C%20Vietnam'},
       {name: 'Objoff', url: 'https://www.google.com/maps/search/?api=1&query=Objoff%2C%2073%20%C4%90.%20S%E1%BB%91%204%20L%C3%A0ng%20B%C3%A1o%20Ch%C3%AD%2C%20Th%E1%BA%A3o%20%C4%90i%E1%BB%81n%2C%20An%20Kh%C3%A1nh%2C%20H%E1%BB%93%20Ch%C3%AD%20Minh%2070000%2C%20Vietnam'},
       {name: 'Nay Mai', url: 'https://www.google.com/maps/search/?api=1&query=Nay%20Mai%2C%20393/7%20Hai%20B%C3%A0%20Tr%C6%B0ng%2C%20Xu%C3%A2n%20H%C3%B2a%2C%20H%E1%BB%93%20Ch%C3%AD%20Minh%2C%20Vietnam'},
+      {name: 'Daspace', url: 'https://www.google.com/maps/place/Daspace+Flagship+Store/@10.7733092,106.7042361,16z/data=!4m6!3m5!1s0x31752f9562d8ddf3:0x28fe5ae66399fcde!8m2!3d10.772919!4d106.703866!16s%2Fg%2F11z809_tp5?entry=ttu&g_ep=EgoyMDI2MDYxNi4wIKXMDSoASAFQAw%3D%3D'},
     ],
   },
   {
