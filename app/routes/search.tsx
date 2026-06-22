@@ -60,7 +60,8 @@ export default function SearchPage() {
   const hasShopifyResults = !!(result?.total);
   const fallback = !hasShopifyResults && term ? fuzzySearch(catalog, term, 48) : {results: [], suggestion: ''};
   const hasFallbackResults = fallback.results.length > 0;
-  const displayTerm = fallback.suggestion || term;
+  // Always echo what the user actually typed, not the fuzzy-matched catalog word.
+  const displayTerm = term;
 
   // Clears the input without navigating, keeping the current results on screen.
   const clearInput = () => {
