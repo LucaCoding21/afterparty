@@ -1,3 +1,4 @@
+import {useEffect, useState} from 'react';
 import {
   Link,
   useLoaderData,
@@ -45,12 +46,42 @@ export default function SearchPage() {
   const {type, term, result, error} = useLoaderData<typeof loader>();
   const rootData = useRouteLoaderData('root') as {searchCatalog?: CatalogProduct[]} | undefined;
   const catalog = rootData?.searchCatalog ?? [];
+
+  // Show the clear button whenever the input has a value. Clearing empties the
+  // box but keeps the current results on screen (no navigation). Stays in sync
+  // with the input as the user types and when a new search term comes in.
+  const [hasText, setHasText] = useState(Boolean(term));
+  useEffect(() => {
+    setHasText(Boolean(term));
+  }, [term]);
+
   if (type === 'predictive') return null;
 
   const hasShopifyResults = !!(result?.total);
   const fallback = !hasShopifyResults && term ? fuzzySearch(catalog, term, 48) : {results: [], suggestion: ''};
   const hasFallbackResults = fallback.results.length > 0;
   const displayTerm = fallback.suggestion || term;
+
+  // Clears the input without navigating, keeping the current results on screen.
+  const clearInput = () => {
+    const input = document.querySelector<HTMLInputElement>('.search-page-input');
+    if (input) input.value = '';
+    setHasText(false);
+  };
+
+  // Inline "Clear" shown beside the results subtext on desktop (CSS hides it on
+  // mobile, where the in-input "x" is used instead). Stays visible whenever the
+  // subtext is shown, even after the input has been emptied.
+  const metaClear = (
+    <span className="search-page-meta-clear">
+      {' '}
+      <span className="search-page-meta-dash" aria-hidden="true">–</span>
+      {' '}
+      <button type="button" className="search-page-meta-clear-btn" onClick={clearInput}>
+        Clear
+      </button>
+    </span>
+  );
 
   return (
     <div className="search-page">
@@ -74,15 +105,18 @@ export default function SearchPage() {
                 type="search"
                 className="search-page-input"
                 autoComplete="off"
+                onChange={(e) => setHasText(Boolean(e.currentTarget.value))}
               />
-              {term && (
+              {hasText && (
                 <Link
                   to="/search"
                   className="search-page-clear"
                   aria-label="Clear search"
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     if (inputRef.current) inputRef.current.value = '';
+                    setHasText(false);
                   }}
                 >
                   <span className="search-page-clear-x" aria-hidden="true">
@@ -103,7 +137,7 @@ export default function SearchPage() {
 
       {term && (hasShopifyResults || hasFallbackResults) && (
         <p className="search-page-meta">
-          SHOWING SIMILAR RESULTS FOR &ldquo;{displayTerm.toUpperCase()}&rdquo;
+          SHOWING SIMILAR RESULTS FOR &ldquo;{displayTerm.toUpperCase()}&rdquo;{metaClear}
         </p>
       )}
 
@@ -148,7 +182,7 @@ export default function SearchPage() {
       )}
 
       {term && !hasShopifyResults && !hasFallbackResults && (
-        <p className="search-page-meta">No results for "{term}"</p>
+        <p className="search-page-meta">No results for &ldquo;{term}&rdquo;{metaClear}</p>
       )}
 
       <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
