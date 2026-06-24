@@ -41,9 +41,18 @@ export function fuzzySearch(
   let bestDist = Infinity;
   let bestLenDiff = Infinity;
   for (const word of allWords) {
+    // Skip very short catalog words ("tee", "ss", etc). They appear in nearly
+    // every title, so matching one returns the whole catalog and any 3-4 letter
+    // typo lands within edit range of them.
+    if (word.length < 4) continue;
     const d = levenshtein(q, word);
     const lenDiff = Math.abs(q.length - word.length);
-    if (d <= Math.max(3, Math.ceil(q.length / 2)) && (d < bestDist || (d === bestDist && lenDiff < bestLenDiff))) {
+    // Tight, length-scaled typo tolerance: real typos are 1-2 edits. A loose
+    // threshold lets unrelated words ("meow") match common words and flood
+    // results, so cap it relative to the longer word.
+    const maxLen = Math.max(q.length, word.length);
+    const threshold = maxLen <= 4 ? 1 : maxLen <= 7 ? 2 : 3;
+    if (d <= threshold && (d < bestDist || (d === bestDist && lenDiff < bestLenDiff))) {
       bestDist = d;
       bestWord = word;
       bestLenDiff = lenDiff;

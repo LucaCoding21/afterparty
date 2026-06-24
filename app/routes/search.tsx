@@ -63,27 +63,6 @@ export default function SearchPage() {
   // Always echo what the user actually typed, not the fuzzy-matched catalog word.
   const displayTerm = term;
 
-  // Clears the input without navigating, keeping the current results on screen.
-  const clearInput = () => {
-    const input = document.querySelector<HTMLInputElement>('.search-page-input');
-    if (input) input.value = '';
-    setHasText(false);
-  };
-
-  // Inline "Clear" shown beside the results subtext on desktop (CSS hides it on
-  // mobile, where the in-input "x" is used instead). Stays visible whenever the
-  // subtext is shown, even after the input has been emptied.
-  const metaClear = (
-    <span className="search-page-meta-clear">
-      {' '}
-      <span className="search-page-meta-dash" aria-hidden="true">–</span>
-      {' '}
-      <button type="button" className="search-page-meta-clear-btn" onClick={clearInput}>
-        Clear
-      </button>
-    </span>
-  );
-
   return (
     <div className="search-page">
       <div className="search-page-header" onClick={(e) => {
@@ -138,7 +117,7 @@ export default function SearchPage() {
 
       {term && (hasShopifyResults || hasFallbackResults) && (
         <p className="search-page-meta">
-          SHOWING SIMILAR RESULTS FOR &ldquo;{displayTerm.toUpperCase()}&rdquo;{metaClear}
+          SHOWING SIMILAR RESULTS FOR &ldquo;{displayTerm.toUpperCase()}&rdquo;
         </p>
       )}
 
@@ -183,7 +162,7 @@ export default function SearchPage() {
       )}
 
       {term && !hasShopifyResults && !hasFallbackResults && (
-        <p className="search-page-meta">No results for &ldquo;{term}&rdquo;{metaClear}</p>
+        <p className="search-page-meta">No results for &ldquo;{term}&rdquo;</p>
       )}
 
       <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />

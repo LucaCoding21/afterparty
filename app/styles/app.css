@@ -1706,6 +1706,7 @@ aside main {
   border-bottom: 1px solid #e8e8e8;
   padding-bottom: 0.1rem;
   margin-bottom: 2rem;
+  max-width: 20rem;
 }
 
 .search-page-title {
@@ -1771,12 +1772,11 @@ aside main {
 .search-page-clear {
   flex-shrink: 0;
   margin-left: auto;
-  /* Desktop: the clear control lives beside the results subtext instead
-     (.search-page-meta-clear); the in-input control is mobile-only. */
-  display: none;
+  /* In-input "x" at the trailing end of the search line, all screen sizes. */
+  display: flex;
   align-items: center;
   position: relative;
-  top: -1.5px;
+  top: -0.5px;
   background: none;
   border: none;
   text-decoration: none;
@@ -1795,68 +1795,14 @@ aside main {
   color: #111;
 }
 
-/* Desktop: show the "Clear" label, hide the "x". */
 .search-page-clear-x {
-  display: none;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 .search-page-clear-text {
-  display: inline;
-  font-size: 0.8rem;
-  letter-spacing: 0;
-}
-
-/* Mobile: show the in-input "x", hide the "Clear" label. */
-@media (max-width: 48em) {
-  .search-page-clear {
-    display: flex;
-    top: -0.5px;
-  }
-
-  .search-page-clear-x {
-    display: inline-flex;
-  }
-
-  .search-page-clear-text {
-    display: none;
-  }
-}
-
-/* Inline "Clear" beside the results subtext (desktop only). */
-.search-page-meta-clear {
-  display: inline;
-}
-
-.search-page-meta-dash {
-  display: inline-block;
-  transform: scaleX(1.8);
-  margin: 0 0.35em;
-}
-
-.search-page-meta-clear-btn {
-  font: inherit;
-  letter-spacing: inherit;
-  text-transform: uppercase;
-  color: inherit;
-  background: none;
-  border: none;
-  padding: 0;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  cursor: pointer;
-  transition: color 0.15s;
-}
-
-.search-page-meta-clear-btn:hover {
-  color: #111;
-}
-
-@media (max-width: 48em) {
-  .search-page-meta-clear {
-    display: none;
-  }
+  display: none;
 }
 
 .search-page-meta {
