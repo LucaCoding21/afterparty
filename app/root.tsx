@@ -153,11 +153,11 @@ export function links() {
       media: '(max-width: 48em)',
       fetchPriority: 'low',
     },
-    {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico'},
-    {rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png'},
-    {rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png'},
-    {rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png'},
-    {rel: 'manifest', href: '/site.webmanifest'},
+    {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico?v=2'},
+    {rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png?v=2'},
+    {rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png?v=2'},
+    {rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png?v=2'},
+    {rel: 'manifest', href: '/site.webmanifest?v=2'},
   ];
 }
 
