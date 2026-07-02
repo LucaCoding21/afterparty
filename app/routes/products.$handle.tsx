@@ -105,6 +105,10 @@ const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = 
     sizeGuide: '/products/size-guides/nhim-long-sleeve-tees.svg',
     sizePhoto: '/products/measurements/2026-nhim-long-sleeve-tee-chart-1.png',
   },
+  'polka-dot-long-sleeve': {
+    sizeGuide: '/products/size-guides/polka-dot-long-sleeve.svg',
+    sizePhoto: '/products/measurements/Polka%20Dot%20Long%20Sleeve.png',
+  },
   'dog-failure-tee': {
     sizeGuide: '/products/size-guides/dog-failure-tee.svg',
   },
