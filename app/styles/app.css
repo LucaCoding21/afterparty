@@ -2285,12 +2285,18 @@ aside main {
 /* On desktop, image fits within viewport (leave room for dot indicators) */
 @media (min-width: 45em) {
   .product-image {
-    max-height: calc(100vh - var(--header-height) - 6rem);
+    /* The carousel's -2rem margin tucks the image top under the Back/Next
+       nav; pad it back down so photos with content at their top edge don't
+       collide with the nav text. Heights drop 2rem to match so the bottom
+       edge (and the dots below) stay put. Model photos override this via
+       .product-image-model's own padding. */
+    padding-top: 2rem;
+    max-height: calc(100vh - var(--header-height) - 8rem);
   }
 
   .product-image img {
     width: 100%;
-    max-height: calc(100vh - var(--header-height) - 6rem);
+    max-height: calc(100vh - var(--header-height) - 8rem);
     object-fit: contain;
     object-position: top center;
   }
@@ -3093,6 +3099,8 @@ html:has(.overlay.expanded) .sticky-add-to-cart {
     max-height: none;
     width: 100%;
     background: #fff;
+    /* No nav tuck-under here (margin-top is 0 above), so no compensating pad */
+    padding-top: 0;
   }
   .product-image img {
     width: 100%;
