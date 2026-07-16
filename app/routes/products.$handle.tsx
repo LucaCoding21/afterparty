@@ -97,6 +97,10 @@ const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = 
     sizeGuide: '/products/size-guides/leopard-shorts.svg',
     sizePhoto: '/products/measurements/Leopard%20Short%20Pants%20Charts%201.png',
   },
+  'nhim-nylon-shorts': {
+    sizeGuide: '/products/size-guides/nhim-nylon-shorts.svg',
+    sizePhoto: '/products/measurements/Nhim%20Nylon%20Shorts%20Chart.png',
+  },
   'nhim-long-sleeve-tees': {
     sizeGuide: '/products/size-guides/nhim-long-sleeve-tees.svg',
     sizePhoto: '/products/measurements/2026-nhim-long-sleeve-tee-chart-1.png',
@@ -540,6 +544,46 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
   const isSoldOut = !selectedVariant?.availableForSale;
   const [sizeWarning, setSizeWarning] = useState(false);
 
+  // Quantity of each variant already in the cart, so Add to Cart can stop at
+  // the stock cap instead of letting Shopify silently clamp the quantity.
+  // The root cart is deferred and revalidates after every cart mutation.
+  const cartPromise = (rootData as {cart?: Promise<unknown>} | undefined)?.cart;
+  const [cartQtyByVariant, setCartQtyByVariant] = useState<Map<string, number>>(
+    () => new Map(),
+  );
+  useEffect(() => {
+    let active = true;
+    Promise.resolve(cartPromise)
+      .then((c) => {
+        if (!active) return;
+        const lines =
+          (c as {lines?: {nodes?: Array<{merchandise?: {id?: string}; quantity?: number}>}} | null)
+            ?.lines?.nodes ?? [];
+        const byVariant = new Map<string, number>();
+        for (const l of lines) {
+          if (!l?.merchandise?.id) continue;
+          byVariant.set(
+            l.merchandise.id,
+            (byVariant.get(l.merchandise.id) ?? 0) + (l.quantity ?? 0),
+          );
+        }
+        setCartQtyByVariant(byVariant);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [cartPromise]);
+  const stockCap =
+    typeof selectedVariant?.quantityAvailable === 'number'
+      ? selectedVariant.quantityAvailable
+      : null;
+  const atStockCap =
+    !isSoldOut &&
+    stockCap !== null &&
+    stockCap > 0 &&
+    (cartQtyByVariant.get(selectedVariant?.id) ?? 0) >= stockCap;
+
   type CarouselImage = {url: string; isModel: boolean; width?: number; height?: number};
   const images: CarouselImage[] = [];
   const altByUrl = new Map<string, string>(
@@ -620,6 +664,14 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
   const selectedSizeName = selectedVariant?.selectedOptions?.find(
     (o: any) => o.name.toLowerCase() === 'size',
   )?.value;
+
+  // Inline low-stock warning shown beside the selected size label. Reflects
+  // total stock, regardless of what's already in the visitor's cart.
+  const stockLeftNote = (() => {
+    if (isSoldOut || stockCap === null || stockCap <= 0) return null;
+    if (stockCap <= 2) return `${stockCap} more left in stock`;
+    return null;
+  })();
 
   // Colors whose every variant is sold out
   const soldOutColorNames = (() => {
@@ -710,6 +762,9 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
                 {selectedSizeName && (
                   <span style={{color: '#000', fontWeight: 500, textTransform: 'none', letterSpacing: 0}}>{selectedSizeName.toUpperCase()}</span>
                 )}
+                {selectedSizeName && stockLeftNote && (
+                  <span className="product-stock-note">{stockLeftNote}</span>
+                )}
               </h5>
               <div className="product-options-grid">
                 {sizeOption.optionValues.map((value) => (
@@ -734,7 +789,12 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
             </div>
           ) : (
             <div className="product-options">
-              <h5>Size: <span style={{color: '#000', fontWeight: 500, textTransform: 'none', letterSpacing: 0}}>ONE SIZE</span></h5>
+              <h5>
+                Size: <span style={{color: '#000', fontWeight: 500, textTransform: 'none', letterSpacing: 0}}>ONE SIZE</span>
+                {stockLeftNote && (
+                  <span className="product-stock-note">{stockLeftNote}</span>
+                )}
+              </h5>
               <div className="product-options-grid">
                 <button type="button" className={`product-options-item selected${isSoldOut ? ' sold-out' : ''}`} disabled>
                   ONE SIZE
@@ -806,10 +866,16 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
           <div className="product-form" ref={formRef}>
             <AddToCartButton
               disabled={isSoldOut}
-              onClick={() => {
+              onClick={(e) => {
                 if (!selectedSizeName && sizeOption) {
+                  e.preventDefault();
                   setSizeWarning(true);
                   setTimeout(() => setSizeWarning(false), 1500);
+                  return;
+                }
+                if (atStockCap) {
+                  e.preventDefault();
+                  open('cart');
                   return;
                 }
                 preloadCartThumbnail(selectedVariant?.image?.url);
@@ -839,11 +905,17 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
         >
           <AddToCartButton
             disabled={isSoldOut}
-            onClick={() => {
+            onClick={(e) => {
               if (isSoldOut) return;
               if (!selectedSizeName && sizeOption) {
+                e.preventDefault();
                 setSizeWarning(true);
                 setTimeout(() => setSizeWarning(false), 1500);
+                return;
+              }
+              if (atStockCap) {
+                e.preventDefault();
+                open('cart');
                 return;
               }
               preloadCartThumbnail(selectedVariant?.image?.url);
@@ -1178,6 +1250,7 @@ function useStickyAddToCart() {
 const PRODUCT_VARIANT_FRAGMENT = `#graphql
   fragment ProductVariant on ProductVariant {
     availableForSale
+    quantityAvailable
     compareAtPrice {
       amount
       currencyCode

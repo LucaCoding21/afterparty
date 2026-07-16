@@ -104,6 +104,14 @@ function CartLineQuantity({line}: {line: CartLine}) {
   const {id: lineId, quantity, isOptimistic} = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
+  // Stop the + button at available stock (null = inventory not tracked).
+  const quantityAvailable = (
+    line.merchandise as {quantityAvailable?: number | null}
+  )?.quantityAvailable;
+  const atStockCap =
+    typeof quantityAvailable === 'number' &&
+    quantityAvailable > 0 &&
+    quantity >= quantityAvailable;
 
   return (
     <div className="cart-line-quantity">
@@ -120,7 +128,8 @@ function CartLineQuantity({line}: {line: CartLine}) {
       <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
         <button
           aria-label="Increase quantity"
-          disabled={!!isOptimistic}
+          disabled={!!isOptimistic || atStockCap}
+          title={atStockCap ? 'No more in stock' : undefined}
           className="cart-qty-btn"
         >
           +

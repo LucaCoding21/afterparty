@@ -12,6 +12,8 @@ export type CartMainProps = {
   layout: CartLayout;
 };
 
+const FREE_SHIPPING_THRESHOLD_VND = 1000000;
+
 export type LineItemChildrenMap = {[parentId: string]: CartLine[]};
 /** Returns a map of all line items and their children. */
 function getLineItemChildrenMap(lines: CartLine[]): LineItemChildrenMap {
@@ -79,12 +81,32 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
           {cartHasItems && (
             <>
               <p className="cart-taxes-note">Taxes and shipping calculated at checkout</p>
+              <FreeShippingNote subtotal={cart?.cost?.subtotalAmount} />
             </>
           )}
         </div>
       </div>
       {cartHasItems && <CartSummary cart={cart} layout={layout} />}
     </div>
+  );
+}
+
+function FreeShippingNote({
+  subtotal,
+}: {
+  subtotal?: {amount?: string; currencyCode?: string};
+}) {
+  // The free-shipping rule is a 1.000.000 VND threshold for Vietnam delivery.
+  // Foreign visitors get Markets-converted USD prices, so the VND math (and
+  // the offer itself) doesn't apply to them — show nothing.
+  if (subtotal?.currencyCode !== 'VND') return null;
+  const remaining = FREE_SHIPPING_THRESHOLD_VND - Number(subtotal.amount ?? 0);
+  return (
+    <p className="cart-shipping-note">
+      {remaining > 0
+        ? `${new Intl.NumberFormat('vi-VN').format(remaining)} VND away from free shipping (Vietnam only)`
+        : 'You’re eligible for free shipping (Vietnam only)'}
+    </p>
   );
 }
 

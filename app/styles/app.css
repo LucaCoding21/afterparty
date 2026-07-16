@@ -1595,6 +1595,15 @@ aside main {
   text-underline-offset: 2px;
 }
 
+/* Free-shipping progress note under the taxes note. Carries the bottom margin
+   the taxes note loses to :last-of-type once this second note renders. */
+.cart-details .cart-shipping-note {
+  font-size: 0.7rem;
+  color: #555;
+  text-align: left;
+  margin: 0.25rem 0 1.25rem;
+}
+
 /* Checkout button */
 
 .cart-checkout-btn,
@@ -2421,6 +2430,23 @@ aside main {
   opacity: 1;
 }
 
+/* Touch devices (mobile/iPad): give the X a circular container so it reads
+   as a tappable button over the photo. */
+@media (hover: none) {
+  .zoom-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.875rem;
+    height: 1.875rem;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
+    opacity: 1;
+  }
+}
+
 /* Dots */
 .carousel-dots {
   display: flex;
@@ -2844,6 +2870,16 @@ aside main {
 
 .product-option-label-swatch img {
   width: 100%;
+}
+
+/* Inline low-stock warning beside the size label */
+.product-stock-note {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #9b3535;
+  margin-left: 0.5rem;
 }
 
 /* Add to cart wrapper — separated from content above */
