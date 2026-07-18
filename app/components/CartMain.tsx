@@ -1,6 +1,7 @@
 import {useOptimisticCart, type OptimisticCartLine} from '@shopify/hydrogen';
-import {Link, useNavigate} from 'react-router';
+import {Link, useNavigate, useRouteLoaderData} from 'react-router';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
+import type {RootLoader} from '~/root';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
@@ -50,6 +51,8 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const className = `cart-main ${withDiscount ? 'with-discount' : ''}`;
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
   const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  const isVietnam = rootData?.consent?.country === 'VN';
 
   return (
     <div className={className}>
@@ -79,10 +82,10 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
             })}
           </ul>
           {cartHasItems && (
-            <>
-              <p className="cart-taxes-note">Taxes and shipping calculated at checkout</p>
-              <FreeShippingNote subtotal={cart?.cost?.subtotalAmount} />
-            </>
+            <p className="cart-taxes-note">Taxes and shipping calculated at checkout</p>
+          )}
+          {isVietnam && (
+            <FreeShippingNote subtotal={cart?.cost?.subtotalAmount} />
           )}
         </div>
       </div>
@@ -97,10 +100,11 @@ function FreeShippingNote({
   subtotal?: {amount?: string; currencyCode?: string};
 }) {
   // The free-shipping rule is a 1.000.000 VND threshold for Vietnam delivery.
-  // Foreign visitors get Markets-converted USD prices, so the VND math (and
-  // the offer itself) doesn't apply to them — show nothing.
-  if (subtotal?.currencyCode !== 'VND') return null;
-  const remaining = FREE_SHIPPING_THRESHOLD_VND - Number(subtotal.amount ?? 0);
+  // Foreign visitors get Markets-converted USD prices, so this note is only
+  // rendered for Vietnam (gated by the caller on the visitor's country).
+  // An empty cart has no subtotal, so default the amount to 0 to still show
+  // the full "away from free shipping" line.
+  const remaining = FREE_SHIPPING_THRESHOLD_VND - Number(subtotal?.amount ?? 0);
   return (
     <p className="cart-shipping-note">
       {remaining > 0
