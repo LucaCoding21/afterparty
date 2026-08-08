@@ -4,7 +4,7 @@
 
 ### Major Changes
 
-- Updated to Storeront A 2026-01 and Customer Account API 2026-01. ([#3434](https://github.com/Shopify/hydrogen/pull/3434)) by [@kdaviduik](https://github.com/kdaviduik)
+- Updated t Storeront A 2026-01 and Customer Account API 2026-01. ([#3434](https://github.com/Shopify/hydrogen/pull/3434)) by [@kdaviduik](https://github.com/kdaviduik)
 
   This is a quarterly API version update aligned with Shopify's API release schedule.
 
