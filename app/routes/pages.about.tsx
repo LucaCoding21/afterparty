@@ -12,9 +12,8 @@ export default function AboutPage() {
           <h1 className="about-heading">About Us</h1>
           <div className="about-section">
             <div className="about-body">
-              <p>Established in early 2025, afterparty has built a following by crafting pieces that speak to the rhythm of nights out, shared stories and music, and the mood that lingers after.</p>
-              <p>Designed for those who identify with Saigon's evolving subcultural scenes, afterparty draws from underground music, art collectives, and creative communities that value authenticity and individuality.</p>
-              <p>For them, these spaces are more than social outlets; they are platforms for self-expression and a temporary escape from the boundaries of daily life.</p>
+              <p>Established in early 2025, afterparty is an independent label based in Saigon, inspired by the energy of nights out, shared stories, music, and the moments that linger after.</p>
+              <p>Shaped by the people, places, and creative communities around us, afterparty explores self-expression through clothing and the experiences that bring people together.</p>
             </div>
           </div>
         </div>
