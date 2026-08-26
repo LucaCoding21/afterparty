@@ -13,22 +13,23 @@
  * canonicals and og:urls, and we don't always have the absolute origin in meta.
  */
 
+export const SITE_ORIGIN = 'https://www.afterparty.space';
+
 /**
  * Fallback share image for pages with no image of their own.
  *
- * Absolute and production-hosted on purpose: crawlers resolve og:image
- * independently of the page they found it on, so a relative path (or a
- * localhost origin in dev) produces a card with no image.
+ * Absolute on purpose: crawlers resolve og:image independently of the page they
+ * found it on, so a relative path (or a localhost origin in dev) produces a card
+ * with no image.
  *
- * Served from the Oxygen origin, which answers GET with 200 but HEAD with 404
- * because static images route through Oxygen's imagery layer. Unfurlers that
- * probe with HEAD before downloading therefore skip the image. Moving this file
- * to Shopify Files and pointing at the cdn.shopify.com URL (which answers HEAD
- * correctly) is the fix; this constant is the only line that needs to change.
+ * Served from Shopify's CDN rather than /public deliberately. Static images on
+ * the Oxygen origin answer GET with 200 but HEAD with 404, because they route
+ * through Oxygen's imagery layer, and unfurlers that probe with HEAD before
+ * downloading skip the image entirely. cdn.shopify.com answers HEAD with 200.
+ * Keep the ?v= cache key: the URL is unreliable without it.
  */
-export const SITE_ORIGIN = 'https://www.afterparty.space';
-
-export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/OG-afterparty.png`;
+export const DEFAULT_OG_IMAGE =
+  'https://cdn.shopify.com/s/files/1/0726/2247/3285/files/IMG_1420.png?v=1787729785';
 
 export type SeoTagInput = {
   title: string;
