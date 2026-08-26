@@ -1,8 +1,10 @@
 import type {Route} from './+types/pages.locations';
+import {seoTags} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'afterparty | Locations'}];
-};
+// See pages.about.tsx: a bare [{title}] would replace root's Open Graph tags
+// and leave this page with no share card.
+export const meta: Route.MetaFunction = () =>
+  seoTags({title: 'afterparty | Locations', url: '/pages/locations'});
 
 const STOCKISTS = [
   {

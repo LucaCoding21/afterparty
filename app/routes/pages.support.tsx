@@ -5,8 +5,6 @@ import {seoTags} from '~/lib/seo';
 export const meta = () => {
   return seoTags({
     title: 'afterparty | Support',
-    description:
-      'Shipping, returns, and order help for afterparty, streetwear from Ho Chi Minh City, Vietnam. Email minh@afterparty.space.',
     url: '/pages/support',
   });
 };

@@ -185,7 +185,6 @@ export const meta: Route.MetaFunction = ({data}) => {
 
   const tags: any[] = seoTags({
     title,
-    description,
     image: heroUrl,
     url,
     type: 'product',

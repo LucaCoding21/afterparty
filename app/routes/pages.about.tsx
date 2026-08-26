@@ -1,8 +1,11 @@
 import type {Route} from './+types/pages.about';
+import {seoTags} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'afterparty | About Us'}];
-};
+// Must build the full tag set here, not just a title: in React Router 7 a
+// route's meta REPLACES its parent's, so returning [{title}] alone would strip
+// root's Open Graph block and leave this page with no share card at all.
+export const meta: Route.MetaFunction = () =>
+  seoTags({title: 'afterparty | About Us', url: '/pages/about'});
 
 export default function AboutPage() {
   return (

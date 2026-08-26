@@ -1,15 +1,37 @@
 /**
- * Builds the standard set of head tags for a page: title, description, canonical,
- * Open Graph, and Twitter card. Each route's meta() spreads the result and
- * appends route-specific extras (preloads, JSON-LD, etc.).
+ * Builds the standard set of head tags for a page: title, canonical, Open Graph,
+ * and Twitter card. Each route's meta() spreads the result and appends
+ * route-specific extras (preloads, JSON-LD, etc.).
+ *
+ * Descriptions are deliberately NOT emitted anywhere on the site. Share cards
+ * are meant to read as brand name + image only, so no meta description,
+ * og:description or twitter:description is set. Routes that still need
+ * description text for structured data compute it locally and pass it to their
+ * own JSON-LD.
  *
  * Pass `url` as a path (e.g. "/products/foo"); platforms accept relative
- * canonicals and og:urls, and we don't always have the absolute origin in
- * meta.
+ * canonicals and og:urls, and we don't always have the absolute origin in meta.
  */
+
+/**
+ * Fallback share image for pages with no image of their own.
+ *
+ * Absolute and production-hosted on purpose: crawlers resolve og:image
+ * independently of the page they found it on, so a relative path (or a
+ * localhost origin in dev) produces a card with no image.
+ *
+ * Served from the Oxygen origin, which answers GET with 200 but HEAD with 404
+ * because static images route through Oxygen's imagery layer. Unfurlers that
+ * probe with HEAD before downloading therefore skip the image. Moving this file
+ * to Shopify Files and pointing at the cdn.shopify.com URL (which answers HEAD
+ * correctly) is the fix; this constant is the only line that needs to change.
+ */
+export const SITE_ORIGIN = 'https://www.afterparty.space';
+
+export const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/OG-afterparty.png`;
+
 export type SeoTagInput = {
   title: string;
-  description: string;
   image?: string | null;
   url: string;
   type?: 'website' | 'product' | 'article';
@@ -17,28 +39,29 @@ export type SeoTagInput = {
 
 export function seoTags({
   title,
-  description,
   image,
   url,
   type = 'website',
 }: SeoTagInput): any[] {
-  const tags: any[] = [
+  const share = image || DEFAULT_OG_IMAGE;
+  // og:url must be absolute: platforms treat it as the canonical identity of the
+  // shared object and resolve it independently of the page they crawled, so a
+  // path alone can cost the card. `canonical` stays relative on purpose, since
+  // Google resolves those against the current origin and rewriting it would
+  // touch a live SEO surface for no gain.
+  const canonicalUrl = url.startsWith('http') ? url : `${SITE_ORIGIN}${url}`;
+  return [
     {title},
-    {name: 'description', content: description},
     {tagName: 'link', rel: 'canonical', href: url},
     {property: 'og:title', content: title},
-    {property: 'og:description', content: description},
     {property: 'og:type', content: type},
-    {property: 'og:url', content: url},
+    {property: 'og:url', content: canonicalUrl},
+    {property: 'og:site_name', content: 'afterparty'},
+    {property: 'og:image', content: share},
     {name: 'twitter:card', content: 'summary_large_image'},
     {name: 'twitter:title', content: title},
-    {name: 'twitter:description', content: description},
+    {name: 'twitter:image', content: share},
   ];
-  if (image) {
-    tags.push({property: 'og:image', content: image});
-    tags.push({name: 'twitter:image', content: image});
-  }
-  return tags;
 }
 
 /** Best-effort plain-text from HTML description, trimmed for meta tag length. */

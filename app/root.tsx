@@ -14,6 +14,7 @@ import {
 } from 'react-router';
 import type {Route} from './+types/root';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
+import {DEFAULT_OG_IMAGE} from '~/lib/seo';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
@@ -44,15 +45,20 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 
 export const meta: Route.MetaFunction = ({data}) => {
   const origin = (data as {origin?: string} | undefined)?.origin ?? 'https://afterparty.space';
-  const image = `${origin}/OG-afterparty.png`;
+  const image = DEFAULT_OG_IMAGE;
   const title = 'afterparty';
   const description =
     'afterparty, streetwear from Ho Chi Minh City (Saigon), Vietnam. Limited drops and signature graphics.';
+  // The description tags (meta description, og:description, twitter:description)
+  // are intentionally omitted: the share card is meant to read as brand name +
+  // image only, with no body copy. `description` is still defined above because
+  // the Organization JSON-LD below uses it, so search and AI crawlers keep the
+  // brand context without it appearing in link previews.
+  // Caveat: platforms that fall back to their own heuristics (Facebook and
+  // Messenger) may still synthesise a description from visible page text.
   return [
     {title},
-    {name: 'description', content: description},
     {property: 'og:title', content: title},
-    {property: 'og:description', content: description},
     {property: 'og:image', content: image},
     {property: 'og:type', content: 'website'},
     {property: 'og:site_name', content: 'afterparty'},
@@ -61,7 +67,6 @@ export const meta: Route.MetaFunction = ({data}) => {
     {tagName: 'link', rel: 'canonical', href: origin},
     {name: 'twitter:card', content: 'summary_large_image'},
     {name: 'twitter:title', content: title},
-    {name: 'twitter:description', content: description},
     {name: 'twitter:image', content: image},
     // Organization schema — anchors the brand to Ho Chi Minh City for Google's
     // entity graph and powers any future Knowledge Panel.
