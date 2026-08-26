@@ -1,6 +1,6 @@
 # skeleton
 
-## 2026.1.0
+## 2026.1.
 
 ### Major Changes
 
