@@ -59,6 +59,19 @@ export function seoTags({
     {property: 'og:url', content: canonicalUrl},
     {property: 'og:site_name', content: 'afterparty'},
     {property: 'og:image', content: share},
+    {property: 'og:image:secure_url', content: share},
+    {property: 'og:image:alt', content: title},
+    // Meta's crawler downloads the image asynchronously when it has no declared
+    // dimensions, so the very first unfurl of a URL renders a card with no
+    // picture. Declaring them lets the image show on the first share. Only
+    // emitted for the fallback, whose size we know: a product image's real
+    // dimensions vary, and declaring wrong ones is worse than declaring none.
+    ...(share === DEFAULT_OG_IMAGE
+      ? [
+          {property: 'og:image:width', content: '1200'},
+          {property: 'og:image:height', content: '630'},
+        ]
+      : []),
     {name: 'twitter:card', content: 'summary_large_image'},
     {name: 'twitter:title', content: title},
     {name: 'twitter:image', content: share},

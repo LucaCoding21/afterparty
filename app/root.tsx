@@ -47,19 +47,40 @@ export const meta: Route.MetaFunction = ({data}) => {
   const origin = (data as {origin?: string} | undefined)?.origin ?? 'https://afterparty.space';
   const image = DEFAULT_OG_IMAGE;
   const title = 'afterparty';
-  const description =
+  // Two separate description strings, deliberately not shared. See CLAUDE.md.
+  //
+  // Shown to people: this is the copy Google renders as the result snippet.
+  const metaDescription =
+    'Founded in 2025, afterparty is an independent fashion brand based in Saigon, focused on graphic-driven streetwear inspired by music, art, and contemporary culture.';
+  // Never rendered anywhere, for machines only. Feeds the Organization JSON-LD
+  // and Google's entity graph, so it keeps the keywords the snippet copy drops:
+  // "streetwear", "Ho Chi Minh City (Saigon)", "Vietnam". Do not collapse these
+  // two into one const; they serve different readers.
+  const orgDescription =
     'afterparty, streetwear from Ho Chi Minh City (Saigon), Vietnam. Limited drops and signature graphics.';
-  // The description tags (meta description, og:description, twitter:description)
-  // are intentionally omitted: the share card is meant to read as brand name +
-  // image only, with no body copy. `description` is still defined above because
-  // the Organization JSON-LD below uses it, so search and AI crawlers keep the
-  // brand context without it appearing in link previews.
-  // Caveat: platforms that fall back to their own heuristics (Facebook and
-  // Messenger) may still synthesise a description from visible page text.
+  // `meta name="description"` IS set here, on the homepage only, to control the
+  // Google snippet: with no description tag Google was synthesising one from the
+  // JSON-LD plus scraped nav text ("Shop All ProductsTops & Shirts...").
+  //
+  // og:description and twitter:description are then declared EMPTY, not omitted.
+  // This is the whole trick and it must not be "cleaned up": Meta's and X's
+  // crawlers fall back to `meta name="description"` when og:description is
+  // absent, so simply leaving them out would leak the Google copy onto the share
+  // card. Declaring them empty satisfies the lookup and suppresses the fallback,
+  // so the card stays brand name + image only while Google still gets its text.
   return [
     {title},
+    {name: 'description', content: metaDescription},
     {property: 'og:title', content: title},
+    // Intentionally empty. See the note above: removing these re-enables the
+    // crawler's fallback to `meta name="description"`.
+    {property: 'og:description', content: ''},
+    {name: 'twitter:description', content: ''},
     {property: 'og:image', content: image},
+    {property: 'og:image:secure_url', content: image},
+    {property: 'og:image:width', content: '1200'},
+    {property: 'og:image:height', content: '630'},
+    {property: 'og:image:alt', content: 'afterparty'},
     {property: 'og:type', content: 'website'},
     {property: 'og:site_name', content: 'afterparty'},
     {property: 'og:locale', content: 'en_US'},
@@ -79,7 +100,7 @@ export const meta: Route.MetaFunction = ({data}) => {
         url: origin,
         logo: `${origin}/logo.png`,
         image,
-        description,
+        description: orgDescription,
         address: {
           '@type': 'PostalAddress',
           addressLocality: 'Ho Chi Minh City',
