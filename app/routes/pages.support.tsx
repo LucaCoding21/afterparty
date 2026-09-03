@@ -45,7 +45,7 @@ export default function SupportPage() {
           <div className="support-contact-block">
             <div className="support-contact-row">
               <span className="support-contact-key">Email</span>
-              <a href="mailto:minh@afterparty.space" className="support-link">minh@afterparty.space</a>
+              <a href="mailto:contact@afterparty.space" className="support-link">contact@afterparty.space</a>
             </div>
             <div className="support-contact-row">
               <span className="support-contact-key">Response</span>
@@ -104,7 +104,7 @@ export default function SupportPage() {
           <p className="support-body-text support-body-text--no-mb">All sales are final, except as outlined in our Refund Policy.</p>
           <div className="support-faq-item">
             <p className="support-faq-q">How do I report an issue with my order?</p>
-            <p className="support-faq-a">Please email <a href="mailto:minh@afterparty.space" className="support-link">minh@afterparty.space</a> within 7 days of receiving your item. Include your order number, along with clear, unedited photos and a video of the issue. We do not accept edited or AI-generated images, and returns sent without prior approval will not be accepted.</p>
+            <p className="support-faq-a">Please email <a href="mailto:contact@afterparty.space" className="support-link">contact@afterparty.space</a> within 7 days of receiving your item. Include your order number, along with clear, unedited photos and a video of the issue. We do not accept edited or AI-generated images, and returns sent without prior approval will not be accepted.</p>
           </div>
           <div className="support-faq-item">
             <p className="support-faq-q">What items are eligible for return?</p>
@@ -116,7 +116,7 @@ export default function SupportPage() {
           </div>
           <div className="support-faq-item">
             <p className="support-faq-q">When are refunds issued?</p>
-            <p className="support-faq-a">Refunds are only issued if your order is canceled before shipment, or if your item arrives damaged, defective, or incorrect and cannot be replaced. Approved refunds are processed to your original payment method within 10 business days. If you haven’t received your refund after 15 business days, please contact <a href="mailto:minh@afterparty.space" className="support-link">minh@afterparty.space</a>.</p>
+            <p className="support-faq-a">Refunds are only issued if your order is canceled before shipment, or if your item arrives damaged, defective, or incorrect and cannot be replaced. Approved refunds are processed to your original payment method within 10 business days. If you haven’t received your refund after 15 business days, please contact <a href="mailto:contact@afterparty.space" className="support-link">contact@afterparty.space</a>.</p>
           </div>
         </Section>
 

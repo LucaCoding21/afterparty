@@ -70,7 +70,7 @@ ${collectionLines}
 ${productLines}
 
 ## Contact
-- Email: minh@afterparty.space
+- Email: contact@afterparty.space
 - Instagram: https://www.instagram.com/afterparty.space/
 - Facebook: https://www.facebook.com/afterparty.space/
 - Location: Ho Chi Minh City, Vietnam
@@ -83,8 +83,8 @@ ${productLines}
 
 ## Returns
 - Refunds and exchanges are not offered once an order has shipped
-- If an order has not shipped, contact minh@afterparty.space to cancel
-- Damaged or incorrect orders: email minh@afterparty.space with order number and photos
+- If an order has not shipped, contact contact@afterparty.space to cancel
+- Damaged or incorrect orders: email contact@afterparty.space with order number and photos
 `;
 }
 
