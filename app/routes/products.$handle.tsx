@@ -55,6 +55,23 @@ function useRecentlyViewed(currentHandle: string, currentTitle: string, currentI
 
 // Maps both static and Shopify handles to size guide assets
 const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = {
+  // Chin drop. Wired ahead of launch while all three are still drafts in
+  // Shopify. These entries are inert until each product is published, since the
+  // loader 404s before it reads this map. The waffle raglan measures identically
+  // to the existing raglan long sleeve, and the chain tee shares the oversized
+  // boxy tee's measurement diagram, so both reuse those assets.
+  'chin-polo-shirt': {
+    sizeGuide: '/products/size-guides/chin-polo-shirt.svg',
+    sizePhoto: '/products/measurements/Chin%20Polo%20Shirt%20Chart%201.png',
+  },
+  'chin-waffle-raglan-tee': {
+    sizeGuide: '/products/size-guides/raglan-tee.svg',
+    sizePhoto: '/products/measurements/2026%20Raglan%20Long%20Sleeve%20Tee%20Chart%20(1).png',
+  },
+  'chin-chain-oversized-tee': {
+    sizeGuide: '/products/size-guides/chin-chain-oversized-tee.svg',
+    sizePhoto: '/products/measurements/2025%20Hater%20Oversized%20Short%20Sleeve%20Boxy%20Tee%20Chart%201.png',
+  },
   // afterparty x MEGAHERTZ collab. The logo tee is a short-sleeve tee; the
   // raglan tee shares the existing raglan long-sleeve fit (same as the other
   // raglan tees).
