@@ -15,6 +15,7 @@ import {
 import type {Route} from './+types/root';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import {DEFAULT_OG_IMAGE} from '~/lib/seo';
+import {getCartForMarket} from '~/lib/cartMarket';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
@@ -268,7 +269,10 @@ function loadDeferredData({context}: Route.LoaderArgs) {
       return null;
     });
   return {
-    cart: cart.get(),
+    cart: getCartForMarket({cart, storefront}).catch((error: Error) => {
+      console.error(error);
+      return null;
+    }),
     isLoggedIn: customerAccount.isLoggedIn(),
     footer,
   };

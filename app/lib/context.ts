@@ -5,13 +5,29 @@ import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
 /**
  * Detect visitor's country from request headers.
  * - Oxygen hosting provides `Oxygen-Buyer-Country` from IP geolocation.
- * - Falls back to VN (Vietnam) as the primary market.
- * - Vietnamese visitors get VND prices, everyone else gets their local currency.
+ * - Countries with their own Shopify Market and currency are passed through
+ *   so the Storefront API prices in that currency: VN (VND), KR (KRW),
+ *   JP (JPY), AU (AUD).
+ * - Everyone else lands in the US / worldwide market and pays in USD.
+ * The free-shipping thresholds in CartMain are keyed by these currencies, so
+ * add a country here whenever a new single-currency market is created.
  */
+const LOCAL_CURRENCY_COUNTRIES = new Set<I18nBase['country']>([
+  'VN',
+  'KR',
+  'JP',
+  'AU',
+]);
+
 function getLocaleFromRequest(request: Request): I18nBase {
-  const buyerCountry = (request.headers.get('Oxygen-Buyer-Country') ?? '').toUpperCase();
+  const buyerCountry = (
+    request.headers.get('Oxygen-Buyer-Country') ?? ''
+  ).toUpperCase() as I18nBase['country'];
   if (buyerCountry === 'VN') {
     return {language: 'VI', country: 'VN'};
+  }
+  if (LOCAL_CURRENCY_COUNTRIES.has(buyerCountry)) {
+    return {language: 'EN', country: buyerCountry};
   }
   return {language: 'EN', country: 'US'};
 }

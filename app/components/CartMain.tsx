@@ -13,7 +13,54 @@ export type CartMainProps = {
   layout: CartLayout;
 };
 
-const FREE_SHIPPING_THRESHOLD_VND = 1000000;
+/**
+ * Free-shipping thresholds per market, keyed by the cart's currency. Shopify
+ * Markets price each cart in exactly one of these currencies (see
+ * `getLocaleFromRequest` in app/lib/context.ts), so the currency tells us
+ * which market's rule applies. The thresholds mirror the conditional
+ * "Free shipping" rates in Shopify admin (Settings > Shipping, one per zone);
+ * change both together.
+ */
+type FreeShippingRule = {
+  threshold: number;
+  /** Trailing scope note, e.g. " (Korea only)". Empty for the worldwide USD market. */
+  scope: string;
+  format: (amount: number) => string;
+};
+
+function formatWithSymbol(currency: string) {
+  return (amount: number) => {
+    const digits = Number.isInteger(amount) ? 0 : 2;
+    const money = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'narrowSymbol',
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(amount);
+    return `${money} ${currency}`;
+  };
+}
+
+const FREE_SHIPPING_RULES: Record<string, FreeShippingRule> = {
+  VND: {
+    threshold: 1_000_000,
+    scope: ' (Vietnam only)',
+    format: (amount) => `${new Intl.NumberFormat('vi-VN').format(amount)} VND`,
+  },
+  USD: {threshold: 200, scope: '', format: formatWithSymbol('USD')},
+  KRW: {threshold: 150_000, scope: ' (Korea only)', format: formatWithSymbol('KRW')},
+  JPY: {threshold: 15_000, scope: ' (Japan only)', format: formatWithSymbol('JPY')},
+  AUD: {threshold: 200, scope: ' (Australia only)', format: formatWithSymbol('AUD')},
+};
+
+/** Currency a visitor's cart will be created in, for when there is no cart yet. */
+const MARKET_CURRENCY: Record<string, string> = {
+  VN: 'VND',
+  KR: 'KRW',
+  JP: 'JPY',
+  AU: 'AUD',
+};
 
 export type LineItemChildrenMap = {[parentId: string]: CartLine[]};
 /** Returns a map of all line items and their children. */
@@ -52,7 +99,13 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
   const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
   const rootData = useRouteLoaderData<RootLoader>('root');
-  const isVietnam = rootData?.consent?.country === 'VN';
+  // An empty cart has no cost yet, so fall back to the visitor's market.
+  const subtotal = cart?.cost?.subtotalAmount;
+  const currency =
+    subtotal?.currencyCode ??
+    MARKET_CURRENCY[rootData?.consent?.country ?? ''] ??
+    'USD';
+  const freeShippingRule = FREE_SHIPPING_RULES[currency];
 
   return (
     <div className={className}>
@@ -84,8 +137,8 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
           {cartHasItems && (
             <p className="cart-taxes-note">Taxes and shipping calculated at checkout</p>
           )}
-          {isVietnam && (
-            <FreeShippingNote subtotal={cart?.cost?.subtotalAmount} />
+          {freeShippingRule && (
+            <FreeShippingNote rule={freeShippingRule} subtotal={subtotal} />
           )}
         </div>
       </div>
@@ -95,21 +148,20 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
 }
 
 function FreeShippingNote({
+  rule,
   subtotal,
 }: {
+  rule: FreeShippingRule;
   subtotal?: {amount?: string; currencyCode?: string};
 }) {
-  // The free-shipping rule is a 1.000.000 VND threshold for Vietnam delivery.
-  // Foreign visitors get Markets-converted USD prices, so this note is only
-  // rendered for Vietnam (gated by the caller on the visitor's country).
   // An empty cart has no subtotal, so default the amount to 0 to still show
   // the full "away from free shipping" line.
-  const remaining = FREE_SHIPPING_THRESHOLD_VND - Number(subtotal?.amount ?? 0);
+  const remaining = rule.threshold - Number(subtotal?.amount ?? 0);
   return (
     <p className="cart-shipping-note">
       {remaining > 0
-        ? `${new Intl.NumberFormat('vi-VN').format(remaining)} VND away from free shipping (Vietnam only)`
-        : 'You’re eligible for free shipping (Vietnam only)'}
+        ? `${rule.format(remaining)} away from free shipping${rule.scope}`
+        : `You’re eligible for free shipping${rule.scope}`}
     </p>
   );
 }

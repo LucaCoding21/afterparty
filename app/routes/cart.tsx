@@ -7,6 +7,7 @@ import type {Route} from './+types/cart';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
+import {getCartForMarket} from '~/lib/cartMarket';
 
 export const meta: Route.MetaFunction = () => {
   return [{title: `afterparty | Cart`}];
@@ -101,8 +102,7 @@ export async function action({request, context}: Route.ActionArgs) {
 }
 
 export async function loader({context}: Route.LoaderArgs) {
-  const {cart} = context;
-  return await cart.get();
+  return await getCartForMarket(context);
 }
 
 export default function Cart() {
