@@ -55,12 +55,11 @@ function useRecentlyViewed(currentHandle: string, currentTitle: string, currentI
 
 // Maps both static and Shopify handles to size guide assets
 const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = {
-  // Chin drop. Wired ahead of launch while all three are still drafts in
-  // Shopify. These entries are inert until each product is published, since the
-  // loader 404s before it reads this map. The waffle raglan measures identically
-  // to the existing raglan long sleeve, and the chain tee shares the oversized
-  // boxy tee's measurement diagram, so both reuse those assets.
-  'chin-polo-shirt': {
+  // Chin drop. Keys must match the live Shopify handles, not the product
+  // titles: the polo ships as 'chin-polo'. The waffle raglan measures
+  // identically to the existing raglan long sleeve, and the chain tee shares
+  // the oversized boxy tee's measurement diagram, so both reuse those assets.
+  'chin-polo': {
     sizeGuide: '/products/size-guides/chin-polo-shirt.svg',
     sizePhoto: '/products/measurements/Chin%20Polo%20Shirt%20Chart%201.png',
   },
