@@ -86,9 +86,6 @@ const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = 
     sizeGuide: '/products/size-guides/megahertz-zip-hoodie.svg',
     sizePhoto: '/products/measurements/MHZ%20Zip%20Hoodie%20Chart%20(1).png',
   },
-  'afterparty-x-megahertz-trucker-hat': {
-    sizeGuide: '/products/size-guides/horse-trucker-hat.svg',
-  },
   'bubble-letter-ringer-tee': {
     sizeGuide: '/products/size-guides/bubble-letter-ringer-tee.svg',
     sizePhoto: '/products/measurements/Ringer%20Short%20Sleeve%20Tee%20Chart%202.png',
@@ -155,9 +152,6 @@ const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = 
   'world-biggest-hater-oversized-tee': {
     sizeGuide: '/products/size-guides/hater-tee.svg',
     sizePhoto: '/products/measurements/2025%20Hater%20Oversized%20Short%20Sleeve%20Boxy%20Tee%20Chart%201.png',
-  },
-  'horse-trucker-hat': {
-    sizeGuide: '/products/size-guides/horse-trucker-hat.svg',
   },
   'nhim-tees': {
     sizeGuide: '/products/size-guides/nhim-tees.svg',

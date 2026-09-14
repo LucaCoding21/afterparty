@@ -2615,22 +2615,30 @@ aside main {
   fill: #000;
 }
 
+/* Measurement diagram under the size table. The diagrams are trimmed to
+   their drawing (no baked-in whitespace) and rendered at one fixed height so
+   every product's garment reads the same size, with the same gap above the
+   diagram as below it: 1.5rem from the table, and 0.5rem here plus the
+   1rem the add-to-cart form pads on top. */
 .product-size-guide-photo {
   margin-top: 1.5rem;
-  margin-bottom: 0;
+  margin-bottom: 0.5rem;
   width: 100%;
   text-align: center;
 }
 
 .product-size-guide-photo img {
-  width: 55%;
-  height: auto;
-  display: inline-block;
+  width: auto;
+  height: 240px;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
 }
 
 @media (max-width: 45em) {
   .product-size-guide-photo img {
-    width: 80%;
+    height: 200px;
   }
 }
 
@@ -2689,9 +2697,11 @@ aside main {
   display: block;
 }
 
-/* Photo sized down vs. the inline product-page version, scoped to zoom only */
+/* Photo sized down vs. the inline product-page version, scoped to zoom only.
+   Scales with the card instead of the fixed inline height. */
 .size-guide-zoom-content .product-size-guide-photo img {
   width: 45%;
+  height: auto;
 }
 
 .product-main {
