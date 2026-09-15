@@ -5,7 +5,8 @@ import {
   useRouteLoaderData,
 } from 'react-router';
 import type {Route} from './+types/search';
-import {getPaginationVariables, Analytics, Money} from '@shopify/hydrogen';
+import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
+import {Price} from '~/components/Price';
 import {SearchForm} from '~/components/SearchForm';
 import {SearchResults} from '~/components/SearchResults';
 import {
@@ -153,7 +154,7 @@ export default function SearchPage() {
               <h4>{product.title}</h4>
               <small>
                 {product.price && (
-                  <Money data={{amount: product.price.amount, currencyCode: product.price.currencyCode as any}} />
+                  <Price data={{amount: product.price.amount, currencyCode: product.price.currencyCode as any}} />
                 )}
               </small>
             </Link>

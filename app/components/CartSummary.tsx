@@ -1,6 +1,7 @@
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/CartMain';
-import {Money, type OptimisticCart} from '@shopify/hydrogen';
+import {type OptimisticCart} from '@shopify/hydrogen';
+import {Price} from '~/components/Price';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -21,7 +22,7 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       <div className="cart-subtotal">
         <span>Subtotal</span>
         <span>
-          {displaySubtotal ? <Money data={displaySubtotal} /> : '—'}
+          {displaySubtotal ? <Price data={displaySubtotal} /> : '—'}
         </span>
       </div>
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />

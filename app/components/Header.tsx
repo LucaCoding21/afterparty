@@ -9,6 +9,7 @@ import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {SEARCH_ENDPOINT} from '~/components/SearchFormPredictive';
 import {shopifyImg} from '~/lib/images';
+import {formatMoney} from '~/lib/money';
 import {fuzzySearch, type CatalogProduct} from '~/lib/fuzzySearch';
 
 interface HeaderProps {
@@ -217,7 +218,7 @@ export function Header({
                         <span className="mobile-search-result-title">{product.title}</span>
                         {product.price && (
                           <span className="mobile-search-result-price">
-                            {new Intl.NumberFormat(undefined, {style: 'currency', currency: product.price.currencyCode, minimumFractionDigits: 0}).format(parseFloat(product.price.amount))}
+                            {formatMoney(product.price, {withoutTrailingZeros: true})}
                           </span>
                         )}
                       </div>
@@ -475,7 +476,7 @@ function HeaderSearch({catalog}: {catalog: CatalogProduct[]}) {
                     <span className="header-search-result-title">{product.title}</span>
                     {product.price && (
                       <span className="header-search-result-price">
-                        {new Intl.NumberFormat(undefined, {style: 'currency', currency: product.price.currencyCode, minimumFractionDigits: 0}).format(parseFloat(product.price.amount))}
+                        {formatMoney(product.price, {withoutTrailingZeros: true})}
                       </span>
                     )}
                   </div>

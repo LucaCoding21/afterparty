@@ -5,6 +5,7 @@ import type {RootLoader} from '~/root';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
+import {formatMoney} from '~/lib/money';
 
 export type CartLayout = 'page' | 'aside';
 
@@ -29,17 +30,11 @@ type FreeShippingRule = {
 };
 
 function formatWithSymbol(currency: string) {
-  return (amount: number) => {
-    const digits = Number.isInteger(amount) ? 0 : 2;
-    const money = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency,
-      currencyDisplay: 'narrowSymbol',
-      minimumFractionDigits: digits,
-      maximumFractionDigits: digits,
-    }).format(amount);
-    return `${money} ${currency}`;
-  };
+  return (amount: number) =>
+    formatMoney(
+      {amount: String(amount), currencyCode: currency},
+      {withoutTrailingZeros: true, alwaysShowCode: true},
+    );
 }
 
 const FREE_SHIPPING_RULES: Record<string, FreeShippingRule> = {

@@ -1,5 +1,6 @@
 import {Link} from 'react-router';
-import {Money, Pagination} from '@shopify/hydrogen';
+import {Pagination} from '@shopify/hydrogen';
+import {Price} from '~/components/Price';
 import {urlWithTrackingParams, type RegularSearchReturn} from '~/lib/search';
 import {flattenToColorVariants} from '~/lib/collections';
 import {shopifyImg} from '~/lib/images';
@@ -131,7 +132,7 @@ function SearchResultsProducts({
                     </div>
                     <h4>{item.title}</h4>
                     <small>
-                      {!item.availableForSale ? 'SOLD OUT' : item.price ? <Money data={item.price} /> : ''}
+                      {!item.availableForSale ? 'SOLD OUT' : item.price ? <Price data={item.price} /> : ''}
                     </small>
                   </Link>
                 );

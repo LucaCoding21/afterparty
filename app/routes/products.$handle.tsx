@@ -14,8 +14,8 @@ import {
   getProductOptions,
   getAdjacentAndFirstAvailableVariants,
   useSelectedOptionInUrlParam,
-  Money,
 } from '@shopify/hydrogen';
+import {Price} from '~/components/Price';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
@@ -742,7 +742,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
           <div className="product-price-wrap">
             <div className="product-price">
               {isSoldOut ? 'SOLD OUT' : selectedVariant?.price ? (
-                <Money data={selectedVariant.price} />
+                <Price data={selectedVariant.price} />
               ) : ''}
             </div>
           </div>
@@ -988,7 +988,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
                 <h4>{item.title}</h4>
                 {item.price && (
                   <small>
-                    <Money data={item.price as any} />
+                    <Price data={item.price as any} />
                   </small>
                 )}
               </Link>
@@ -1010,7 +1010,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
                 <h4>{item.title}</h4>
                 {item.price && (
                   <small>
-                    <Money data={item.price as any} />
+                    <Price data={item.price as any} />
                   </small>
                 )}
               </Link>

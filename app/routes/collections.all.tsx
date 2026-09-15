@@ -1,7 +1,7 @@
 import {useEffect} from 'react';
 import type {Route} from './+types/collections.all';
 import {Link, useLoaderData} from 'react-router';
-import {Money} from '@shopify/hydrogen';
+import {Price} from '~/components/Price';
 import {flattenToColorVariants, buildProductUrl} from '~/lib/collections';
 import {shopifyImg, shopifySrcSet} from '~/lib/images';
 
@@ -91,7 +91,7 @@ export default function ShopAll() {
             <h4>{item.title}</h4>
             <small>
               {!item.availableForSale ? 'SOLD OUT' : (
-                <Money data={item.price} />
+                <Price data={item.price} />
               )}
             </small>
           </Link>
