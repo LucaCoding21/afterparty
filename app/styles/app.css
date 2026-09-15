@@ -2618,15 +2618,16 @@ aside main {
 /* Measurement diagram under the size table. The diagrams are trimmed to
    their drawing (no baked-in whitespace) and rendered at a fixed height, with
    the same gap above the diagram as below it: 1.5rem from the table, and
-   0.5rem here plus the 1rem the add-to-cart form pads on top.
+   0.5rem here plus the 1rem the add-to-cart form pads on top, then nudged
+   2px upward (less on top, more below) at Ellen's request.
 
    The height depends on the drawing's shape (class set from the image's
    aspect ratio once it loads): a tall drawing like pants gets more height
    than a wide one like a tee, so the garments read as roughly the same size
    instead of pants shrinking to half a tee's width. */
 .product-size-guide-photo {
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
+  margin-top: calc(1.5rem - 2px);
+  margin-bottom: calc(0.5rem + 2px);
   width: 100%;
   text-align: center;
 }
