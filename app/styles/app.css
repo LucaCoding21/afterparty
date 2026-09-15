@@ -2615,26 +2615,30 @@ aside main {
   fill: #000;
 }
 
-/* Measurement diagram under the size table. The diagrams are trimmed to
-   their drawing (no baked-in whitespace) and rendered at a fixed height, with
-   the same gap above the diagram as below it: 1.5rem from the table, and
-   0.5rem here plus the 1rem the add-to-cart form pads on top, then nudged
-   2px upward (less on top, more below) at Ellen's request.
+/* Measurement diagram under the size table. The PNGs are cropped tight to
+   the drawing (zero blank canvas), so these margins are the exact visual
+   gap on every product: 31px from the table to the top of the drawing and
+   39px from its bottom to the add-to-cart button (this margin, plus the
+   1rem the add-to-cart form pads on top, plus the details' own spacing).
+   The numbers were tuned by eye on the raglan tee.
 
    The height depends on the drawing's shape (class set from the image's
    aspect ratio once it loads): a tall drawing like pants gets more height
    than a wide one like a tee, so the garments read as roughly the same size
    instead of pants shrinking to half a tee's width. */
 .product-size-guide-photo {
-  margin-top: calc(1.5rem - 2px);
-  margin-bottom: calc(0.5rem + 2px);
+  margin-top: 31px;
+  margin-bottom: 19px;
   width: 100%;
   text-align: center;
 }
 
+/* Heights are the drawing itself (files have no margin). They match what
+   the reference product of each shape rendered at before the tight crop:
+   raglan tee (wide), MHZ zip hoodie (square), velour track pants (tall). */
 .product-size-guide-photo img {
   width: auto;
-  height: 280px;
+  height: 276px;
   max-width: 100%;
   display: block;
   margin: 0 auto;
@@ -2642,24 +2646,24 @@ aside main {
 }
 
 .product-size-guide-photo--wide img {
-  height: 240px;
+  height: 222px;
 }
 
 .product-size-guide-photo--tall img {
-  height: 330px;
+  height: 313px;
 }
 
 @media (max-width: 45em) {
   .product-size-guide-photo img {
-    height: 240px;
+    height: 236px;
   }
 
   .product-size-guide-photo--wide img {
-    height: 200px;
+    height: 185px;
   }
 
   .product-size-guide-photo--tall img {
-    height: 280px;
+    height: 266px;
   }
 }
 
