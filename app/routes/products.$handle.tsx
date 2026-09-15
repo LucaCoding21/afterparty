@@ -364,9 +364,23 @@ function SizeGuideZoomOverlay({children, onClose}: {children: React.ReactNode; o
   );
 }
 
+/**
+ * Buckets a measurement drawing by its aspect ratio so CSS can give tall
+ * garments (pants) more height than wide ones (tees). At a single fixed
+ * height a pair of pants renders half the width of a tee and reads as tiny;
+ * a taller box for tall drawings keeps the visual size roughly even.
+ */
+function photoShapeClass(img: HTMLImageElement): string {
+  const ratio = img.naturalWidth / img.naturalHeight;
+  if (ratio < 0.75) return 'product-size-guide-photo--tall';
+  if (ratio > 1.2) return 'product-size-guide-photo--wide';
+  return 'product-size-guide-photo--square';
+}
+
 function SizeGuide({sizeGuideUrl, sizePhotoSrc}: {sizeGuideUrl: string; sizePhotoSrc?: string}) {
   const [svg, setSvg] = useState('');
   const [zoomed, setZoomed] = useState(false);
+  const [photoShape, setPhotoShape] = useState('');
   const isDesktop = useIsDesktop();
   useEffect(() => {
     let cancelled = false;
@@ -393,10 +407,14 @@ function SizeGuide({sizeGuideUrl, sizePhotoSrc}: {sizeGuideUrl: string; sizePhot
       />
       {sizePhotoSrc && (
         <div
-          className={`product-size-guide-photo${isDesktop ? ' product-size-guide-zoomable' : ''}`}
+          className={`product-size-guide-photo${photoShape ? ` ${photoShape}` : ''}${isDesktop ? ' product-size-guide-zoomable' : ''}`}
           onClick={openZoom}
         >
-          <img src={sizePhotoSrc} alt="Measurement Reference" />
+          <img
+            src={sizePhotoSrc}
+            alt="Measurement Reference"
+            onLoad={(e) => setPhotoShape(photoShapeClass(e.currentTarget))}
+          />
         </div>
       )}
       {zoomed && (
