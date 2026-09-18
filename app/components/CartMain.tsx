@@ -138,6 +138,7 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
           <FreeKeycapNote
             currency={currency}
             subtotal={subtotal}
+            lines={cart?.lines?.nodes ?? []}
             cartHasItems={cartHasItems}
           />
         </div>
@@ -170,25 +171,48 @@ function FreeShippingNote({
  * Free Nhím Keycap Clicker gift note, directly under the free-shipping line.
  * Vietnam (VND carts) earns it at a subtotal threshold; every other market
  * gets it on any order, so the "added" line shows as soon as the cart has an
- * item. The gift itself is added by the Shopify discount; this is only copy.
+ * item. The gift itself is priced to zero by the "Free Nhím Keycap Clicker"
+ * Buy X get Y automatic discounts in Shopify admin; this is only copy.
+ *
+ * Shopify never counts the gift towards its own "buy" requirement, so the
+ * Vietnam threshold is measured against the cart *without* one keycap. Mirror
+ * that here or a 702.000 shirt + 120.000 keycap cart would read "added" while
+ * the keycap still costs 120.000.
  */
 const KEYCAP_GIFT_THRESHOLD_VND = 800_000;
+const KEYCAP_HANDLE = 'nhim-keycap-clicker';
 
 function FreeKeycapNote({
   currency,
   subtotal,
+  lines,
   cartHasItems,
 }: {
   currency: string;
   subtotal?: {amount?: string; currencyCode?: string};
+  lines: CartLine[];
   cartHasItems: boolean;
 }) {
   if (currency === 'VND') {
     const rule = FREE_SHIPPING_RULES.VND;
-    const remaining = KEYCAP_GIFT_THRESHOLD_VND - Number(subtotal?.amount ?? 0);
+    const keycapLines = lines.filter(
+      (line) => line.merchandise?.product?.handle === KEYCAP_HANDLE,
+    );
+    // Once the discount applies Shopify splits the free unit onto its own
+    // zero-cost line, which is the same signal CartLineItem uses for "FREE".
+    const giftApplied = keycapLines.some(
+      (line) => Number(line.cost?.totalAmount?.amount) === 0,
+    );
+    // A keycap in the cart is the one that will become the gift, so leave a
+    // single unit of it out of the counted amount.
+    const oneKeycap = Number(
+      keycapLines[0]?.cost?.amountPerQuantity?.amount ?? 0,
+    );
+    const counted = Number(subtotal?.amount ?? 0) - oneKeycap;
+    const remaining = KEYCAP_GIFT_THRESHOLD_VND - counted;
     return (
       <p className="cart-shipping-note cart-gift-note">
-        {remaining > 0
+        {!giftApplied && remaining > 0
           ? `${rule.format(remaining)} away from free Nhím Keycap Clicker`
           : 'Free Nhím Keycap Clicker added to your order'}
       </p>
