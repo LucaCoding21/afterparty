@@ -1498,7 +1498,6 @@ aside main {
 
 /* Free gift lines show "FREE" in place of a zero price */
 .cart-line-bottom .product-price .cart-line-free {
-  font-weight: 600;
   text-transform: uppercase;
 }
 

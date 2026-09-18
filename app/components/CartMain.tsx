@@ -10,6 +10,7 @@ import {
   KEYCAP_GIFT_THRESHOLD_VND,
   keycapGiftEarned,
   keycapQualifyingAmount,
+  isKeycapLine,
   type KeycapCartLike,
 } from '~/lib/keycapGift';
 
@@ -129,7 +130,7 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
         </p>
         <div>
           <ul aria-labelledby="cart-lines">
-            {(cart?.lines?.nodes ?? []).map((line) => {
+            {sortKeycapLast(cart?.lines?.nodes ?? []).map((line) => {
               // we do not render non-parent lines at the root of the cart
               if (
                 'parentRelationship' in line &&
@@ -179,6 +180,15 @@ function FreeShippingNote({
         ? `${rule.format(remaining)} away from free shipping${rule.scope}`
         : `You’re eligible for free shipping${rule.scope}`}
     </p>
+  );
+}
+
+/** The keycap always sits under the real items, whichever order it was added in. */
+function sortKeycapLast<T extends Parameters<typeof isKeycapLine>[0]>(
+  lines: T[],
+) {
+  return [...lines].sort(
+    (a, b) => Number(isKeycapLine(a)) - Number(isKeycapLine(b)),
   );
 }
 
