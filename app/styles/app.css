@@ -1455,6 +1455,16 @@ aside main {
   color: #000;
 }
 
+/* Auto-added free keycap: a label where Remove would be, no controls. */
+.cart-line-gift {
+  font-size: 0.7rem;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #bbb;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .cart-line-options {
   font-size: 0.7rem;
   color: #777;

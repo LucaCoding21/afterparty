@@ -1,4 +1,5 @@
 import type {CartReturn, HydrogenCart, I18nBase} from '@shopify/hydrogen';
+import {syncKeycapGift} from '~/lib/keycapGift';
 
 type CartContext = {
   cart: HydrogenCart;
@@ -6,7 +7,15 @@ type CartContext = {
 };
 
 /**
- * Load the cart and make sure it is priced in the visitor's market.
+ * The root loader and the /cart loader both call `getCartForMarket` in the
+ * same request. Share one promise per request so the gift sync cannot run
+ * twice in parallel and add the keycap twice.
+ */
+const inflight = new WeakMap<HydrogenCart, Promise<CartReturn | null>>();
+
+/**
+ * Load the cart, make sure it is priced in the visitor's market, and keep the
+ * free keycap gift line in step with what the cart has earned.
  *
  * A cart is priced in the currency of the country it was created in and does
  * not follow the request's `@inContext` country afterwards. That leaves two
@@ -16,24 +25,40 @@ type CartContext = {
  * re-prices the cart, which also keeps the free-shipping note in CartMain
  * (keyed by cart currency) in the right currency.
  */
-export async function getCartForMarket({
+export function getCartForMarket(context: CartContext) {
+  let pending = inflight.get(context.cart);
+  if (!pending) {
+    pending = loadCart(context);
+    inflight.set(context.cart, pending);
+  }
+  return pending;
+}
+
+async function loadCart({
   cart,
   storefront,
 }: CartContext): Promise<CartReturn | null> {
-  const current = await cart.get();
+  let current = await cart.get();
+  if (!current) return current;
+
   const country = storefront.i18n.country;
-  if (!current || current.buyerIdentity?.countryCode === country) {
-    return current;
-  }
-  try {
-    const result = await cart.updateBuyerIdentity({countryCode: country});
-    if (result.userErrors?.length) {
-      console.error('cart buyer country update failed', result.userErrors);
-      return current;
+  if (current.buyerIdentity?.countryCode !== country) {
+    try {
+      const result = await cart.updateBuyerIdentity({countryCode: country});
+      if (result.userErrors?.length) {
+        console.error('cart buyer country update failed', result.userErrors);
+      } else {
+        // Mutations return Hydrogen's minimal cart fragment (no cost, no
+        // lines), so re-read the cart with the full query fragment.
+        current = (await cart.get()) ?? current;
+      }
+    } catch (error) {
+      console.error(error);
     }
-    // Mutations return Hydrogen's minimal cart fragment (no cost, no lines),
-    // so re-read the cart with the full query fragment.
-    return (await cart.get()) ?? current;
+  }
+
+  try {
+    return await syncKeycapGift(cart, current);
   } catch (error) {
     console.error(error);
     return current;

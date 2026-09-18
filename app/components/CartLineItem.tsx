@@ -5,6 +5,7 @@ import {useVariantUrl} from '~/lib/variants';
 import {Link} from 'react-router';
 import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
+import {isKeycapGiftLine} from '~/lib/keycapGift';
 import type {
   CartApiQueryFragment,
   CartLineFragment,
@@ -31,6 +32,9 @@ export function CartLineItem({
   const visibleOptions = selectedOptions.filter(
     (o) => o.value !== 'Default Title',
   );
+  // The auto-added free keycap is managed by syncKeycapGift, so it has no
+  // remove or quantity controls: taking it out would only get it re-added.
+  const isGift = isKeycapGiftLine(line);
 
   return (
     <li key={id} className="cart-line">
@@ -62,7 +66,14 @@ export function CartLineItem({
             >
               {product.title}
             </Link>
-            <CartLineRemoveButton lineIds={[id]} disabled={!!line.isOptimistic} />
+            {isGift ? (
+              <span className="cart-line-gift">Gift</span>
+            ) : (
+              <CartLineRemoveButton
+                lineIds={[id]}
+                disabled={!!line.isOptimistic}
+              />
+            )}
           </div>
 
           {visibleOptions.length > 0 && (
@@ -81,7 +92,7 @@ export function CartLineItem({
             ) : (
               <ProductPrice price={line?.cost?.totalAmount} />
             )}
-            <CartLineQuantity line={line} />
+            {!isGift && <CartLineQuantity line={line} />}
           </div>
         </div>
       </div>

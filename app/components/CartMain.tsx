@@ -6,6 +6,12 @@ import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
 import {formatMoney} from '~/lib/money';
+import {
+  KEYCAP_GIFT_THRESHOLD_VND,
+  keycapGiftEarned,
+  keycapQualifyingAmount,
+  type KeycapCartLike,
+} from '~/lib/keycapGift';
 
 export type CartLayout = 'page' | 'aside';
 
@@ -44,9 +50,21 @@ const FREE_SHIPPING_RULES: Record<string, FreeShippingRule> = {
     format: (amount) => `${new Intl.NumberFormat('vi-VN').format(amount)} VND`,
   },
   USD: {threshold: 200, scope: '', format: formatWithSymbol('USD')},
-  KRW: {threshold: 150_000, scope: ' (Korea only)', format: formatWithSymbol('KRW')},
-  JPY: {threshold: 15_000, scope: ' (Japan only)', format: formatWithSymbol('JPY')},
-  AUD: {threshold: 200, scope: ' (Australia only)', format: formatWithSymbol('AUD')},
+  KRW: {
+    threshold: 150_000,
+    scope: ' (Korea only)',
+    format: formatWithSymbol('KRW'),
+  },
+  JPY: {
+    threshold: 15_000,
+    scope: ' (Japan only)',
+    format: formatWithSymbol('JPY'),
+  },
+  AUD: {
+    threshold: 200,
+    scope: ' (Australia only)',
+    format: formatWithSymbol('AUD'),
+  },
 };
 
 /** Currency a visitor's cart will be created in, for when there is no cart yet. */
@@ -130,17 +148,14 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
             })}
           </ul>
           {cartHasItems && (
-            <p className="cart-taxes-note">Taxes and shipping calculated at checkout</p>
+            <p className="cart-taxes-note">
+              Taxes and shipping calculated at checkout
+            </p>
           )}
           {freeShippingRule && (
             <FreeShippingNote rule={freeShippingRule} subtotal={subtotal} />
           )}
-          <FreeKeycapNote
-            currency={currency}
-            subtotal={subtotal}
-            lines={cart?.lines?.nodes ?? []}
-            cartHasItems={cartHasItems}
-          />
+          <FreeKeycapNote cart={cart} currency={currency} />
         </div>
       </div>
       {cartHasItems && <CartSummary cart={cart} layout={layout} />}
@@ -169,56 +184,32 @@ function FreeShippingNote({
 
 /**
  * Free Nhím Keycap Clicker gift note, directly under the free-shipping line.
- * Vietnam (VND carts) earns it at a subtotal threshold; every other market
- * gets it on any order, so the "added" line shows as soon as the cart has an
- * item. The gift itself is priced to zero by the "Free Nhím Keycap Clicker"
- * Buy X get Y automatic discounts in Shopify admin; this is only copy.
- *
- * Shopify never counts the gift towards its own "buy" requirement, so the
- * Vietnam threshold is measured against the cart *without* one keycap. Mirror
- * that here or a 702.000 shirt + 120.000 keycap cart would read "added" while
- * the keycap still costs 120.000.
+ * Vietnam (VND carts) earns it at a threshold; every other market gets it on
+ * any order. The keycap itself is added and priced to zero by
+ * `syncKeycapGift` in app/lib/keycapGift.ts plus the Shopify discounts; this
+ * is only copy, and it measures the cart the same way Shopify does (without
+ * the keycap).
  */
-const KEYCAP_GIFT_THRESHOLD_VND = 800_000;
-const KEYCAP_HANDLE = 'nhim-keycap-clicker';
-
 function FreeKeycapNote({
+  cart,
   currency,
-  subtotal,
-  lines,
-  cartHasItems,
 }: {
+  cart: KeycapCartLike | null | undefined;
   currency: string;
-  subtotal?: {amount?: string; currencyCode?: string};
-  lines: CartLine[];
-  cartHasItems: boolean;
 }) {
-  if (currency === 'VND') {
-    const rule = FREE_SHIPPING_RULES.VND;
-    const keycapLines = lines.filter(
-      (line) => line.merchandise?.product?.handle === KEYCAP_HANDLE,
-    );
-    // Once the discount applies Shopify splits the free unit onto its own
-    // zero-cost line, which is the same signal CartLineItem uses for "FREE".
-    const giftApplied = keycapLines.some(
-      (line) => Number(line.cost?.totalAmount?.amount) === 0,
-    );
-    // A keycap in the cart is the one that will become the gift, so leave a
-    // single unit of it out of the counted amount.
-    const oneKeycap = Number(
-      keycapLines[0]?.cost?.amountPerQuantity?.amount ?? 0,
-    );
-    const counted = Number(subtotal?.amount ?? 0) - oneKeycap;
-    const remaining = KEYCAP_GIFT_THRESHOLD_VND - counted;
+  // An empty cart has no lines yet; like the shipping note, still show the
+  // full "away from" line in Vietnam.
+  const earned = cart ? keycapGiftEarned(cart) : false;
+  if (currency === 'VND' && !earned) {
+    const remaining =
+      KEYCAP_GIFT_THRESHOLD_VND - (cart ? keycapQualifyingAmount(cart) : 0);
     return (
       <p className="cart-shipping-note cart-gift-note">
-        {!giftApplied && remaining > 0
-          ? `${rule.format(remaining)} away from free Nhím Keycap Clicker`
-          : 'Free Nhím Keycap Clicker added to your order'}
+        {`${FREE_SHIPPING_RULES.VND.format(remaining)} away from free Nhím Keycap Clicker`}
       </p>
     );
   }
-  if (!cartHasItems) return null;
+  if (!earned) return null;
   return (
     <p className="cart-shipping-note cart-gift-note">
       Free Nhím Keycap Clicker added to your order
