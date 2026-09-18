@@ -48,9 +48,10 @@ async function loadCart({
       if (result.userErrors?.length) {
         console.error('cart buyer country update failed', result.userErrors);
       } else {
-        // Mutations return Hydrogen's minimal cart fragment (no cost, no
-        // lines), so re-read the cart with the full query fragment.
-        current = (await cart.get()) ?? current;
+        // Mutations return the full cart fragment (see CART_MUTATE_FRAGMENT).
+        current = result.cart?.lines
+          ? result.cart
+          : ((await cart.get()) ?? current);
       }
     } catch (error) {
       console.error(error);

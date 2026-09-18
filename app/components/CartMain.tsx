@@ -11,6 +11,7 @@ import {
   keycapGiftEarned,
   keycapQualifyingAmount,
   isKeycapLine,
+  withOptimisticKeycapGift,
   type KeycapCartLike,
 } from '~/lib/keycapGift';
 
@@ -103,7 +104,13 @@ function getLineItemChildrenMap(lines: CartLine[]): LineItemChildrenMap {
 export function CartMain({layout, cart: originalCart}: CartMainProps) {
   // The useOptimisticCart hook applies pending actions to the cart
   // so the user immediately sees feedback when they modify the cart.
-  const cart = useOptimisticCart(originalCart);
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  // Add or drop the free keycap line optimistically too, so it shows up in
+  // the same paint as the item that earned it.
+  const cart = withOptimisticKeycapGift(
+    useOptimisticCart(originalCart),
+    rootData?.keycapVariant,
+  );
 
   const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
   const withDiscount =
@@ -112,7 +119,6 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const className = `cart-main ${withDiscount ? 'with-discount' : ''}`;
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
   const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
-  const rootData = useRouteLoaderData<RootLoader>('root');
   // An empty cart has no cost yet, so fall back to the visitor's market.
   const subtotal = cart?.cost?.subtotalAmount;
   const currency =

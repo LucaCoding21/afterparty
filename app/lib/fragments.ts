@@ -173,6 +173,17 @@ export const CART_QUERY_FRAGMENT = `#graphql
   }
 ` as const;
 
+/**
+ * Cart mutations return this instead of Hydrogen's minimal id/quantity
+ * fragment, so a mutation's result is the full cart (lines, cost, discount
+ * allocations) and the keycap gift sync never needs a follow-up read.
+ */
+export const CART_MUTATE_FRAGMENT = CART_QUERY_FRAGMENT.replace(
+  'fragment CartApiQuery on Cart',
+  'fragment CartApiMutation on Cart',
+  // Mutations do not declare the query's $numCartLines variable.
+).replace('lines(first: $numCartLines)', 'lines(first: 100)');
+
 const MENU_FRAGMENT = `#graphql
   fragment MenuItem on MenuItem {
     id

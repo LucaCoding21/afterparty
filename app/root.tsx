@@ -16,6 +16,7 @@ import type {Route} from './+types/root';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import {DEFAULT_OG_IMAGE} from '~/lib/seo';
 import {getCartForMarket} from '~/lib/cartMarket';
+import {KEYCAP_VARIANT_QUERY, type KeycapVariant} from '~/lib/keycapGift';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
@@ -45,7 +46,9 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 };
 
 export const meta: Route.MetaFunction = ({data}) => {
-  const origin = (data as {origin?: string} | undefined)?.origin ?? 'https://afterparty.space';
+  const origin =
+    (data as {origin?: string} | undefined)?.origin ??
+    'https://afterparty.space';
   const image = DEFAULT_OG_IMAGE;
   const title = 'afterparty';
   // Two separate description strings, deliberately not shared. See CLAUDE.md.
@@ -181,9 +184,23 @@ export function links() {
       fetchPriority: 'low',
     },
     {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico?v=2'},
-    {rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png?v=2'},
-    {rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png?v=2'},
-    {rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png?v=2'},
+    {
+      rel: 'icon',
+      type: 'image/png',
+      sizes: '32x32',
+      href: '/favicon-32x32.png?v=2',
+    },
+    {
+      rel: 'icon',
+      type: 'image/png',
+      sizes: '16x16',
+      href: '/favicon-16x16.png?v=2',
+    },
+    {
+      rel: 'apple-touch-icon',
+      sizes: '180x180',
+      href: '/apple-touch-icon.png?v=2',
+    },
     {rel: 'manifest', href: '/site.webmanifest?v=2'},
   ];
 }
@@ -224,7 +241,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const {storefront} = context;
   const origin = new URL(request.url).origin;
 
-  const [header, {products}] = await Promise.all([
+  const [header, {products}, keycap] = await Promise.all([
     storefront.query(HEADER_QUERY, {
       cache: storefront.CacheLong(),
       variables: {
@@ -234,7 +251,17 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     storefront.query(SEARCH_CATALOG_QUERY, {
       cache: storefront.CacheLong(),
     }),
+    // The free keycap's variant, so the cart can show the gift line
+    // optimistically while the server is still adding it.
+    storefront
+      .query(KEYCAP_VARIANT_QUERY, {cache: storefront.CacheLong()})
+      .catch((error: Error) => {
+        console.error(error);
+        return null;
+      }),
   ]);
+  const keycapVariant: KeycapVariant | null =
+    keycap?.product?.variants?.nodes?.[0] ?? null;
 
   // Lightweight product index for instant client-side search
   const searchCatalog = products.nodes.map((p: any) => ({
@@ -244,7 +271,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     price: p.variants?.nodes?.[0]?.price,
   }));
 
-  return {header, searchCatalog, origin};
+  return {header, searchCatalog, origin, keycapVariant};
 }
 
 /**
