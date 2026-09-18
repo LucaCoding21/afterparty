@@ -72,7 +72,15 @@ export function CartLineItem({
           )}
 
           <div className="cart-line-bottom">
-            <ProductPrice price={line?.cost?.totalAmount} />
+            {Number(line?.cost?.totalAmount?.amount) === 0 ? (
+              // Free gift lines (e.g. the Nhím Keycap Clicker) read "FREE"
+              // instead of a zero price so shoppers know it costs nothing.
+              <div className="product-price">
+                <span className="cart-line-free">FREE</span>
+              </div>
+            ) : (
+              <ProductPrice price={line?.cost?.totalAmount} />
+            )}
             <CartLineQuantity line={line} />
           </div>
         </div>

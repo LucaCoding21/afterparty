@@ -135,6 +135,11 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
           {freeShippingRule && (
             <FreeShippingNote rule={freeShippingRule} subtotal={subtotal} />
           )}
+          <FreeKeycapNote
+            currency={currency}
+            subtotal={subtotal}
+            cartHasItems={cartHasItems}
+          />
         </div>
       </div>
       {cartHasItems && <CartSummary cart={cart} layout={layout} />}
@@ -157,6 +162,42 @@ function FreeShippingNote({
       {remaining > 0
         ? `${rule.format(remaining)} away from free shipping${rule.scope}`
         : `You’re eligible for free shipping${rule.scope}`}
+    </p>
+  );
+}
+
+/**
+ * Free Nhím Keycap Clicker gift note, directly under the free-shipping line.
+ * Vietnam (VND carts) earns it at a subtotal threshold; every other market
+ * gets it on any order, so the "added" line shows as soon as the cart has an
+ * item. The gift itself is added by the Shopify discount; this is only copy.
+ */
+const KEYCAP_GIFT_THRESHOLD_VND = 800_000;
+
+function FreeKeycapNote({
+  currency,
+  subtotal,
+  cartHasItems,
+}: {
+  currency: string;
+  subtotal?: {amount?: string; currencyCode?: string};
+  cartHasItems: boolean;
+}) {
+  if (currency === 'VND') {
+    const rule = FREE_SHIPPING_RULES.VND;
+    const remaining = KEYCAP_GIFT_THRESHOLD_VND - Number(subtotal?.amount ?? 0);
+    return (
+      <p className="cart-shipping-note cart-gift-note">
+        {remaining > 0
+          ? `${rule.format(remaining)} away from free Nhím Keycap Clicker`
+          : 'Free Nhím Keycap Clicker added to your order'}
+      </p>
+    );
+  }
+  if (!cartHasItems) return null;
+  return (
+    <p className="cart-shipping-note cart-gift-note">
+      Free Nhím Keycap Clicker added to your order
     </p>
   );
 }

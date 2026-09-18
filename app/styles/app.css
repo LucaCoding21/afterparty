@@ -1486,6 +1486,12 @@ aside main {
   font-weight: 400;
 }
 
+/* Free gift lines show "FREE" in place of a zero price */
+.cart-line-bottom .product-price .cart-line-free {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
 /* Quantity controls */
 .cart-line-quantity {
   display: flex;
@@ -1602,6 +1608,12 @@ aside main {
   color: #555;
   text-align: left;
   margin: 0.25rem 0 1.25rem;
+}
+
+/* Free keycap gift note sits directly under the shipping note and takes over
+   its bottom margin. */
+.cart-details .cart-shipping-note:has(+ .cart-gift-note) {
+  margin-bottom: 0;
 }
 
 /* Checkout button */
