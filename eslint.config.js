@@ -32,6 +32,8 @@ export default [
       '**/*.generated.d.ts',
       '**/.react-router/',
       '**/packages/hydrogen/dist/',
+      // The keycap discount app is its own npm project with its own tooling.
+      'shopify-app/',
     ],
   },
   ...fixupConfigRules(

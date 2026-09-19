@@ -3,18 +3,23 @@ import type {CartReturn, HydrogenCart} from '@shopify/hydrogen';
 /**
  * Free Nhím Keycap Clicker gift.
  *
- * Pricing is handled by two "Free Nhím Keycap Clicker" Buy X get Y automatic
- * discounts in Shopify admin (one for Vietnam with a minimum, one for every
- * other market with none). Shopify only zeroes a keycap that is already in
- * the cart, so this module puts it there: when the cart earns the gift and
- * has no keycap yet, one is added with a hidden `_gift` attribute, and it is
- * taken out again if the cart drops below the threshold. A keycap the
- * shopper added themselves is left alone; Shopify makes that one free.
+ * Pricing is handled by the "Free Nhím Keycap Clicker" automatic discount in
+ * Shopify admin, backed by the discount function in `shopify-app/` (see
+ * shopify-app/extensions/keycap-gift). It zeroes exactly one keycap unit
+ * once the rest of the cart qualifies and never touches the other lines, so
+ * cart lines keep their ids and are not split. (The Buy X get Y discount it
+ * replaced allocated the "buy" units too, which split lines on every
+ * quantity change.)
  *
- * Shopify never counts the gift towards its own "buy" requirement, so the
- * threshold is measured on everything in the cart *except* keycaps. The
- * Vietnam discount stores its minimum as USD 29.90, which Shopify converts
- * to roughly 800.000 VND; keep the two in step when changing either.
+ * Shopify only zeroes a keycap that is already in the cart, so this module
+ * puts it there: when the cart earns the gift and has no keycap yet, one is
+ * added with a hidden `_gift` attribute, and it is taken out again if the
+ * cart drops below the threshold. A keycap the shopper added themselves is
+ * left alone; the discount makes that one free instead.
+ *
+ * The threshold is measured on everything in the cart *except* keycaps,
+ * exactly as the function does. `KEYCAP_GIFT_THRESHOLD_VND` mirrors the
+ * function's default config; change both together.
  */
 export const KEYCAP_HANDLE = 'nhim-keycap-clicker';
 export const KEYCAP_GIFT_THRESHOLD_VND = 800_000;
@@ -77,9 +82,13 @@ export function keycapGiftEarned(cart: KeycapCartLike) {
 }
 
 /**
- * Add or remove the auto gift line so the cart matches what it has earned.
- * Mutations return the full cart fragment, so the result is the updated
- * cart with no extra read. Returns `current` when nothing changed.
+ * Add or remove the auto gift line so the cart matches what it has earned,
+ * and collapse duplicate gift lines back to one. Duplicates happen when two
+ * requests sync the same cart at once (each sees "no keycap yet" and adds
+ * one); nothing serialises requests across Oxygen workers, so the next sync
+ * repairs it instead. Mutations return the full cart fragment, so the result
+ * is the updated cart with no extra read. Returns `current` when nothing
+ * changed.
  */
 export async function syncKeycapGift(
   cart: HydrogenCart,
@@ -87,7 +96,8 @@ export async function syncKeycapGift(
 ): Promise<CartReturn> {
   const lines = current.lines?.nodes ?? [];
   const earned = keycapGiftEarned(current);
-  const giftLine = lines.find(isKeycapGiftLine);
+  const giftLines = lines.filter(isKeycapGiftLine);
+  const [giftLine, ...extraGiftLines] = giftLines;
 
   let result;
   if (earned && !lines.some(isKeycapLine)) {
@@ -99,7 +109,11 @@ export async function syncKeycapGift(
       },
     ]);
   } else if (!earned && giftLine) {
-    result = await cart.removeLines([giftLine.id]);
+    result = await cart.removeLines(giftLines.map((line) => line.id));
+  } else if (extraGiftLines.length) {
+    result = await cart.removeLines(extraGiftLines.map((line) => line.id));
+  } else if (giftLine && (giftLine.quantity ?? 1) > 1) {
+    result = await cart.updateLines([{id: giftLine.id, quantity: 1}]);
   } else {
     return current;
   }
@@ -107,7 +121,11 @@ export async function syncKeycapGift(
     console.error('keycap gift sync failed', result.userErrors);
     return current;
   }
-  return result.cart?.lines ? result.cart : ((await cart.get()) ?? current);
+  const next = result.cart?.lines
+    ? result.cart
+    : ((await cart.get()) ?? current);
+  // A removal of extras may leave a gift line still above quantity 1.
+  return extraGiftLines.length ? syncKeycapGift(cart, next) : next;
 }
 
 /** Keycap variant as loaded by the root loader, for the optimistic line. */

@@ -401,6 +401,39 @@ export type FooterQuery = {
   >;
 };
 
+export type KeycapVariantQueryVariables = StorefrontAPI.Exact<{
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+}>;
+
+export type KeycapVariantQuery = {
+  product?: StorefrontAPI.Maybe<{
+    variants: {
+      nodes: Array<
+        Pick<
+          StorefrontAPI.ProductVariant,
+          'id' | 'title' | 'availableForSale'
+        > & {
+          image?: StorefrontAPI.Maybe<
+            Pick<
+              StorefrontAPI.Image,
+              'id' | 'url' | 'altText' | 'width' | 'height'
+            >
+          >;
+          price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+          selectedOptions: Array<
+            Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
+          >;
+          product: Pick<
+            StorefrontAPI.Product,
+            'id' | 'handle' | 'title' | 'vendor'
+          >;
+        }
+      >;
+    };
+  }>;
+};
+
 export type SearchCatalogQueryVariables = StorefrontAPI.Exact<{
   country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
   language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
@@ -1371,6 +1404,10 @@ interface GeneratedQueryTypes {
   '#graphql\n  query Footer(\n    $country: CountryCode\n    $footerMenuHandle: String!\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    menu(handle: $footerMenuHandle) {\n      ...Menu\n    }\n  }\n  #graphql\n  fragment MenuItem on MenuItem {\n    id\n    resourceId\n    tags\n    title\n    type\n    url\n  }\n  fragment ChildMenuItem on MenuItem {\n    ...MenuItem\n  }\n  fragment ParentMenuItem on MenuItem {\n    ...MenuItem\n    items {\n      ...ChildMenuItem\n    }\n  }\n  fragment Menu on Menu {\n    id\n    items {\n      ...ParentMenuItem\n    }\n  }\n\n': {
     return: FooterQuery;
     variables: FooterQueryVariables;
+  };
+  '#graphql\n  query KeycapVariant($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    product(handle: "nhim-keycap-clicker") {\n      variants(first: 1) {\n        nodes {\n          id\n          title\n          availableForSale\n          image { id url altText width height }\n          price { amount currencyCode }\n          selectedOptions { name value }\n          product { id handle title vendor }\n        }\n      }\n    }\n  }\n': {
+    return: KeycapVariantQuery;
+    variables: KeycapVariantQueryVariables;
   };
   '#graphql\n  query SearchCatalog($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    products(first: 50) {\n      nodes {\n        handle\n        title\n        featuredImage { url }\n        variants(first: 1) {\n          nodes {\n            image { url }\n            price { amount currencyCode }\n          }\n        }\n      }\n    }\n  }\n': {
     return: SearchCatalogQuery;

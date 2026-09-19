@@ -8,6 +8,7 @@ import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
 import {getCartForMarket} from '~/lib/cartMarket';
+import {syncKeycapGift} from '~/lib/keycapGift';
 
 export const meta: Route.MetaFunction = () => {
   return [{title: `afterparty | Cart`}];
@@ -76,6 +77,23 @@ export async function action({request, context}: Route.ActionArgs) {
     }
     default:
       throw new Error(`${action} cart action is not defined`);
+  }
+
+  // Settle the free keycap here, in the same response as the change that
+  // earned (or lost) it, rather than a revalidation later: the optimistic
+  // gift line then hands over to the real one without a gap in between.
+  // The loaders still run the same sync, so an error here is not fatal.
+  if (
+    result?.cart?.lines &&
+    (action === CartForm.ACTIONS.LinesAdd ||
+      action === CartForm.ACTIONS.LinesUpdate ||
+      action === CartForm.ACTIONS.LinesRemove)
+  ) {
+    try {
+      result = {...result, cart: await syncKeycapGift(cart, result.cart)};
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   const cartId = result?.cart?.id;

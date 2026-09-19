@@ -132,3 +132,29 @@ Check in this order before editing anything:
 
 Verify the live output before assuming the markup is wrong:
 `curl -sSL -A "facebookexternalhit/1.1" https://www.afterparty.space/ | grep -o '<meta[^>]*og:[^>]*>'`
+
+## Free keycap gift — the discount lives in `shopify-app/`, not in Shopify admin's discount types
+
+`shopify-app/` is a separate extension-only Shopify app (its own `package.json`,
+excluded from the storefront's ESLint) holding one discount function,
+`extensions/keycap-gift`. The "Free Nhím Keycap Clicker" automatic discount in
+admin is backed by it. Do NOT recreate the gift as a native Buy X get Y
+discount: BxGy allocates the "buy" units, which splits cart lines on every
+quantity change, gives the split-off line a new id on every mutation (stale
+Remove/+ buttons) and tags the qualifying items at checkout. The function
+targets only the keycap line, so none of that happens.
+
+- Rule: exactly one keycap unit free once the *other* lines qualify
+  (800.000 VND in Vietnam, any amount elsewhere). Keycaps never count toward
+  their own threshold. Defaults live in the function; the discount's
+  `$app.function-configuration` metafield can override them.
+- `KEYCAP_GIFT_THRESHOLD_VND` in `app/lib/keycapGift.ts` mirrors the function's
+  VND threshold. Change both together.
+- The storefront still adds/removes the gift line itself (`syncKeycapGift`, run
+  inside the cart action and in the loaders); Shopify only prices a keycap that
+  is already in the cart.
+- Deploy changes with `cd shopify-app && shopify app deploy`. Tests:
+  `cd shopify-app/extensions/keycap-gift && npm test`. Creating or editing the
+  discount itself must be done as the keycap app (client-credentials token),
+  not through `shopify store execute`; app discounts belong to the app that
+  owns the function.
