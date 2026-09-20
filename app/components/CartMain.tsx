@@ -14,6 +14,10 @@ import {
   withOptimisticKeycapGift,
   type KeycapCartLike,
 } from '~/lib/keycapGift';
+import {
+  optimisticCartSubtotal,
+  withOptimisticLineCosts,
+} from '~/lib/optimisticCart';
 
 export type CartLayout = 'page' | 'aside';
 
@@ -105,10 +109,12 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   // The useOptimisticCart hook applies pending actions to the cart
   // so the user immediately sees feedback when they modify the cart.
   const rootData = useRouteLoaderData<RootLoader>('root');
-  // Add or drop the free keycap line optimistically too, so it shows up in
-  // the same paint as the item that earned it.
+  // Hydrogen leaves line and cart totals stale while an action is pending,
+  // so fix the line totals first, then add or drop the free keycap line
+  // optimistically too, so it shows up in the same paint as the item that
+  // earned it.
   const cart = withOptimisticKeycapGift(
-    useOptimisticCart(originalCart),
+    withOptimisticLineCosts(useOptimisticCart(originalCart), originalCart),
     rootData?.keycapVariant,
   );
 
@@ -120,7 +126,7 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
   const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
   // An empty cart has no cost yet, so fall back to the visitor's market.
-  const subtotal = cart?.cost?.subtotalAmount;
+  const subtotal = optimisticCartSubtotal(cart);
   const currency =
     subtotal?.currencyCode ??
     MARKET_CURRENCY[rootData?.consent?.country ?? ''] ??

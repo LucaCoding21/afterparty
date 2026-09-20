@@ -1,5 +1,12 @@
 import {Suspense, useState, useRef, useEffect, useMemo} from 'react';
-import {Await, NavLink, useAsyncValue, useLocation, useNavigate} from 'react-router';
+import {
+  Await,
+  NavLink,
+  useAsyncValue,
+  useLocation,
+  useNavigate,
+  useRouteLoaderData,
+} from 'react-router';
 import {
   type CartViewPayload,
   useAnalytics,
@@ -11,6 +18,8 @@ import {SEARCH_ENDPOINT} from '~/components/SearchFormPredictive';
 import {shopifyImg} from '~/lib/images';
 import {formatMoney} from '~/lib/money';
 import {fuzzySearch, type CatalogProduct} from '~/lib/fuzzySearch';
+import {withOptimisticKeycapGift} from '~/lib/keycapGift';
+import type {RootLoader} from '~/root';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -535,10 +544,20 @@ function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
   );
 }
 
+/** Badge count while a change is pending, including the keycap the server is about to add or drop. */
+function useOptimisticCartCount(originalCart: CartApiQueryFragment | null) {
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  const cart = withOptimisticKeycapGift(
+    useOptimisticCart(originalCart),
+    rootData?.keycapVariant,
+  );
+  return cart?.totalQuantity ?? 0;
+}
+
 function CartBanner() {
   const originalCart = useAsyncValue() as CartApiQueryFragment | null;
-  const cart = useOptimisticCart(originalCart);
-  return <CartBadge count={cart?.totalQuantity ?? 0} />;
+  const cart = useOptimisticCartCount(originalCart);
+  return <CartBadge count={cart} />;
 }
 
 /* ── Mobile cart icon ── */
@@ -573,8 +592,8 @@ function MobileCartBadge({count}: {count: number | null}) {
 
 function MobileCartBanner() {
   const originalCart = useAsyncValue() as CartApiQueryFragment | null;
-  const cart = useOptimisticCart(originalCart);
-  return <MobileCartBadge count={cart?.totalQuantity ?? 0} />;
+  const cart = useOptimisticCartCount(originalCart);
+  return <MobileCartBadge count={cart} />;
 }
 
 function MobileCartToggle({cart}: Pick<HeaderProps, 'cart'>) {

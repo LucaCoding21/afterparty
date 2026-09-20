@@ -34,7 +34,10 @@ type CartLineLike = {
   id: string;
   quantity?: number;
   attributes?: Array<{key: string; value?: string | null}> | null;
-  cost?: {totalAmount?: {amount?: string | null} | null} | null;
+  cost?: {
+    totalAmount?: {amount?: string | null} | null;
+    amountPerQuantity?: {amount?: string | null} | null;
+  } | null;
   merchandise?: {
     price?: {amount?: string | null} | null;
     product?: {handle?: string | null} | null;
@@ -59,13 +62,21 @@ export function isKeycapGiftLine(line: CartLineLike) {
 }
 
 /**
- * A line's cost. Optimistic lines (pending adds) have no `cost` yet, only
- * the variant's price, so fall back to price x quantity for them.
+ * A line's cost, as unit price x quantity. `cost.totalAmount` is not used
+ * when a unit price is known because it goes stale in the optimistic cart:
+ * `useOptimisticCart` changes `quantity` on a pending quantity update (and
+ * on a repeat add of the same variant) but leaves `cost` as the server last
+ * returned it. Only the VND rule compares an amount against a threshold, so
+ * that stale total made the gift wait for the server round trip in Vietnam
+ * while it appeared instantly elsewhere. Pending adds of a new variant have
+ * no `cost` at all, only the variant's price.
  */
 function lineAmount(line: CartLineLike) {
-  const cost = line.cost?.totalAmount?.amount;
-  if (cost != null) return Number(cost);
-  return Number(line.merchandise?.price?.amount ?? 0) * (line.quantity ?? 1);
+  const quantity = line.quantity ?? 1;
+  const unit =
+    line.cost?.amountPerQuantity?.amount ?? line.merchandise?.price?.amount;
+  if (unit != null) return Number(unit) * quantity;
+  return Number(line.cost?.totalAmount?.amount ?? 0);
 }
 
 /** What Shopify measures the discount against: the cart without keycaps. */
