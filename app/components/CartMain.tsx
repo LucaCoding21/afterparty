@@ -221,7 +221,7 @@ function FreeKeycapNote({
 }) {
   // An empty cart has no lines yet; like the shipping note, still show the
   // full "away from" line in Vietnam.
-  const earned = cart ? keycapGiftEarned(cart) : false;
+  const earned = cart ? keycapGiftEarned(cart, currency) : false;
   if (currency === 'VND' && !earned) {
     const remaining =
       KEYCAP_GIFT_THRESHOLD_VND - (cart ? keycapQualifyingAmount(cart) : 0);

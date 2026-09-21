@@ -86,8 +86,18 @@ export function keycapQualifyingAmount(cart: KeycapCartLike) {
     .reduce((sum, line) => sum + lineAmount(line), 0);
 }
 
-export function keycapGiftEarned(cart: KeycapCartLike) {
-  const currency = cart.cost?.subtotalAmount?.currencyCode;
+/**
+ * `fallbackCurrency` is the visitor's market currency, used when the cart
+ * has no cost yet. That is the case for the optimistic cart on the first
+ * add to an empty cart: Hydrogen builds it from scratch with lines only.
+ * Without it Vietnam fell through to the "any amount" rule and the gift
+ * flashed on for one round trip before the real cart took it away.
+ */
+export function keycapGiftEarned(
+  cart: KeycapCartLike,
+  fallbackCurrency?: string | null,
+) {
+  const currency = cart.cost?.subtotalAmount?.currencyCode ?? fallbackCurrency;
   const amount = keycapQualifyingAmount(cart);
   return currency === 'VND' ? amount >= KEYCAP_GIFT_THRESHOLD_VND : amount > 0;
 }
@@ -171,11 +181,16 @@ export function withOptimisticKeycapGift<
 >(cart: T, keycapVariant: KeycapVariant | null | undefined): T {
   if (!cart?.isOptimistic || !cart.lines) return cart;
   const lines = cart.lines.nodes;
-  const earned = keycapGiftEarned(cart);
+  // The keycap variant is loaded in the visitor's market, so its currency
+  // stands in for the cart's until the cart has a cost of its own.
+  const currencyCode =
+    cart.cost?.subtotalAmount?.currencyCode ??
+    keycapVariant?.price.currencyCode ??
+    'USD';
+  const earned = keycapGiftEarned(cart, currencyCode);
   const giftLine = lines.find(isKeycapGiftLine);
 
   if (earned && !lines.some(isKeycapLine) && keycapVariant?.availableForSale) {
-    const currencyCode = cart.cost?.subtotalAmount?.currencyCode ?? 'USD';
     const gift = {
       id: OPTIMISTIC_GIFT_LINE_ID,
       quantity: 1,
