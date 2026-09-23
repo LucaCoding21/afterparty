@@ -9,6 +9,22 @@ export const meta = () =>
 
 const LOOKBOOK_SECTIONS = [
   {
+    title: 'afterparty x CHIN',
+    images: [
+      '/Lookbook/afterparty x CHIN/Copy of 1.jpg',
+      '/Lookbook/afterparty x CHIN/Copy of 2.jpg',
+      '/Lookbook/afterparty x CHIN/Copy of 3.jpg',
+      '/Lookbook/afterparty x CHIN/Copy of 4.jpg',
+      '/Lookbook/afterparty x CHIN/Copy of 5.jpg',
+      '/Lookbook/afterparty x CHIN/Copy of 6.jpg',
+      '/Lookbook/afterparty x CHIN/Copy of 7.jpg',
+      '/Lookbook/afterparty x CHIN/Copy of 8.jpg',
+      '/Lookbook/afterparty x CHIN/Copy of 9.jpg',
+      '/Lookbook/afterparty x CHIN/Copy of 10.jpg',
+      '/Lookbook/afterparty x CHIN/Copy of 11.jpg',
+    ],
+  },
+  {
     title: 'afterparty x MEGAHERTZ',
     images: [
       '/Lookbook/afterparty x MEGAHERTZ/Copy of 1 - buwan.jpg',
