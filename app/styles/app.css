@@ -2395,7 +2395,7 @@ aside main {
   right: 8%;
 }
 
-/* Zoom cursor on hover */
+/* Zoom cursor, only while over the photo itself (toggled from ImageCarousel) */
 .product-image-zoomable {
   cursor: zoom-in;
 }

@@ -1107,6 +1107,7 @@ function ImageCarousel({
 }) {
   const [index, setIndex] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+  const [overPhoto, setOverPhoto] = useState(false);
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -1166,6 +1167,32 @@ function ImageCarousel({
     touchStartY.current = null;
   }
 
+  // On desktop the <img> box is wider than the photo (object-fit: contain
+  // letterboxes it), so hit-test the painted photo rather than the element.
+  // Keeps the magnifier cursor and click-to-zoom off the blank margins.
+  function isOverPhoto(e: React.MouseEvent<HTMLImageElement>) {
+    const img = e.currentTarget;
+    const {naturalWidth, naturalHeight} = img;
+    if (!naturalWidth || !naturalHeight) return false;
+    const box = img.getBoundingClientRect();
+    const scale = Math.min(box.width / naturalWidth, box.height / naturalHeight);
+    const photoWidth = naturalWidth * scale;
+    const photoHeight = naturalHeight * scale;
+    // Read object-position (computed as percentages) so this follows the CSS:
+    // product shots sit top center, model photos center center.
+    const [posX, posY] = getComputedStyle(img)
+      .objectPosition.split(' ')
+      .map((v) => parseFloat(v) / 100);
+    const left = box.left + (box.width - photoWidth) * posX;
+    const top = box.top + (box.height - photoHeight) * posY;
+    return (
+      e.clientX >= left &&
+      e.clientX <= left + photoWidth &&
+      e.clientY >= top &&
+      e.clientY <= top + photoHeight
+    );
+  }
+
   const current = images[index];
   return (
     <div className="product-image-carousel">
@@ -1175,7 +1202,7 @@ function ImageCarousel({
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
       >
-        <div className={`product-image product-image-zoomable${current?.isModel ? ' product-image-model' : ''}`} onClick={() => setZoomed(true)}>
+        <div className={`product-image${current?.isModel ? ' product-image-model' : ''}`}>
           <img
             src={shopifyImg(current?.url, {width: 1200})}
             srcSet={shopifySrcSet(current?.url, CAROUSEL_WIDTHS)}
@@ -1186,6 +1213,12 @@ function ImageCarousel({
             height={current?.height}
             fetchPriority={index === 0 ? 'high' : 'auto'}
             decoding="async"
+            className={overPhoto ? 'product-image-zoomable' : undefined}
+            onMouseMove={(e) => setOverPhoto(isOverPhoto(e))}
+            onMouseLeave={() => setOverPhoto(false)}
+            onClick={(e) => {
+              if (isOverPhoto(e)) setZoomed(true);
+            }}
           />
         </div>
         {images.length > 1 && (
