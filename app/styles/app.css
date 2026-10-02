@@ -2308,20 +2308,17 @@ aside main {
   transform-origin: center center;
 }
 
-.product-image.product-image-model img {
-  transform: scale(1);
-}
-
 /* On desktop, image fits within viewport (leave room for dot indicators) */
 @media (min-width: 45em) {
   .product-image {
     /* The carousel's -2rem margin tucks the image top under the Back/Next
        nav; pad it back down so photos with content at their top edge don't
-       collide with the nav text. Heights drop 2rem to match so the bottom
-       edge (and the dots below) stay put. Model photos override this via
-       .product-image-model's own padding. */
+       collide with the nav text. Padding plus the photo's max-height fill
+       .carousel-main exactly, so the bottom of the photo is never clipped.
+       Every photo, product shot or model, uses this one frame so clicking
+       through the carousel never shifts the photo. */
     padding-top: 2rem;
-    max-height: calc(100vh - var(--header-height) - 8rem);
+    max-height: calc(100vh - var(--header-height) - 6rem);
   }
 
   .product-image img {
@@ -2329,21 +2326,6 @@ aside main {
     max-height: calc(100vh - var(--header-height) - 8rem);
     object-fit: contain;
     object-position: top center;
-  }
-}
-
-/* Model/lifestyle photos — same height as first image */
-@media (min-width: 45em) {
-  .product-image-model {
-    max-height: calc(100vh - var(--header-height) - 6rem);
-    padding: 3rem 8rem;
-  }
-
-  .product-image-model img {
-    width: 100%;
-    max-height: calc(100vh - var(--header-height) - 10rem);
-    object-fit: contain;
-    object-position: center center;
   }
 }
 
@@ -3201,13 +3183,6 @@ html:has(.overlay.expanded) .sticky-add-to-cart {
     display: block;
     object-fit: contain;
     object-position: top center;
-  }
-  .product-image-model {
-    max-height: none;
-    padding: 0;
-  }
-  .product-image-model img {
-    max-height: none;
   }
   .carousel-arrow {
     display: none;

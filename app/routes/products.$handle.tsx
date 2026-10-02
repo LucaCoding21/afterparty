@@ -1178,8 +1178,8 @@ function ImageCarousel({
     const scale = Math.min(box.width / naturalWidth, box.height / naturalHeight);
     const photoWidth = naturalWidth * scale;
     const photoHeight = naturalHeight * scale;
-    // Read object-position (computed as percentages) so this follows the CSS:
-    // product shots sit top center, model photos center center.
+    // Read object-position (computed as percentages) so this keeps following
+    // the CSS if the photo's alignment in .product-image img ever changes.
     const [posX, posY] = getComputedStyle(img)
       .objectPosition.split(' ')
       .map((v) => parseFloat(v) / 100);
@@ -1202,7 +1202,7 @@ function ImageCarousel({
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
       >
-        <div className={`product-image${current?.isModel ? ' product-image-model' : ''}`}>
+        <div className="product-image">
           <img
             src={shopifyImg(current?.url, {width: 1200})}
             srcSet={shopifySrcSet(current?.url, CAROUSEL_WIDTHS)}
