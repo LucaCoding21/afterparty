@@ -288,8 +288,8 @@ export function Header({
               <NavLink to="/collections/outerwear" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
                 Outerwear
               </NavLink>
-              <NavLink to="/collections/pants" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
-                Pants
+              <NavLink to="/collections/bottoms" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
+                Bottoms
               </NavLink>
               <NavLink to="/collections/accessories" className={({isActive}) => `mobile-menu-link${isActive ? ' active' : ''}`} onClick={closeMobile} prefetch="intent">
                 Accessories
@@ -618,8 +618,8 @@ export function ShopSubnav() {
       <NavLink to="/collections/outerwear" className={({isActive}) => `header-subnav-link ${isActive ? 'active' : ''}`} prefetch="intent">
         Outerwear
       </NavLink>
-      <NavLink to="/collections/pants" className={({isActive}) => `header-subnav-link ${isActive ? 'active' : ''}`} prefetch="intent">
-        Pants
+      <NavLink to="/collections/bottoms" className={({isActive}) => `header-subnav-link ${isActive ? 'active' : ''}`} prefetch="intent">
+        Bottoms
       </NavLink>
       <NavLink to="/collections/accessories" className={({isActive}) => `header-subnav-link ${isActive ? 'active' : ''}`} prefetch="intent">
         Accessories
