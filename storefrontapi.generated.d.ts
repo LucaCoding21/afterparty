@@ -666,14 +666,43 @@ export type CatalogQuery = {
   };
 };
 
-export type OuterwearCollectionQueryVariables = StorefrontAPI.Exact<{
-  handle: StorefrontAPI.Scalars['String']['input'];
+export type BottomsCollectionQueryVariables = StorefrontAPI.Exact<{
   country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
   language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
 }>;
 
-export type OuterwearCollectionQuery = {
-  collection?: StorefrontAPI.Maybe<{
+export type BottomsCollectionQuery = {
+  bottoms?: StorefrontAPI.Maybe<{
+    products: {
+      nodes: Array<
+        Pick<
+          StorefrontAPI.Product,
+          'id' | 'handle' | 'title' | 'availableForSale'
+        > & {
+          featuredImage?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url'>>;
+          options: Array<Pick<StorefrontAPI.ProductOption, 'name' | 'values'>>;
+          priceRange: {
+            minVariantPrice: Pick<
+              StorefrontAPI.MoneyV2,
+              'amount' | 'currencyCode'
+            >;
+          };
+          variants: {
+            nodes: Array<
+              Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'> & {
+                selectedOptions: Array<
+                  Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
+                >;
+                image?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url'>>;
+                price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+              }
+            >;
+          };
+        }
+      >;
+    };
+  }>;
+  pants?: StorefrontAPI.Maybe<{
     products: {
       nodes: Array<
         Pick<
@@ -705,13 +734,44 @@ export type OuterwearCollectionQuery = {
   }>;
 };
 
-export type PantsCollectionQueryVariables = StorefrontAPI.Exact<{
+export type BottomsCollectionProductsFragment = {
+  products: {
+    nodes: Array<
+      Pick<
+        StorefrontAPI.Product,
+        'id' | 'handle' | 'title' | 'availableForSale'
+      > & {
+        featuredImage?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url'>>;
+        options: Array<Pick<StorefrontAPI.ProductOption, 'name' | 'values'>>;
+        priceRange: {
+          minVariantPrice: Pick<
+            StorefrontAPI.MoneyV2,
+            'amount' | 'currencyCode'
+          >;
+        };
+        variants: {
+          nodes: Array<
+            Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'> & {
+              selectedOptions: Array<
+                Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
+              >;
+              image?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url'>>;
+              price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+            }
+          >;
+        };
+      }
+    >;
+  };
+};
+
+export type OuterwearCollectionQueryVariables = StorefrontAPI.Exact<{
   handle: StorefrontAPI.Scalars['String']['input'];
   country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
   language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
 }>;
 
-export type PantsCollectionQuery = {
+export type OuterwearCollectionQuery = {
   collection?: StorefrontAPI.Maybe<{
     products: {
       nodes: Array<
@@ -1437,13 +1497,13 @@ interface GeneratedQueryTypes {
     return: CatalogQuery;
     variables: CatalogQueryVariables;
   };
+  '#graphql\n  query BottomsCollection($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    bottoms: collection(handle: "bottoms") {\n      ...BottomsCollectionProducts\n    }\n    pants: collection(handle: "pants") {\n      ...BottomsCollectionProducts\n    }\n  }\n  fragment BottomsCollectionProducts on Collection {\n    products(first: 50, sortKey: CREATED, reverse: true) {\n      nodes {\n        id\n        handle\n        title\n        availableForSale\n        featuredImage { url }\n        options { name values }\n        priceRange { minVariantPrice { amount currencyCode } }\n        variants(first: 20) {\n          nodes {\n            id\n            availableForSale\n            selectedOptions { name value }\n            image { url }\n            price { amount currencyCode }\n          }\n        }\n      }\n    }\n  }\n': {
+    return: BottomsCollectionQuery;
+    variables: BottomsCollectionQueryVariables;
+  };
   '#graphql\n  query OuterwearCollection($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      products(first: 50, sortKey: CREATED, reverse: true) {\n        nodes {\n          id\n          handle\n          title\n          availableForSale\n          featuredImage { url }\n          options { name values }\n          priceRange { minVariantPrice { amount currencyCode } }\n          variants(first: 20) {\n            nodes {\n              id\n              availableForSale\n              selectedOptions { name value }\n              image { url }\n              price { amount currencyCode }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: OuterwearCollectionQuery;
     variables: OuterwearCollectionQueryVariables;
-  };
-  '#graphql\n  query PantsCollection($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      products(first: 50, sortKey: CREATED, reverse: true) {\n        nodes {\n          id\n          handle\n          title\n          availableForSale\n          featuredImage { url }\n          options { name values }\n          priceRange { minVariantPrice { amount currencyCode } }\n          variants(first: 20) {\n            nodes {\n              id\n              availableForSale\n              selectedOptions { name value }\n              image { url }\n              price { amount currencyCode }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
-    return: PantsCollectionQuery;
-    variables: PantsCollectionQueryVariables;
   };
   '#graphql\n  query TopsShirtsCollection($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      products(first: 50, sortKey: CREATED, reverse: true) {\n        nodes {\n          id\n          handle\n          title\n          availableForSale\n          featuredImage { url }\n          options { name values }\n          priceRange { minVariantPrice { amount currencyCode } }\n          variants(first: 20) {\n            nodes {\n              id\n              availableForSale\n              selectedOptions { name value }\n              image { url }\n              price { amount currencyCode }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: TopsShirtsCollectionQuery;

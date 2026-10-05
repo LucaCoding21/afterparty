@@ -5,35 +5,44 @@ import {Price} from '~/components/Price';
 import {flattenToColorVariants, buildProductUrl} from '~/lib/collections';
 import {shopifyImg, shopifySrcSet} from '~/lib/images';
 
+// The Shopify collection is being renamed from handle "pants" to "bottoms".
+// Ask for both so the page keeps its products whichever one exists in admin.
+// Once the handle is "bottoms", the pants lookup can be removed.
 export async function loader({context}: Route.LoaderArgs) {
-  const {collection} = await context.storefront.query(COLLECTION_QUERY, {
-    variables: {handle: 'pants'},
+  const {bottoms, pants} = await context.storefront.query(COLLECTION_QUERY, {
     cache: context.storefront.CacheLong(),
   });
+  const collection = bottoms ?? pants;
   return {items: flattenToColorVariants(collection?.products?.nodes ?? [])};
 }
 
 const COLLECTION_QUERY = `#graphql
-  query BottomsCollection($handle: String!, $country: CountryCode, $language: LanguageCode)
+  query BottomsCollection($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    collection(handle: $handle) {
-      products(first: 50, sortKey: CREATED, reverse: true) {
-        nodes {
-          id
-          handle
-          title
-          availableForSale
-          featuredImage { url }
-          options { name values }
-          priceRange { minVariantPrice { amount currencyCode } }
-          variants(first: 20) {
-            nodes {
-              id
-              availableForSale
-              selectedOptions { name value }
-              image { url }
-              price { amount currencyCode }
-            }
+    bottoms: collection(handle: "bottoms") {
+      ...BottomsCollectionProducts
+    }
+    pants: collection(handle: "pants") {
+      ...BottomsCollectionProducts
+    }
+  }
+  fragment BottomsCollectionProducts on Collection {
+    products(first: 50, sortKey: CREATED, reverse: true) {
+      nodes {
+        id
+        handle
+        title
+        availableForSale
+        featuredImage { url }
+        options { name values }
+        priceRange { minVariantPrice { amount currencyCode } }
+        variants(first: 20) {
+          nodes {
+            id
+            availableForSale
+            selectedOptions { name value }
+            image { url }
+            price { amount currencyCode }
           }
         }
       }
