@@ -566,7 +566,8 @@ button.header-search-link {
   }
 }
 
-.header-subnav-link {
+.header-subnav-link,
+.header-subnav-link:visited {
   color: #999;
   text-decoration: none;
   font-family: var(--font-sans);
