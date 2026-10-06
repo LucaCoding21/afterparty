@@ -2312,21 +2312,20 @@ aside main {
 /* On desktop, image fits within viewport (leave room for dot indicators) */
 @media (min-width: 45em) {
   .product-image {
-    /* The carousel's -2rem margin tucks the image top under the Back/Next
-       nav; pad it back down so photos with content at their top edge don't
-       collide with the nav text. Padding plus the photo's max-height fill
-       .carousel-main exactly, so the bottom of the photo is never clipped.
-       Every photo, product shot or model, uses this one frame so clicking
-       through the carousel never shifts the photo. */
-    padding-top: 2rem;
+    /* One frame for every photo, product shot or model. The padding clears
+       the Back/Next nav (the carousel's -2rem margin tucks the image under
+       it) and leaves room on the sides. The photo's max-height plus the
+       vertical padding stays inside the frame and .carousel-main, so no
+       photo is ever cropped. */
     max-height: calc(100vh - var(--header-height) - 6rem);
+    padding: 3rem 8rem;
   }
 
   .product-image img {
     width: 100%;
-    max-height: calc(100vh - var(--header-height) - 8rem);
+    max-height: calc(100vh - var(--header-height) - 10rem);
     object-fit: contain;
-    object-position: top center;
+    object-position: center center;
   }
 }
 
@@ -3174,8 +3173,8 @@ html:has(.overlay.expanded) .sticky-add-to-cart {
     max-height: none;
     width: 100%;
     background: #fff;
-    /* No nav tuck-under here (margin-top is 0 above), so no compensating pad */
-    padding-top: 0;
+    /* No nav tuck-under here (margin-top is 0 above), so no frame padding */
+    padding: 0;
   }
   .product-image img {
     width: 100%;
