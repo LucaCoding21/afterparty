@@ -137,6 +137,10 @@ const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = 
     sizeGuide: '/products/size-guides/dragon-jersey.svg',
     sizePhoto: '/products/measurements/Jersey%20Size%20Chart%201.png',
   },
+  'dragon-bball-shorts': {
+    sizeGuide: '/products/size-guides/dragon-bball-shorts.svg',
+    sizePhoto: '/products/measurements/Dragon%20Bball%20Shorts%20Chart.png',
+  },
   'hater-baby-tee': {
     sizeGuide: '/products/size-guides/hater-baby-tee.svg',
     sizePhoto: '/products/measurements/2025%20Hater%20Baby%20Tee%20Size%20Chart%201.png',
