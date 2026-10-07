@@ -51,6 +51,42 @@ State classes: `.active`, `.expanded`, `.open`, `.selected`, `.disabled`, `.is-o
 2. Modify those existing rules — don't duplicate or create parallel styles
 3. New components: add styles to the end of the relevant section in `app.css`, following the comment-delimited section pattern
 
+## Product photo and size guide spacing: APPROVED, DO NOT CHANGE
+
+The owners signed off on the current product page photo sizing and size guide
+spacing on 2026-10-05, after many rounds of revisions. Do not change these rules
+in `app/styles/app.css`, not as a cleanup, a "consistency fix", or a side effect
+of another task, unless the user explicitly asks for that exact change.
+
+### Product photos (desktop, `min-width: 45em`)
+Every photo, product shot or model, uses ONE frame (commit `dbb3d4c`):
+- `.product-image`: `padding: 3rem 8rem`, `max-height: calc(100vh - var(--header-height) - 6rem)`
+- `.product-image img`: `max-height: calc(100vh - var(--header-height) - 10rem)`, `object-position: center center`
+
+Result: every photo sits 24px below the Back/Next row, all photos are the same
+size, and nothing is cropped. Tablet (`48em` to `64em`) resets the frame padding
+to `0` and shows photos edge to edge. Mobile is separate.
+
+There is deliberately no separate frame for model photos anymore
+(`.product-image-model` was removed). Do not reintroduce one, and do not give
+product shots their own frame. Two different frames are what caused close-ups to
+look jammed against the nav, model photos to jump when clicking through the
+carousel, and a 2rem crop off the bottom of product shots.
+
+### Size guides
+Approved spacing: 31px from the table to the measurement diagram, 39px from the
+diagram to Add to Cart, diagram height set by its shape bucket
+(`.product-size-guide-photo--wide/--square/--tall`). Adding a size guide for a new
+product means adding files only: an SVG table copied from the closest existing
+one in `public/products/size-guides/`, a diagram PNG cropped tight (no blank
+margin) in `public/products/measurements/`, and an entry in `SIZE_GUIDE_MAP` in
+`app/routes/products.$handle.tsx`. Never CSS.
+
+### If a change seems to need these rules
+Ask first. Then measure before and after, live site vs local, at several
+desktop window sizes (for example 1240x880, 1440x900, 1920x1080, 1100x700) plus
+tablet and mobile: gap below the nav, photo size, and pixels cropped.
+
 ## SEO & Share Cards — READ BEFORE TOUCHING META TAGS
 
 ### No `og:description` or `twitter:description`. This is deliberate.
