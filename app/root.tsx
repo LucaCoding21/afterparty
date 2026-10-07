@@ -20,6 +20,7 @@ import {KEYCAP_VARIANT_QUERY, type KeycapVariant} from '~/lib/keycapGift';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
+import {MetaPixel} from './components/MetaPixel';
 
 export type RootLoader = typeof loader;
 
@@ -357,6 +358,7 @@ export default function App() {
       <PageLayout {...data}>
         <Outlet />
       </PageLayout>
+      <MetaPixel />
     </Analytics.Provider>
   );
 }
