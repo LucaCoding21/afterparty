@@ -173,6 +173,10 @@ const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = 
     sizeGuide: '/products/size-guides/velour-track-pants.svg',
     sizePhoto: '/products/measurements/Velour%20Track%20Pants%20Chart%201.png',
   },
+  'classic-logo-sweatpants': {
+    sizeGuide: '/products/size-guides/classic-logo-sweatpants.svg',
+    sizePhoto: '/products/measurements/Classic%20Logo%20Sweatpants%20Chart.png',
+  },
   'star-letter-raglan-tee': {
     sizeGuide: '/products/size-guides/raglan-tee.svg',
     sizePhoto: '/products/measurements/2026%20Raglan%20Long%20Sleeve%20Tee%20Chart%20(1).png',
