@@ -2073,6 +2073,20 @@ aside main {
   margin: auto;
 }
 
+/* Desktop only: mobile keeps the default full-bleed crop */
+@media (min-width: 45em) {
+  [data-handle="classic-logo-sweatpants"] .product-item-img {
+    background: #fff;
+  }
+
+  [data-handle="classic-logo-sweatpants"] img {
+    width: 95%;
+    height: 95%;
+    object-fit: contain;
+    margin: auto;
+  }
+}
+
 .product-item h4 {
   font-size: 0.75rem;
   font-weight: 500;
