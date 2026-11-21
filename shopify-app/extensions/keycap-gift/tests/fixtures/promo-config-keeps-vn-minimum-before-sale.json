@@ -45,11 +45,21 @@
               }
             }
           }
-        ]
+        ],
+        "deliveryGroups": []
       },
       "shop": {
         "localTime": {
-          "blackFriday": false
+          "bfUtc7": false,
+          "bfUtc8": false,
+          "bfUtc9": false,
+          "bfIndonesia": false,
+          "bfAustralia": false,
+          "bfNewZealand": false,
+          "bfCet": false,
+          "bfUk": false,
+          "bfCanada": false,
+          "bfUnitedStates": false
         }
       },
       "discount": {
@@ -63,6 +73,11 @@
               "previewToken": "test-preview-token"
             }
           }
+        }
+      },
+      "localization": {
+        "country": {
+          "isoCode": "VN"
         }
       }
     },

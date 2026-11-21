@@ -14,6 +14,7 @@
         },
         "lines": [
           {
+            "quantity": 1,
             "cost": {
               "subtotalAmount": {
                 "amount": "120.0"
@@ -29,13 +30,23 @@
         ],
         "deliveryGroups": [
           {
-            "id": "gid://shopify/CartDeliveryGroup/1"
+            "id": "gid://shopify/CartDeliveryGroup/1",
+            "deliveryAddress": null
           }
         ]
       },
       "shop": {
         "localTime": {
-          "blackFriday": false
+          "bfUtc7": false,
+          "bfUtc8": false,
+          "bfUtc9": false,
+          "bfIndonesia": false,
+          "bfAustralia": false,
+          "bfNewZealand": false,
+          "bfCet": false,
+          "bfUk": false,
+          "bfCanada": false,
+          "bfUnitedStates": false
         }
       },
       "discount": {
@@ -49,6 +60,11 @@
               "previewToken": "test-preview-token"
             }
           }
+        }
+      },
+      "localization": {
+        "country": {
+          "isoCode": "AU"
         }
       }
     },

@@ -3,11 +3,7 @@ import type {
   HydrogenCart,
   HydrogenSession,
 } from '@shopify/hydrogen';
-import {
-  BLACK_FRIDAY_ENDS,
-  BLACK_FRIDAY_STARTS,
-  type BlackFriday,
-} from '~/lib/blackFriday';
+import {blackFridayWindow, type BlackFriday} from '~/lib/blackFriday';
 
 /**
  * Black Friday preview.
@@ -46,8 +42,13 @@ async function resolveBlackFriday(
   request: Request,
   session: HydrogenSession,
 ): Promise<BlackFridayRequestState> {
+  // The visitor's own country, not the market: everyone outside VN, KR, JP
+  // and AU shares the US market but keeps their own local time.
+  const {starts, ends} = blackFridayWindow(
+    request.headers.get('Oxygen-Buyer-Country'),
+  );
   const now = Date.now();
-  const live = now >= BLACK_FRIDAY_STARTS && now < BLACK_FRIDAY_ENDS;
+  const live = now >= starts && now < ends;
 
   let token: string | null = session.get(PREVIEW_SESSION_KEY) ?? null;
   const param = new URL(request.url).searchParams.get(PREVIEW_PARAM);
@@ -62,7 +63,7 @@ async function resolveBlackFriday(
   }
 
   const preview =
-    !live && now < BLACK_FRIDAY_ENDS && token !== null
+    !live && now < ends && token !== null
       ? await isPreviewToken(token)
       : false;
   return {on: live || preview, preview, previewToken: preview ? token : null};

@@ -21,14 +21,13 @@ const DEFAULT_CONFIG = {
   promo: null,
 };
 
-/**
- * The sale window itself is in the input queries (`blackFriday:
- * dateTimeBetween(...)`, store timezone), since a function has no clock.
- */
 const PROMO_DEFAULTS = {
   /** Gift minimum during the sale: none anywhere. */
   giftMinimumByCurrency: {},
-  /** Free shipping threshold per cart currency; a missing currency gets none. */
+  /**
+   * Free shipping threshold per checkout currency, on the subtotal the
+   * customer pays for (the free gift excluded). A missing currency gets none.
+   */
   freeShippingMinimumByCurrency: {
     VND: 0,
     KRW: 100000,
@@ -43,6 +42,38 @@ const PROMO_DEFAULTS = {
   previewToken: null,
 };
 
+/**
+ * Black Friday runs 27/11 00:00 to 30/11 23:59 in the customer's local
+ * time, by shipping country. A function has no clock, so each window is a
+ * `shop.localTime.dateTimeBetween` alias in the input queries, written in
+ * the store's timezone (Vietnam, UTC+7). Countries spanning several time
+ * zones start at midnight in their easternmost zone and end at midnight in
+ * their westernmost, so nobody loses sale hours. Only countries with a
+ * shipping zone are listed; anything else falls back to Vietnam time.
+ * Mirrored in app/lib/blackFriday.ts.
+ */
+const WINDOW_BY_COUNTRY = {
+  VN: 'bfUtc7',
+  TH: 'bfUtc7',
+  SG: 'bfUtc8',
+  MY: 'bfUtc8',
+  HK: 'bfUtc8',
+  TW: 'bfUtc8',
+  PH: 'bfUtc8',
+  KR: 'bfUtc9',
+  JP: 'bfUtc9',
+  ID: 'bfIndonesia',
+  AU: 'bfAustralia',
+  NZ: 'bfNewZealand',
+  DE: 'bfCet',
+  FR: 'bfCet',
+  NL: 'bfCet',
+  GB: 'bfUk',
+  CA: 'bfCanada',
+  US: 'bfUnitedStates',
+};
+const DEFAULT_WINDOW = 'bfUtc7';
+
 export function readConfig(input) {
   const config = {
     ...DEFAULT_CONFIG,
@@ -52,8 +83,18 @@ export function readConfig(input) {
   return config;
 }
 
+/** The shipping address's country once checkout has one, the market's before. */
+function shippingCountry(input) {
+  for (const group of input.cart.deliveryGroups) {
+    const code = group.deliveryAddress?.countryCode;
+    if (code) return code;
+  }
+  return input.localization.country.isoCode;
+}
+
 export function promoActive(input, promo) {
-  if (input.shop.localTime.blackFriday) return true;
+  const window = WINDOW_BY_COUNTRY[shippingCountry(input)] ?? DEFAULT_WINDOW;
+  if (input.shop.localTime[window]) return true;
   return Boolean(
     promo.previewToken && input.cart.bfPreview?.value === promo.previewToken,
   );
@@ -66,7 +107,7 @@ export function isGiftLine(line, config) {
   );
 }
 
-/** Thresholds are measured on everything except the gift product. */
+/** Gift thresholds are measured on everything except the gift product. */
 export function qualifyingAmount(lines, config) {
   return lines
     .filter((line) => !isGiftLine(line, config))

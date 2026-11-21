@@ -169,7 +169,11 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
             </p>
           )}
           {blackFriday ? (
-            <BlackFridayShippingNote cart={cart} currency={currency} />
+            <BlackFridayShippingNote
+              cart={cart}
+              currency={currency}
+              subtotal={subtotal}
+            />
           ) : (
             freeShippingRule && (
               <FreeShippingNote rule={freeShippingRule} subtotal={subtotal} />
@@ -209,19 +213,21 @@ function FreeShippingNote({
 /**
  * Free-shipping note while Black Friday is on (app/lib/blackFriday.ts),
  * worded as the client asked. Vietnam ships free on every order; every
- * other market counts down to its sale threshold, measured like the
- * checkout discount: on the cart without keycaps.
+ * other market counts down to its sale threshold on the subtotal, as the
+ * checkout discount measures it (the free keycap counts as 0).
  */
 function BlackFridayShippingNote({
   cart,
   currency,
+  subtotal,
 }: {
   cart: KeycapCartLike | null | undefined;
   currency: string;
+  subtotal?: {amount?: string};
 }) {
   const threshold = BLACK_FRIDAY_FREE_SHIPPING[currency];
   if (threshold === undefined) return null;
-  const amount = cart ? keycapQualifyingAmount(cart) : 0;
+  const amount = Number(subtotal?.amount ?? 0);
   const eligible =
     currency === 'VND'
       ? Boolean(cart?.lines?.nodes?.length)

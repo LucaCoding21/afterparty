@@ -1,0 +1,75 @@
+{
+  "payload": {
+    "export": "cart-delivery-options-discounts-generate-run",
+    "target": "cart.delivery-options.discounts.generate.run",
+    "input": {
+      "cart": {
+        "bfPreview": null,
+        "cost": {
+          "subtotalAmount": {
+            "currencyCode": "USD"
+          }
+        },
+        "lines": [
+          {
+            "quantity": 1,
+            "cost": {
+              "subtotalAmount": {
+                "amount": "150.0"
+              }
+            },
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "product": {
+                "handle": "nhim-short-sleeve-tee"
+              }
+            }
+          }
+        ],
+        "deliveryGroups": [
+          {
+            "id": "gid://shopify/CartDeliveryGroup/1",
+            "deliveryAddress": {
+              "countryCode": "GB"
+            }
+          }
+        ]
+      },
+      "shop": {
+        "localTime": {
+          "bfUtc7": false,
+          "bfUtc8": false,
+          "bfUtc9": false,
+          "bfIndonesia": false,
+          "bfAustralia": false,
+          "bfNewZealand": false,
+          "bfCet": false,
+          "bfUk": false,
+          "bfCanada": false,
+          "bfUnitedStates": true
+        }
+      },
+      "discount": {
+        "discountClasses": [
+          "PRODUCT",
+          "SHIPPING"
+        ],
+        "metafield": {
+          "jsonValue": {
+            "promo": {
+              "previewToken": "test-preview-token"
+            }
+          }
+        }
+      },
+      "localization": {
+        "country": {
+          "isoCode": "US"
+        }
+      }
+    },
+    "output": {
+      "operations": []
+    }
+  }
+}
