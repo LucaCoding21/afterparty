@@ -2464,6 +2464,27 @@ aside main {
   }
 }
 
+/* Desktop (mouse): the bare grey X got lost over the photo, so give it a
+   solid white circle. The size guide popup's inset X is left as is. */
+@media (hover: hover) and (min-width: 48em) {
+  .zoom-close:not(.zoom-close--inset) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    background: var(--color-light);
+    border-radius: 50%;
+    box-shadow: 0 1px 7px rgba(0, 0, 0, 0.14);
+    opacity: 1;
+  }
+
+  .zoom-close:not(.zoom-close--inset):hover {
+    background: #f2f2f2;
+  }
+}
+
 /* Dots */
 .carousel-dots {
   display: flex;
