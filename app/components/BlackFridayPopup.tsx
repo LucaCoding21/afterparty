@@ -1,7 +1,7 @@
 import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 
 // Shown once per page load: a refresh or a new visit loads fresh JS and shows
-// it again, but coming back to the homepage through the site's own links
+// it again, but coming back to Shop All through the site's own links
 // (client-side navigation) keeps this flag and skips it.
 let shownThisPageLoad = false;
 
@@ -14,7 +14,7 @@ export function BlackFridayPopup() {
   // Lets StrictMode's double effect run recognise this same instance.
   const isOwner = useRef(false);
 
-  // Runs before paint, so a repeat visit to the homepage never flashes it.
+  // Runs before paint, so a repeat visit to Shop All never flashes it.
   useIsomorphicLayoutEffect(() => {
     if (isOwner.current) return;
     if (shownThisPageLoad) {

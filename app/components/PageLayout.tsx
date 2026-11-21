@@ -52,7 +52,7 @@ export function PageLayout({
       <main>{children}</main>
       <Footer />
       {/* Only while the sale is on (or previewed), see app/lib/blackFriday.ts. */}
-      {blackFriday?.on && location.pathname === '/' && (
+      {blackFriday?.on && location.pathname === '/collections/all' && (
         <BlackFridayPopup />
       )}
     </Aside.Provider>
