@@ -125,53 +125,85 @@ Download URLs to `/tmp` and Read them to pick the hero (back/graphic) per color.
 The fitting table is 100% front-end, keyed by **product handle** in
 `SIZE_GUIDE_MAP` in `app/routes/products.$handle.tsx`. Shopify only supplies the
 handle. Two assets per product:
-- `sizeGuide`: a hand-built SVG in `public/products/size-guides/`.
-- `sizePhoto` (optional): the measurement diagram the user gives, dropped in
-  `public/products/measurements/` (URL-encode spaces as `%20`; keep `()` literal).
+- `sizeGuide`: an SVG table in `public/products/size-guides/`.
+- `sizePhoto` (optional): the measurement diagram, in `public/products/measurements/`.
 
-### B1. Wire it
+**Every table and diagram is made with `scripts/size-guide.py`. Never hand-write
+an SVG or hand-crop a diagram.** The script holds the house format, so new guides
+match the existing ones exactly with no measuring or nudging.
+
+### B0. What the designer hands over (one folder per drop)
+For each product, two exports named after the product title:
+- `<Product Name> Chart <year>.png`: the full chart (diagram + table). This is
+  where the numbers are read from.
+- `<Product Name> Chart <year> 2.png` (or a second file with the same name):
+  the diagram alone, no table. This becomes the `sizePhoto`.
+Chart rules to check before building, and to send back to the designer if broken:
+- Sizes are S/M/L, S/M/L/XL or ONE SIZE (the table supports 1, 3 or 4 sizes).
+- 1 to 6 rows, values in cm, numbers only (half sizes like 22.5 are fine).
+- Every measurement drawn on the diagram has a row in the table, and the other
+  way round. (The Nov 2026 jeans drew "thigh" with no thigh row: flag that.)
+- The diagram export is at least ~800px tall so it stays sharp on retina.
+When two products measure identically and their diagrams are the same drawing,
+they share one table and one diagram (e.g. `letter-tees.svg` for the Graffiti and
+Mystic tees).
+
+### B1. Build the table
+Read the numbers off the full chart (zoom into it; the jeans text is small) and run:
+```bash
+python3 scripts/size-guide.py table <name> --sizes S,M,L,XL \
+  --row "WIDTH=57,59,61,63" --row "LENGTH=65,67,69,71" --row "SLEEVE LENGTH=17,18,19,20"
+```
+`<name>` is the handle (or a shared name like `letter-tees`). Row labels in
+CAPS, in the chart's order. Standard labels: tops WIDTH / LENGTH / SLEEVE LENGTH;
+bottoms WAIST / RISE / THIGH / INSEAM / LENGTH / LEG OPENING.
+
+### B2. Prepare the diagram
+```bash
+python3 scripts/size-guide.py diagram "<designer's diagram-only file>" "<Product Name> Chart <year>"
+```
+It crops to the drawing (the approved spacing assumes zero blank margin),
+saves the PNG and prints the shape bucket (wide / square / tall) the page will
+use and the `sizePhoto` path to paste. Diagram height on the page comes from
+the bucket, so no CSS is ever needed.
+
+### B3. Wire it
 Add an entry keyed by the **exact** handle (a mismatch = silently no guide):
 ```ts
 '<handle>': {
   sizeGuide: '/products/size-guides/<name>.svg',
-  sizePhoto: '/products/measurements/<Photo>%20(1).png',
+  sizePhoto: '/products/measurements/<Product%20Name>%20Chart%20<year>.png',
 },
 ```
-Reuse an existing SVG/photo when the fit matches (e.g. both MHZ tees vs raglan;
-the MHZ raglan reuses `raglan-tee.svg` + the raglan long-sleeve photo). Multiple
-handles can point at the same files.
+Confirm the handle in Shopify (A1 audit) rather than guessing it from the title.
 
-### B2. SVG geometry (house format — match exactly)
-- `viewBox="0 0 441 H"` — **width always 441**; `H = 41 + 51 × <dataRows> + ~0.5`
-  (3 rows → 196; 6 rows → 348).
-- Horizontal divider `<line>`s at y = `0.5, 41, 92, 144, 195.5, 246.5, 297.5, 347.5…`
-  (header band 41 tall, each data row ~51).
-- Text baselines: header `y=26`; data rows `70, 121.5, 173.3, 224.5, 275.5, 326`.
-- Label column at `x=14` (left-aligned), `fill="#111"`. Values `fill="#000"`,
-  `text-anchor="middle"`. Font `'Inter var', 'Inter', sans-serif`.
-- Column centers:
-  - **3 sizes (S/M/L):** `141, 261, 381`.
-  - **4 sizes (S/M/L/XL):** `161, 241, 321, 401` (label region 0–121).
-  - **ONE SIZE:** single centered value at `x=275`.
-- Note: CSS (`.product-size-guide-svg text`) forces `font-size: 0.7rem !important`
-  and scales the 441 viewBox to the container — so the `font-size` attrs in the
-  SVG are stripped/ignored; geometry (positions) is what matters.
-- Rows are garment flat-lay measurements in **cm** (e.g. WIDTH / LENGTH /
-  SLEEVE LENGTH; pants: WAIST / RISE / THIGH / INSEAM / LENGTH / LEG OPENING).
-  Match the row labels and `cm` values to the user's screenshot exactly.
+### B4. Check
+```bash
+python3 scripts/size-guide.py check   # every entry: files exist, house format, tight crop
+npm run typecheck
+```
+### B4b. Always finish with a preview link (the user expects this every time)
+With the dev server running, build the comparison page. Pair each new handle
+with a live product of the same kind (tee → `afterparty-x-megahertz-logo-t-shirt`,
+button jersey → `dragon-jersey`, flared pants → `leopard-flared-pants`,
+straight/wide pants → `classic-logo-sweatpants`) and pass the designer's full
+chart for each:
+```bash
+node scripts/size-guide-preview.mjs --out <scratchpad>/size-guide-preview \
+  --pair "<new-handle>=<reference-handle>" --chart "<new-handle>=<full chart file>" ...
+```
+It renders the real product page at desktop 1440 and mobile 390 (drafts work,
+because the new files are swapped into the reference product's page), measures
+the gaps, and exits non-zero if any gap isn't 31px / 39px. Then publish
+`<out>/index.html` with the Artifact tool, passing every file in `<out>/img` as
+`files` (root = `<out>`), and give the user the private link. Look at the
+screenshots before publishing; fix anything that looks off first.
 
-Fastest path: copy the closest existing SVG (e.g. `bubble-letter-ringer-tee.svg`
-for a 4-size tee) and swap the numbers, labels, and column centers.
-
-### B3. Tee front/back ordering
+### B5. Tee front/back ordering
 Tees whose variant image is the **back/graphic** (logo on front) should show the
 front first on the PDP — add the handle to `FRONT_FIRST_HANDLES` in
 `DynamicProductPage` (e.g. the Nhím tees, MHZ logo tee). Ringer tees put the
 graphic on the front (single flat-lay per color) and don't need it.
-
-### B4. Verify
-`npm run typecheck`, confirm the photo file exists, and (if asked) run the dev
-server to screenshot the PDP with the Size Guide dropdown open.
 
 ---
 
@@ -180,7 +212,8 @@ server to screenshot the PDP with the Size Guide dropdown open.
 2. **Audit** (A1) → report blockers.
 3. Read the size screenshots and the product images; confirm colors/prices.
 4. **Variants** (A3) → build Color × Size, verify.
-5. **Size guide** (B) → create/reuse SVG, add measurement photo, wire
-   `SIZE_GUIDE_MAP`, typecheck.
+5. **Size guide** (B) → `scripts/size-guide.py table` + `diagram`, wire
+   `SIZE_GUIDE_MAP`, then `size-guide.py check`, typecheck, and the preview
+   link (B4b).
 6. Hand back the launch checklist (stock, set Active, publish to headless) — the
    owner does those.

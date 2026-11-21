@@ -77,10 +77,19 @@ carousel, and a 2rem crop off the bottom of product shots.
 Approved spacing: 31px from the table to the measurement diagram, 39px from the
 diagram to Add to Cart, diagram height set by its shape bucket
 (`.product-size-guide-photo--wide/--square/--tall`). Adding a size guide for a new
-product means adding files only: an SVG table copied from the closest existing
-one in `public/products/size-guides/`, a diagram PNG cropped tight (no blank
-margin) in `public/products/measurements/`, and an entry in `SIZE_GUIDE_MAP` in
-`app/routes/products.$handle.tsx`. Never CSS.
+product means adding files only, never CSS:
+- the SVG table, built with `python3 scripts/size-guide.py table ...` into
+  `public/products/size-guides/` (never hand-written or copied and edited)
+- the diagram PNG, cropped with `python3 scripts/size-guide.py diagram ...` into
+  `public/products/measurements/`
+- an entry in `SIZE_GUIDE_MAP` in `app/routes/products.$handle.tsx`, keyed by
+  the exact Shopify handle
+
+Run `python3 scripts/size-guide.py check` before committing; it must report
+0 problems. Then always finish by building the old-vs-new preview with
+`node scripts/size-guide-preview.mjs` and giving the user the private Artifact
+link. The full steps, including what the designer hands over, are in section B
+of `.claude/skills/launch-prep/SKILL.md`.
 
 ### If a change seems to need these rules
 Ask first. Then measure before and after, live site vs local, at several

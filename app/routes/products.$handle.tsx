@@ -86,6 +86,32 @@ const SIZE_GUIDE_MAP: Record<string, {sizeGuide: string; sizePhoto?: string}> = 
     sizeGuide: '/products/size-guides/megahertz-zip-hoodie.svg',
     sizePhoto: '/products/measurements/MHZ%20Zip%20Hoodie%20Chart%20(1).png',
   },
+  // Nov 2026 drop. The Graffiti and Mystic tees measure identically and share
+  // one diagram, so both point at the same files.
+  'graffiti-letter-tee': {
+    sizeGuide: '/products/size-guides/letter-tees.svg',
+    sizePhoto: '/products/measurements/Letter%20Tee%20Chart%202026.png',
+  },
+  'mystic-letter-tee': {
+    sizeGuide: '/products/size-guides/letter-tees.svg',
+    sizePhoto: '/products/measurements/Letter%20Tee%20Chart%202026.png',
+  },
+  'script-letter-football-jersey': {
+    sizeGuide: '/products/size-guides/script-letter-football-jersey.svg',
+    sizePhoto: '/products/measurements/Script%20Letter%20Football%20Jersey%20Chart%202026.png',
+  },
+  'glitter-baseball-jersey': {
+    sizeGuide: '/products/size-guides/glitter-baseball-jersey.svg',
+    sizePhoto: '/products/measurements/Glitter%20Baseball%20Jersey%20Chart%202026.png',
+  },
+  'star-studded-flared-jeans': {
+    sizeGuide: '/products/size-guides/star-studded-flared-jeans.svg',
+    sizePhoto: '/products/measurements/Star%20Studded%20Flared%20Jeans%20Chart%202026.png',
+  },
+  'glitter-straight-fit-jeans': {
+    sizeGuide: '/products/size-guides/glitter-straight-fit-jeans.svg',
+    sizePhoto: '/products/measurements/Glitter%20Straight%20Fit%20Jeans%20Chart%202026.png',
+  },
   'bubble-letter-ringer-tee': {
     sizeGuide: '/products/size-guides/bubble-letter-ringer-tee.svg',
     sizePhoto: '/products/measurements/Ringer%20Short%20Sleeve%20Tee%20Chart%202.png',
