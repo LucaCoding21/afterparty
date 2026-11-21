@@ -8,6 +8,7 @@ import {Aside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
 import {Header, ShopSubnav} from '~/components/Header';
 import {CartMain} from '~/components/CartMain';
+import {BlackFridayPopup} from '~/components/BlackFridayPopup';
 
 type SearchCatalogItem = {handle: string; title: string; image: string; price?: {amount: string; currencyCode: string}};
 
@@ -47,6 +48,7 @@ export function PageLayout({
       {isCollectionPage && <ShopSubnav />}
       <main>{children}</main>
       <Footer />
+      {location.pathname === '/collections/all' && <BlackFridayPopup />}
     </Aside.Provider>
   );
 }
