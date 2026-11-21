@@ -5,7 +5,7 @@
   <line y1="144" x2="441" y2="144" stroke="#D8D8D8" stroke-opacity="0.4"/>
   <line y1="195.5" x2="441" y2="195.5" stroke="#D8D8D8" stroke-opacity="0.4"/>
   <line y1="246.5" x2="441" y2="246.5" stroke="#D8D8D8" stroke-opacity="0.4"/>
-  <line y1="297.5" x2="441" y2="297.5" stroke="#D8D8D8" stroke-opacity="0.4"/>
+  <line y1="296.5" x2="441" y2="296.5" stroke="#D8D8D8" stroke-opacity="0.4"/>
   <text x="14" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11">SIZE</text>
   <text x="141" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11" text-anchor="middle">S</text>
   <text x="261" y="26" fill="#111" font-family="'Inter var', 'Inter', sans-serif" font-size="11" text-anchor="middle">M</text>
