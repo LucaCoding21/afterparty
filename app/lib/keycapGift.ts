@@ -19,7 +19,9 @@ import type {CartReturn, HydrogenCart} from '@shopify/hydrogen';
  *
  * The threshold is measured on everything in the cart *except* keycaps,
  * exactly as the function does. `KEYCAP_GIFT_THRESHOLD_VND` mirrors the
- * function's default config; change both together.
+ * function's default config; change both together. During Black Friday
+ * (`blackFriday` true, see app/lib/blackFriday.ts) there is no threshold
+ * anywhere: every order earns the gift.
  */
 export const KEYCAP_HANDLE = 'nhim-keycap-clicker';
 export const KEYCAP_GIFT_THRESHOLD_VND = 800_000;
@@ -96,10 +98,13 @@ export function keycapQualifyingAmount(cart: KeycapCartLike) {
 export function keycapGiftEarned(
   cart: KeycapCartLike,
   fallbackCurrency?: string | null,
+  blackFriday = false,
 ) {
   const currency = cart.cost?.subtotalAmount?.currencyCode ?? fallbackCurrency;
   const amount = keycapQualifyingAmount(cart);
-  return currency === 'VND' ? amount >= KEYCAP_GIFT_THRESHOLD_VND : amount > 0;
+  return currency === 'VND' && !blackFriday
+    ? amount >= KEYCAP_GIFT_THRESHOLD_VND
+    : amount > 0;
 }
 
 /**
@@ -114,9 +119,10 @@ export function keycapGiftEarned(
 export async function syncKeycapGift(
   cart: HydrogenCart,
   current: CartReturn,
+  blackFriday = false,
 ): Promise<CartReturn> {
   const lines = current.lines?.nodes ?? [];
-  const earned = keycapGiftEarned(current);
+  const earned = keycapGiftEarned(current, null, blackFriday);
   const giftLines = lines.filter(isKeycapGiftLine);
   const [giftLine, ...extraGiftLines] = giftLines;
 
@@ -146,7 +152,9 @@ export async function syncKeycapGift(
     ? result.cart
     : ((await cart.get()) ?? current);
   // A removal of extras may leave a gift line still above quantity 1.
-  return extraGiftLines.length ? syncKeycapGift(cart, next) : next;
+  return extraGiftLines.length
+    ? syncKeycapGift(cart, next, blackFriday)
+    : next;
 }
 
 /** Keycap variant as loaded by the root loader, for the optimistic line. */
@@ -178,7 +186,11 @@ export function withOptimisticKeycapGift<
     | (KeycapCartLike & {isOptimistic?: boolean; totalQuantity?: number})
     | null
     | undefined,
->(cart: T, keycapVariant: KeycapVariant | null | undefined): T {
+>(
+  cart: T,
+  keycapVariant: KeycapVariant | null | undefined,
+  blackFriday = false,
+): T {
   if (!cart?.isOptimistic || !cart.lines) return cart;
   const lines = cart.lines.nodes;
   // The keycap variant is loaded in the visitor's market, so its currency
@@ -187,7 +199,7 @@ export function withOptimisticKeycapGift<
     cart.cost?.subtotalAmount?.currencyCode ??
     keycapVariant?.price.currencyCode ??
     'USD';
-  const earned = keycapGiftEarned(cart, currencyCode);
+  const earned = keycapGiftEarned(cart, currencyCode, blackFriday);
   const giftLine = lines.find(isKeycapGiftLine);
 
   if (earned && !lines.some(isKeycapLine) && keycapVariant?.availableForSale) {

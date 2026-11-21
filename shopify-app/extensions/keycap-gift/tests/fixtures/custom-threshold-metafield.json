@@ -4,6 +4,7 @@
     "target": "cart.lines.discounts.generate.run",
     "input": {
       "cart": {
+        "bfPreview": null,
         "cost": {
           "subtotalAmount": {
             "currencyCode": "VND"
@@ -45,6 +46,11 @@
             }
           }
         ]
+      },
+      "shop": {
+        "localTime": {
+          "blackFriday": false
+        }
       },
       "discount": {
         "discountClasses": [

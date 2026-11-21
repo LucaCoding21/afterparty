@@ -1,5 +1,8 @@
 query CartInput {
   cart {
+    bfPreview: attribute(key: "_bf_preview") {
+      value
+    }
     cost {
       subtotalAmount {
         currencyCode
@@ -24,6 +27,14 @@ query CartInput {
           }
         }
       }
+    }
+  }
+  shop {
+    localTime {
+      blackFriday: dateTimeBetween(
+        startDateTime: "2026-11-27T00:00:00"
+        endDateTime: "2026-12-01T00:00:00"
+      )
     }
   }
   discount {

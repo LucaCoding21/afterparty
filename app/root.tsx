@@ -16,6 +16,8 @@ import type {Route} from './+types/root';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import {DEFAULT_OG_IMAGE} from '~/lib/seo';
 import {getCartForMarket} from '~/lib/cartMarket';
+import {getBlackFriday} from '~/lib/blackFriday.server';
+import type {BlackFriday} from '~/lib/blackFriday';
 import {KEYCAP_VARIANT_QUERY, type KeycapVariant} from '~/lib/keycapGift';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
@@ -207,8 +209,18 @@ export function links() {
 }
 
 export async function loader(args: Route.LoaderArgs) {
+  // Whether the Black Friday rules apply to this visitor (live or preview).
+  // No network, so it is settled before the cart starts loading.
+  const {previewToken, ...blackFriday} = await getBlackFriday(
+    args.request,
+    args.context.session,
+  );
+
   // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
+  const deferredData = loadDeferredData(args, {
+    on: blackFriday.on,
+    previewToken,
+  });
 
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
@@ -218,6 +230,7 @@ export async function loader(args: Route.LoaderArgs) {
   return {
     ...deferredData,
     ...criticalData,
+    blackFriday: blackFriday satisfies BlackFriday,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
     shop: getShopAnalytics({
       storefront,
@@ -280,7 +293,10 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
  * fetched after the initial page load. If it's unavailable, the page should still 200.
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
-function loadDeferredData({context}: Route.LoaderArgs) {
+function loadDeferredData(
+  {context}: Route.LoaderArgs,
+  blackFriday: {on: boolean; previewToken: string | null},
+) {
   const {storefront, customerAccount, cart} = context;
 
   // defer the footer query (below the fold)
@@ -297,10 +313,12 @@ function loadDeferredData({context}: Route.LoaderArgs) {
       return null;
     });
   return {
-    cart: getCartForMarket({cart, storefront}).catch((error: Error) => {
-      console.error(error);
-      return null;
-    }),
+    cart: getCartForMarket({cart, storefront}, blackFriday).catch(
+      (error: Error) => {
+        console.error(error);
+        return null;
+      },
+    ),
     isLoggedIn: customerAccount.isLoggedIn(),
     footer,
   };

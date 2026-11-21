@@ -1,10 +1,14 @@
 import type {CartReturn, HydrogenCart, I18nBase} from '@shopify/hydrogen';
 import {syncKeycapGift} from '~/lib/keycapGift';
+import {syncBlackFridayPreview} from '~/lib/blackFriday.server';
 
 type CartContext = {
   cart: HydrogenCart;
   storefront: {i18n: I18nBase};
 };
+
+/** From `getBlackFriday` in app/lib/blackFriday.server.ts. */
+type BlackFridayState = {on: boolean; previewToken: string | null};
 
 /**
  * The root loader and the /cart loader both call `getCartForMarket` in the
@@ -25,19 +29,22 @@ const inflight = new WeakMap<HydrogenCart, Promise<CartReturn | null>>();
  * re-prices the cart, which also keeps the free-shipping note in CartMain
  * (keyed by cart currency) in the right currency.
  */
-export function getCartForMarket(context: CartContext) {
+export function getCartForMarket(
+  context: CartContext,
+  blackFriday: BlackFridayState,
+) {
   let pending = inflight.get(context.cart);
   if (!pending) {
-    pending = loadCart(context);
+    pending = loadCart(context, blackFriday);
     inflight.set(context.cart, pending);
   }
   return pending;
 }
 
-async function loadCart({
-  cart,
-  storefront,
-}: CartContext): Promise<CartReturn | null> {
+async function loadCart(
+  {cart, storefront}: CartContext,
+  blackFriday: BlackFridayState,
+): Promise<CartReturn | null> {
   let current = await cart.get();
   if (!current) return current;
 
@@ -59,7 +66,17 @@ async function loadCart({
   }
 
   try {
-    return await syncKeycapGift(cart, current);
+    current = await syncBlackFridayPreview(
+      cart,
+      current,
+      blackFriday.previewToken,
+    );
+  } catch (error) {
+    console.error(error);
+  }
+
+  try {
+    return await syncKeycapGift(cart, current, blackFriday.on);
   } catch (error) {
     console.error(error);
     return current;

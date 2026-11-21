@@ -4,6 +4,7 @@
     "target": "cart.lines.discounts.generate.run",
     "input": {
       "cart": {
+        "bfPreview": null,
         "cost": {
           "subtotalAmount": {
             "currencyCode": "USD"
@@ -43,6 +44,11 @@
             }
           }
         ]
+      },
+      "shop": {
+        "localTime": {
+          "blackFriday": false
+        }
       },
       "discount": {
         "discountClasses": [

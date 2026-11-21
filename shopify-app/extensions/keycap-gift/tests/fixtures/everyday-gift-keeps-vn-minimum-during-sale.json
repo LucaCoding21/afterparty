@@ -1,0 +1,68 @@
+{
+  "payload": {
+    "export": "cart-lines-discounts-generate-run",
+    "target": "cart.lines.discounts.generate.run",
+    "input": {
+      "cart": {
+        "bfPreview": {
+          "value": "test-preview-token"
+        },
+        "cost": {
+          "subtotalAmount": {
+            "currencyCode": "VND"
+          }
+        },
+        "lines": [
+          {
+            "id": "gid://shopify/CartLine/1",
+            "quantity": 1,
+            "cost": {
+              "subtotalAmount": {
+                "amount": "300000.0"
+              }
+            },
+            "gift": null,
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "product": {
+                "handle": "nhim-short-sleeve-tee"
+              }
+            }
+          },
+          {
+            "id": "gid://shopify/CartLine/2",
+            "quantity": 1,
+            "cost": {
+              "subtotalAmount": {
+                "amount": "120000.0"
+              }
+            },
+            "gift": {
+              "value": "keycap"
+            },
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "product": {
+                "handle": "nhim-keycap-clicker"
+              }
+            }
+          }
+        ]
+      },
+      "shop": {
+        "localTime": {
+          "blackFriday": true
+        }
+      },
+      "discount": {
+        "discountClasses": [
+          "PRODUCT"
+        ],
+        "metafield": null
+      }
+    },
+    "output": {
+      "operations": []
+    }
+  }
+}

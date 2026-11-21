@@ -9,6 +9,10 @@ import {CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
 import {getCartForMarket} from '~/lib/cartMarket';
 import {syncKeycapGift} from '~/lib/keycapGift';
+import {
+  getBlackFriday,
+  syncBlackFridayPreview,
+} from '~/lib/blackFriday.server';
 
 export const meta: Route.MetaFunction = () => {
   return [{title: `afterparty | Cart`}];
@@ -90,7 +94,18 @@ export async function action({request, context}: Route.ActionArgs) {
       action === CartForm.ACTIONS.LinesRemove)
   ) {
     try {
-      result = {...result, cart: await syncKeycapGift(cart, result.cart)};
+      // A first add creates the cart, so stamp a Black Friday preview on it
+      // here too, before checkout can be reached.
+      const blackFriday = await getBlackFriday(request, context.session);
+      const stamped = await syncBlackFridayPreview(
+        cart,
+        result.cart,
+        blackFriday.previewToken,
+      );
+      result = {
+        ...result,
+        cart: await syncKeycapGift(cart, stamped, blackFriday.on),
+      };
     } catch (error) {
       console.error(error);
     }
@@ -119,8 +134,11 @@ export async function action({request, context}: Route.ActionArgs) {
   );
 }
 
-export async function loader({context}: Route.LoaderArgs) {
-  return await getCartForMarket(context);
+export async function loader({request, context}: Route.LoaderArgs) {
+  return await getCartForMarket(
+    context,
+    await getBlackFriday(request, context.session),
+  );
 }
 
 export default function Cart() {

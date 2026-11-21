@@ -18,6 +18,7 @@ import {
   optimisticCartSubtotal,
   withOptimisticLineCosts,
 } from '~/lib/optimisticCart';
+import {BLACK_FRIDAY_FREE_SHIPPING} from '~/lib/blackFriday';
 
 export type CartLayout = 'page' | 'aside';
 
@@ -109,6 +110,7 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   // The useOptimisticCart hook applies pending actions to the cart
   // so the user immediately sees feedback when they modify the cart.
   const rootData = useRouteLoaderData<RootLoader>('root');
+  const blackFriday = rootData?.blackFriday.on ?? false;
   // Hydrogen leaves line and cart totals stale while an action is pending,
   // so fix the line totals first, then add or drop the free keycap line
   // optimistically too, so it shows up in the same paint as the item that
@@ -116,6 +118,7 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const cart = withOptimisticKeycapGift(
     withOptimisticLineCosts(useOptimisticCart(originalCart), originalCart),
     rootData?.keycapVariant,
+    blackFriday,
   );
 
   const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
@@ -165,10 +168,18 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
               Taxes and shipping calculated at checkout
             </p>
           )}
-          {freeShippingRule && (
-            <FreeShippingNote rule={freeShippingRule} subtotal={subtotal} />
+          {blackFriday ? (
+            <BlackFridayShippingNote cart={cart} currency={currency} />
+          ) : (
+            freeShippingRule && (
+              <FreeShippingNote rule={freeShippingRule} subtotal={subtotal} />
+            )
           )}
-          <FreeKeycapNote cart={cart} currency={currency} />
+          <FreeKeycapNote
+            cart={cart}
+            currency={currency}
+            blackFriday={blackFriday}
+          />
         </div>
       </div>
       {cartHasItems && <CartSummary cart={cart} layout={layout} />}
@@ -195,6 +206,41 @@ function FreeShippingNote({
   );
 }
 
+/**
+ * Free-shipping note while Black Friday is on (app/lib/blackFriday.ts),
+ * worded as the client asked. Vietnam ships free on every order; every
+ * other market counts down to its sale threshold, measured like the
+ * checkout discount: on the cart without keycaps.
+ */
+function BlackFridayShippingNote({
+  cart,
+  currency,
+}: {
+  cart: KeycapCartLike | null | undefined;
+  currency: string;
+}) {
+  const threshold = BLACK_FRIDAY_FREE_SHIPPING[currency];
+  if (threshold === undefined) return null;
+  const amount = cart ? keycapQualifyingAmount(cart) : 0;
+  const eligible =
+    currency === 'VND'
+      ? Boolean(cart?.lines?.nodes?.length)
+      : amount >= threshold;
+
+  let text = 'You’re eligible for free shipping';
+  if (!eligible) {
+    text =
+      currency === 'VND'
+        ? 'Free shipping until 30/11/2026'
+        : `${formatMoney(
+            {amount: String(threshold - amount), currencyCode: currency},
+            // "$100 USD", "$100 AUD", "₩100,000", "¥10,000"
+            {withoutTrailingZeros: true, alwaysShowCode: currency === 'USD'},
+          )} away from free shipping until Nov 30`;
+  }
+  return <p className="cart-shipping-note">{text}</p>;
+}
+
 /** The keycap always sits under the real items, whichever order it was added in. */
 function sortKeycapLast<T extends Parameters<typeof isKeycapLine>[0]>(
   lines: T[],
@@ -215,13 +261,24 @@ function sortKeycapLast<T extends Parameters<typeof isKeycapLine>[0]>(
 function FreeKeycapNote({
   cart,
   currency,
+  blackFriday,
 }: {
   cart: KeycapCartLike | null | undefined;
   currency: string;
+  blackFriday: boolean;
 }) {
   // An empty cart has no lines yet; like the shipping note, still show the
   // full "away from" line in Vietnam.
-  const earned = cart ? keycapGiftEarned(cart, currency) : false;
+  const earned = cart ? keycapGiftEarned(cart, currency, blackFriday) : false;
+  if (blackFriday) {
+    return (
+      <p className="cart-shipping-note cart-gift-note">
+        {earned
+          ? 'Free Nhím Keycap Clicker added to your order'
+          : 'Free Nhím Keycap Clicker with every order'}
+      </p>
+    );
+  }
   if (currency === 'VND' && !earned) {
     const remaining =
       KEYCAP_GIFT_THRESHOLD_VND - (cart ? keycapQualifyingAmount(cart) : 0);
