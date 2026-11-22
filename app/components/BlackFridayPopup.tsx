@@ -8,6 +8,56 @@ let shownThisPageLoad = false;
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
+/**
+ * Rendered in <head> on pages that show the popup, so its fonts and artwork
+ * download first instead of waiting behind the product grid at the end of
+ * the HTML. Only the artwork for the current screen size is fetched.
+ */
+export function BlackFridayPopupPreloads() {
+  return (
+    <>
+      <link
+        rel="preload"
+        href="/fonts/biortec-bold.woff2"
+        as="font"
+        type="font/woff2"
+        crossOrigin="anonymous"
+      />
+      <link
+        rel="preload"
+        href="/fonts/inter-tight-medium.woff2"
+        as="font"
+        type="font/woff2"
+        crossOrigin="anonymous"
+      />
+      <link
+        rel="preload"
+        href="/popup/blackfriday-art-desktop.webp"
+        as="image"
+        type="image/webp"
+        media="(min-width: 48em)"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        href="/popup/blackfriday-art-mobile.webp"
+        as="image"
+        type="image/webp"
+        media="(max-width: 47.99em)"
+        fetchPriority="high"
+      />
+    </>
+  );
+}
+
+/** The popup shows on Shop All while the sale is on (or previewed). */
+export function showsBlackFridayPopup(
+  blackFriday: {on: boolean} | undefined,
+  pathname: string,
+) {
+  return Boolean(blackFriday?.on) && pathname === '/collections/all';
+}
+
 export function BlackFridayPopup() {
   // Open in the server render so the popup is in the first paint.
   const [open, setOpen] = useState(true);
@@ -42,13 +92,6 @@ export function BlackFridayPopup() {
 
   return (
     <>
-      <link
-        rel="preload"
-        href="/fonts/biortec-bold.woff2"
-        as="font"
-        type="font/woff2"
-        crossOrigin="anonymous"
-      />
       <div
         className="bf-popup"
         role="presentation"
@@ -86,13 +129,14 @@ export function BlackFridayPopup() {
               alt=""
               width={1080}
               height={1095}
+              fetchPriority="high"
             />
           </picture>
 
           <div className="bf-popup-head">
             <h2 className="bf-popup-title">BLACK FRIDAY</h2>
             <p className="bf-popup-subtitle">FREE SHIPPING + FREE GIFT</p>
-            <p className="bf-popup-dates">27/11–30/11</p>
+            <p className="bf-popup-dates">27/11—30/11</p>
           </div>
 
           <div className="bf-popup-body">

@@ -4575,10 +4575,13 @@ body.home-page footer {
 
 @font-face {
   font-family: 'Inter Tight';
-  src: url('/fonts/inter-tight-var.woff2') format('woff2');
-  font-weight: 100 900;
+  /* Medium only, Latin + Vietnamese + currency signs: 23 KB instead of the
+     233 KB variable font. Preloaded in <head> with Biortec, so both arrive
+     early and the card paints in one go instead of swapping fonts. */
+  src: url('/fonts/inter-tight-medium.woff2') format('woff2');
+  font-weight: 500;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 .bf-popup {
@@ -4647,11 +4650,11 @@ body.home-page footer {
 }
 
 .bf-popup-head {
-  top: 15.375cqw;
+  top: 15.392cqw;
 }
 
 .bf-popup-body {
-  top: 116.33cqw;
+  top: 115.99cqw;
 }
 
 .bf-popup-title,
@@ -4675,56 +4678,54 @@ body.home-page footer {
 }
 
 .bf-popup-title {
+  margin-top: -0.269cqw;
   margin-left: -0.556cqw;
   font-size: 11.76cqw;
   word-spacing: 0.063em;
-  color: #111a12;
+  color: #11190c;
 }
 
 .bf-popup-subtitle {
   margin-top: 0;
-  margin-left: 0.185cqw;
-  font-size: 5.95cqw;
-  color: #000;
+  margin-left: 0;
+  font-size: 5.983cqw;
+  color: #11190c;
 }
 
 .bf-popup-dates {
-  margin-top: 0.107cqw;
-  font-size: 6.49cqw;
+  margin-top: 0.4cqw;
+  font-size: 5.983cqw;
   color: #808080;
 }
 
 .bf-popup-heading {
-  font-size: 4.63cqw;
-  color: #111a12;
+  font-size: 4.6135cqw;
+  color: #11190c;
 }
 
 .bf-popup-heading--spaced {
-  margin-top: 6.295cqw;
-  font-size: 4.755cqw;
-  color: #222;
+  margin-top: 6.012cqw;
 }
 
 .bf-popup-text {
-  margin: -0.278cqw 0 0;
+  margin: 0.551cqw 0 0;
   font-family: 'Inter Tight', var(--font-sans);
   font-weight: 500;
-  font-size: 4.29cqw;
+  font-size: 4.166cqw;
   line-height: 1.243;
   letter-spacing: -0.01em;
-  color: #777;
+  color: #808080;
   white-space: nowrap;
 }
 
 .bf-popup-body > .bf-popup-heading:first-child {
-  margin-left: 0.278cqw;
+  margin-left: 0.093cqw;
 }
 
-/* The shipping list is set a touch smaller than the gift line */
+/* Both body blocks are 44pt on the artboard; the list has its own leading */
 .bf-popup-heading--spaced + .bf-popup-text {
-  margin-top: 0.808cqw;
-  font-size: 4.2cqw;
-  line-height: 1.279;
+  margin-top: 0.416cqw;
+  line-height: 1.3079;
 }
 
 /* Desktop: the designer's 1377x1737 artboard. Headlines keep their
@@ -4757,19 +4758,20 @@ body.home-page footer {
   }
 
   .bf-popup-title {
-    margin-left: -0.436cqw;
+    margin-top: 0.102cqw;
+    margin-left: -0.218cqw;
     font-size: 9.22cqw;
   }
 
   .bf-popup-subtitle {
-    margin-top: -0.073cqw;
+    margin-top: -0.175cqw;
     margin-left: 0.145cqw;
-    font-size: 4.67cqw;
+    font-size: 4.684cqw;
   }
 
   .bf-popup-dates {
-    margin-top: 0.16cqw;
-    font-size: 5.09cqw;
+    margin-top: 0.44cqw;
+    font-size: 4.73cqw;
   }
 
   .bf-popup-heading {
@@ -4781,18 +4783,17 @@ body.home-page footer {
   }
 
   .bf-popup-heading--spaced {
-    margin-top: 3.532cqw;
-    font-size: 3.735cqw;
+    margin-top: 3.343cqw;
   }
 
   .bf-popup-heading--spaced + .bf-popup-text {
     margin-top: 0.52cqw;
     font-size: 2.97cqw;
-    line-height: 1.2996;
+    line-height: 1.3069;
   }
 
   .bf-popup-text {
-    margin-top: 0.3cqw;
+    margin-top: 0.496cqw;
     font-size: 2.97cqw;
   }
 }

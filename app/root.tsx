@@ -22,6 +22,10 @@ import {KEYCAP_VARIANT_QUERY, type KeycapVariant} from '~/lib/keycapGift';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
+import {
+  BlackFridayPopupPreloads,
+  showsBlackFridayPopup,
+} from './components/BlackFridayPopup';
 import {MetaPixel} from './components/MetaPixel';
 
 export type RootLoader = typeof loader;
@@ -326,6 +330,8 @@ function loadDeferredData(
 
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
+  const data = useRouteLoaderData<RootLoader>('root');
+  const {pathname} = useLocation();
 
   return (
     <html lang="en">
@@ -338,6 +344,9 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
         <Links />
+        {showsBlackFridayPopup(data?.blackFriday, pathname) && (
+          <BlackFridayPopupPreloads />
+        )}
       </head>
       <body>
         {children}
