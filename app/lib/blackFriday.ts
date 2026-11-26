@@ -1,7 +1,7 @@
 /**
  * Black Friday 2026: free shipping at lower thresholds and the free Nhím
- * Keycap Clicker on every order, 27/11 00:00 to 30/11 23:59 in the
- * customer's local time.
+ * Keycap Clicker on every order, from 27/11 to Mon 30/11 23:59 US Pacific
+ * time, for everyone.
  *
  * Checkout prices come from the "Free Nhím Keycap Clicker" discount in
  * Shopify admin, whose keycap-gift function (shopify-app/) has the same
@@ -24,23 +24,25 @@ function saleWindow(starts: string, ends: string): SaleWindow {
  * which is the same for nearly everyone. Mirrors WINDOW_BY_COUNTRY in
  * shopify-app/extensions/keycap-gift/src/config.js.
  *
- * The client started the sale early, everywhere at once, on 27/11 (Vietnam
- * time), so every start is in the past. Each country still ends at its own
- * local midnight after 30/11 (countries spanning several time zones end at
- * midnight in their westernmost).
+ * The client moved the sale to one window for everyone: it started early,
+ * everywhere at once, on 27/11 (Vietnam time), and ends Mon 30/11 23:59 US
+ * Pacific time. The per-country table stays so the checkout function and
+ * this file keep the same shape.
  */
 const EARLY_START = '2026-11-25T17:00:00Z';
+/** Mon 30/11 23:59 US Pacific time, for everyone. */
+const SALE_ENDS = '2026-12-01T08:00:00Z';
 
-const UTC7 = saleWindow(EARLY_START, '2026-11-30T17:00:00Z');
-const UTC8 = saleWindow(EARLY_START, '2026-11-30T16:00:00Z');
-const UTC9 = saleWindow(EARLY_START, '2026-11-30T15:00:00Z');
-const INDONESIA = saleWindow(EARLY_START, '2026-11-30T17:00:00Z');
-const AUSTRALIA = saleWindow(EARLY_START, '2026-11-30T16:00:00Z');
-const NEW_ZEALAND = saleWindow(EARLY_START, '2026-11-30T11:00:00Z');
-const CET = saleWindow(EARLY_START, '2026-11-30T23:00:00Z');
-const UK = saleWindow(EARLY_START, '2026-12-01T00:00:00Z');
-const CANADA = saleWindow(EARLY_START, '2026-12-01T08:00:00Z');
-const UNITED_STATES = saleWindow(EARLY_START, '2026-12-01T10:00:00Z');
+const UTC7 = saleWindow(EARLY_START, SALE_ENDS);
+const UTC8 = saleWindow(EARLY_START, SALE_ENDS);
+const UTC9 = saleWindow(EARLY_START, SALE_ENDS);
+const INDONESIA = saleWindow(EARLY_START, SALE_ENDS);
+const AUSTRALIA = saleWindow(EARLY_START, SALE_ENDS);
+const NEW_ZEALAND = saleWindow(EARLY_START, SALE_ENDS);
+const CET = saleWindow(EARLY_START, SALE_ENDS);
+const UK = saleWindow(EARLY_START, SALE_ENDS);
+const CANADA = saleWindow(EARLY_START, SALE_ENDS);
+const UNITED_STATES = saleWindow(EARLY_START, SALE_ENDS);
 
 const WINDOW_BY_COUNTRY: Record<string, SaleWindow> = {
   VN: UTC7,
