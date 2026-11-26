@@ -9,15 +9,19 @@ See "Size guides" in CLAUDE.md and section B of .claude/skills/launch-prep.
       Writes public/products/size-guides/<name>.svg in the house format.
       Values are in cm; write them exactly as on the designer's chart.
 
-  python3 scripts/size-guide.py diagram "<designer file>" "<Product Name> Chart <year>"
-      Crops the diagram tight (no blank margin), saves it to
-      public/products/measurements/<name>.png and prints its shape bucket.
+  python3 scripts/size-guide.py diagram "<chart image>" "<Product Name> Chart <year>"
+      The chart image can be a rough screenshot of the designer's whole chart
+      (dark edges, white page, drawing, size table). The tool finds the white
+      page, cuts away the size table, drops stray specks and crops the drawing
+      tight, then saves public/products/measurements/<name>.png and prints its
+      shape bucket. Check the saved PNG once by eye: it should be the drawing
+      and its labels only.
 
   python3 scripts/size-guide.py check
       Checks every SIZE_GUIDE_MAP entry: files exist, tables match the house
       format, diagrams are cropped tight. Run it before committing.
 
-Needs Pillow (pip3 install pillow) for `diagram` and `check`.
+Needs Pillow and numpy (pip3 install pillow numpy) for `diagram` and `check`.
 """
 
 import argparse
@@ -91,19 +95,137 @@ def cmd_table(a):
     print(f'Wrote {path.relative_to(ROOT)}')
 
 
+def _trim_specks(counts, gap=4, max_ink=60):
+    """Index range of `counts` (ink pixels per row or column) with stray specks
+    at either end dropped. A speck is a little ink (under max_ink pixels)
+    separated from the drawing by at least `gap` blank lines. A designer's
+    export can carry one in a corner; it is invisible but stretches the image
+    box, which makes the gap around the drawing uneven on the page."""
+    ink = [i for i, c in enumerate(counts) if c]
+    if not ink:
+        return None
+    lo, hi = ink[0], ink[-1] + 1
+
+    def trim(idx):
+        # Walk inward over one end; drop the run before the first wide gap if it is tiny.
+        total, last = 0, idx[0]
+        for i in idx:
+            if abs(i - last) > gap:
+                return i if total < max_ink else None
+            total += counts[i]; last = i
+        return None
+
+    new_lo = trim(ink)
+    while new_lo is not None and new_lo > lo:
+        lo = new_lo
+        new_lo = trim([i for i in ink if i >= lo])
+    new_hi = trim(ink[::-1])
+    while new_hi is not None and new_hi + 1 < hi:
+        hi = new_hi + 1
+        new_hi = trim([i for i in ink[::-1] if i < hi])
+    return lo, hi
+
+
 def ink_bbox(im, threshold=250):
     from PIL import Image
     rgba = im.convert('RGBA')
     flat = Image.new('RGBA', rgba.size, (255, 255, 255, 255))
     flat.alpha_composite(rgba)
-    return flat, flat.convert('L').point(lambda v: 255 if v < threshold else 0).getbbox()
+    mask = flat.convert('L').point(lambda v: 255 if v < threshold else 0)
+    bb = mask.getbbox()
+    if not bb:
+        return flat, None
+    w, h = mask.size
+    px = mask.load()
+    rows = [sum(1 for x in range(w) if px[x, y]) for y in range(h)]
+    top, bottom = _trim_specks(rows)
+    cols = [sum(1 for y in range(top, bottom) if px[x, y]) for x in range(w)]
+    left, right = _trim_specks(cols)
+    return flat, (left, top, right, bottom)
+
+
+def _runs(flags):
+    """(start, end) of each run of True values."""
+    out, start = [], None
+    for i, f in enumerate(list(flags) + [False]):
+        if f and start is None:
+            start = i
+        elif not f and start is not None:
+            out.append((start, i)); start = None
+    return out
+
+
+def _longest_run(mask_row):
+    """Length of the longest unbroken run of True in a 1-D numpy bool array."""
+    import numpy as np
+    if not mask_row.any():
+        return 0
+    d = np.diff(np.concatenate(([0], mask_row.astype(np.int8), [0])))
+    return int((np.flatnonzero(d == -1) - np.flatnonzero(d == 1)).max())
+
+
+def isolate_drawing(flat):
+    """From a screenshot of a whole designer chart, return the part that holds
+    only the drawing: inside the white page, and above (or below) the size
+    table. A file that is already just the drawing comes back unchanged."""
+    import numpy as np
+    a = np.asarray(flat.convert('L'), dtype=np.int16)
+    h, w = a.shape
+
+    # 1. The white page. Only rows/columns at the image's edges that are
+    #    almost entirely non-white (an app window, the desktop) are dropped.
+    #    A garment's dark hem or cuff always has white beside it, so a plain
+    #    drawing file is never trimmed here.
+    white = a > 235
+    frame_rows = white.mean(axis=1) < 0.1
+    frame_cols = white.mean(axis=0) < 0.1
+    top = 0
+    while top < h and frame_rows[top]: top += 1
+    bottom = h
+    while bottom > top and frame_rows[bottom - 1]: bottom -= 1
+    left = 0
+    while left < w and frame_cols[left]: left += 1
+    right = w
+    while right > left and frame_cols[right - 1]: right -= 1
+    if bottom - top < 10 or right - left < 10:
+        sys.exit('Could not find the white page in this image. Send the chart on a white background.')
+    # Stay 3px clear of a page edge found inside the image (anti-aliasing).
+    if top: top += 3
+    if left: left += 3
+    if bottom < h: bottom -= 3
+    if right < w: right -= 3
+    page = a[top:bottom, left:right]
+    ph, pw = page.shape
+
+    # 2. The size table: lines that run unbroken across most of the page (its
+    #    grid and the edges of its black title bar). Drawings have no
+    #    horizontal stroke that long; a hem or stripe is broken by the
+    #    garment's outline or is much narrower.
+    dark = page < 90
+    long_rows = [y for y in range(ph) if _longest_run(dark[y]) > pw * 0.7]
+    lines = _runs([y in set(long_rows) for y in range(ph)])
+    if len(lines) < 3:
+        return flat.crop((left, top, right, bottom)), 'no size table found, using the whole page'
+    t_top, t_bottom = lines[0][0], lines[-1][1]
+    ink = (page < 160).sum(axis=1)
+    above, below = int(ink[:max(0, t_top - 4)].sum()), int(ink[t_bottom + 4:].sum())
+    if above >= below:
+        region, where = (left, top, right, top + max(1, t_top - 4)), 'above'
+    else:
+        region, where = (left, top + t_bottom + 4, right, bottom), 'below'
+    return flat.crop(region), f'cut away the size table, kept the drawing {where} it'
 
 
 def cmd_diagram(a):
     from PIL import Image
-    flat, bb = ink_bbox(Image.open(a.source))
+    rgba = Image.open(a.source).convert('RGBA')
+    flat = Image.new('RGBA', rgba.size, (255, 255, 255, 255))
+    flat.alpha_composite(rgba)
+    part, note = isolate_drawing(flat)
+    print(f'Found the drawing: {note}.')
+    flat, bb = ink_bbox(part)
     if not bb:
-        sys.exit('The image is blank.')
+        sys.exit('No drawing found in the image.')
     out = flat.crop(bb).convert('RGB')
     w, h = out.size
     if h < 700:

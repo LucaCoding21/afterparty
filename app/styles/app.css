@@ -2654,19 +2654,25 @@ aside main {
 }
 
 /* Measurement diagram under the size table. The PNGs are cropped tight to
-   the drawing (zero blank canvas), so these margins are the exact visual
-   gap on every product: 31px from the table to the top of the drawing and
-   39px from its bottom to the add-to-cart button (this margin, plus the
-   1rem the add-to-cart form pads on top, plus the details' own spacing).
-   The numbers were tuned by eye on the raglan tee.
+   the drawing (zero blank canvas), so the gap is set once and is the same
+   above and below the drawing on every product:
+   - above: the table's bottom line ends 1 unit inside its 441-unit-wide
+     SVG, which grows with the column (under 1px on desktop, about 1.6px on
+     tablet). A percentage margin is a share of that same width, so
+     100% / 441 subtracts exactly that unit at every size;
+   - below: the add-to-cart form pads 1rem on top and the button has a 4px
+     top margin, so the margin is the gap minus 20px.
+   `scripts/check-size-guide-gaps.cjs` measures every product and fails if
+   the two sides differ by more than 1px.
 
    The height depends on the drawing's shape (class set from the image's
    aspect ratio once it loads): a tall drawing like pants gets more height
    than a wide one like a tee, so the garments read as roughly the same size
    instead of pants shrinking to half a tee's width. */
 .product-size-guide-photo {
-  margin-top: 31px;
-  margin-bottom: 19px;
+  --size-guide-gap: 35px;
+  margin-top: calc(var(--size-guide-gap) - 100% / 441);
+  margin-bottom: calc(var(--size-guide-gap) - 20px);
   width: 100%;
   text-align: center;
 }

@@ -53,8 +53,9 @@ State classes: `.active`, `.expanded`, `.open`, `.selected`, `.disabled`, `.is-o
 
 ## Product photo and size guide spacing: APPROVED, DO NOT CHANGE
 
-The owners signed off on the current product page photo sizing and size guide
-spacing on 2026-10-05, after many rounds of revisions. Do not change these rules
+The owners signed off on the current product page photo sizing on 2026-10-05,
+after many rounds of revisions, and the size guide spacing was changed to an
+even 35px / 35px on 2026-11-26 at the user's request. Do not change these rules
 in `app/styles/app.css`, not as a cleanup, a "consistency fix", or a side effect
 of another task, unless the user explicitly asks for that exact change.
 
@@ -74,22 +75,46 @@ look jammed against the nav, model photos to jump when clicking through the
 carousel, and a 2rem crop off the bottom of product shots.
 
 ### Size guides
-Approved spacing: 31px from the table to the measurement diagram, 39px from the
-diagram to Add to Cart, diagram height set by its shape bucket
-(`.product-size-guide-photo--wide/--square/--tall`). Adding a size guide for a new
-product means adding files only, never CSS:
+Approved spacing (2026-11-26, replacing the 31px / 39px from 2026-10-05): the
+drawing sits **35px below the table and 35px above Add to Cart**, even on every
+product at every screen size. It is set once, as `--size-guide-gap` on
+`.product-size-guide-photo` in `app.css`; the margins there subtract the table
+line's inset (`100% / 441`) and the add-to-cart area's own 20px, so both visible
+gaps equal the variable. Diagram height comes from its shape bucket
+(`.product-size-guide-photo--wide/--square/--tall`).
+
+The gap is only even if the diagram PNG has no blank margin and no stray
+specks, because the page measures from the image's edges. That is why every
+diagram goes through the tool. Adding a size guide means adding files only,
+never CSS:
 - the SVG table, built with `python3 scripts/size-guide.py table ...` into
   `public/products/size-guides/` (never hand-written or copied and edited)
-- the diagram PNG, cropped with `python3 scripts/size-guide.py diagram ...` into
-  `public/products/measurements/`
+- the diagram PNG, made with `python3 scripts/size-guide.py diagram ...` into
+  `public/products/measurements/`. Give it the designer's whole chart, even a
+  rough screenshot with dark edges: it finds the white page, cuts away the size
+  table, drops specks and crops tight. Never hand-crop.
 - an entry in `SIZE_GUIDE_MAP` in `app/routes/products.$handle.tsx`, keyed by
   the exact Shopify handle
 
-Run `python3 scripts/size-guide.py check` before committing; it must report
-0 problems. Then always finish by building the old-vs-new preview with
+Checks, all of which must pass:
+- `npm run check:size-guide-files` (`size-guide.py check`): files exist, tables
+  in house format, diagrams tight with no specks. The pre-push hook in
+  `.githooks/` runs it automatically on any push that touches size guides
+  (`npm install` turns the hook on).
+- `npm run check:size-guides -- --base http://localhost:<dev port>` with the dev
+  server running: the file check, then `scripts/check-size-guide-gaps.cjs`,
+  which measures the gap above and below every live product's drawing at
+  1100, 1240, 1440, 1920, tablet 820 and phone 390, and fails if any side
+  differs by more than 1px. `--out <dir>` saves screenshots and results.json.
+
+Then always finish by building the old-vs-new preview with
 `node scripts/size-guide-preview.mjs` and giving the user the private Artifact
 link. The full steps, including what the designer hands over, are in section B
 of `.claude/skills/launch-prep/SKILL.md`.
+
+Known and separate: at 1100 and 1240 wide the product column is narrower than
+the drawing, so drawings shrink and the (still even) gaps grow to 55-100px.
+That is the photo sizing, not the gap; leave it unless asked.
 
 ### If a change seems to need these rules
 Ask first. Then measure before and after, live site vs local, at several

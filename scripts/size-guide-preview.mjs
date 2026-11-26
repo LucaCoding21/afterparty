@@ -83,7 +83,12 @@ async function capture(host, vw, file, swap) {
     const a = d.getBoundingClientRect();
     const btn = [...document.querySelectorAll('button')].find((b) => /add to cart|sold out/i.test(b.textContent) && b.getBoundingClientRect().top > a.top);
     const pr = d.querySelector('.product-size-guide-photo img')?.getBoundingClientRect();
-    const sr = d.querySelector('.product-size-guide-svg svg').getBoundingClientRect();
+    // The gap above starts at the bottom edge of the table's last line (a line's
+    // box is its centre, so add half its stroke), as in check-size-guide-gaps.cjs.
+    const svgEl = d.querySelector('.product-size-guide-svg svg');
+    const units = svgEl.getBoundingClientRect().width / svgEl.viewBox.baseVal.width;
+    const lineEl = [...svgEl.querySelectorAll('line')].sort((p, q) => q.getBoundingClientRect().bottom - p.getBoundingClientRect().bottom)[0];
+    const sr = {bottom: lineEl.getBoundingClientRect().bottom + ((parseFloat(getComputedStyle(lineEl).strokeWidth) || 1) / 2) * units};
     const br = btn?.getBoundingClientRect();
     const bottom = Math.max(a.bottom + 60, br ? br.bottom + 12 : 0);
     return {x: a.left - 16, y: a.top + scrollY - 12, w: a.width + 32, h: bottom - a.top + 12,
@@ -98,6 +103,9 @@ async function capture(host, vw, file, swap) {
   return r;
 }
 
+// Approved spacing: 35px above and below the drawing (rounded, so 34 to 36).
+const gapOk = (g) => g != null && Math.abs(g - 35) <= 1;
+
 mkdirSync(join(out, 'img'), {recursive: true});
 const sections = [];
 let allGood = true;
@@ -109,7 +117,7 @@ try {
       const old = await capture(ref, vw, `${ref}-${key}.png`);
       const neu = await capture(ref, vw, `${handle}-${key}.png`, swap);
       views[key] = {old, neu};
-      const ok = (s) => s.tableGap === 31 && s.buttonGap === 39;
+      const ok = (s) => gapOk(s.tableGap) && gapOk(s.buttonGap);
       if (!ok(old) || !ok(neu)) allGood = false;
       console.log(`${handle} ${key}: new gaps ${neu.tableGap}/${neu.buttonGap}, diagram ${neu.photo?.join('x')} | ${ref} ${old.photo?.join('x')}`);
     }
@@ -125,7 +133,7 @@ try {
 }
 
 const title = (h) => h.split('-').map((w) => w[0].toUpperCase() + w.slice(1)).join(' ');
-const gap = (s) => `diagram ${s.photo ? s.photo.join('×') : 'none'} · gaps <b class="${s.tableGap === 31 ? 'ok' : 'bad'}">${s.tableGap}</b> / <b class="${s.buttonGap === 39 ? 'ok' : 'bad'}">${s.buttonGap}</b>`;
+const gap = (s) => `diagram ${s.photo ? s.photo.join('×') : 'none'} · gaps <b class="${gapOk(s.tableGap) ? 'ok' : 'bad'}">${s.tableGap}</b> / <b class="${gapOk(s.buttonGap) ? 'ok' : 'bad'}">${s.buttonGap}</b>`;
 const pair = (s, key) => `
     <div class="pair ${key}">
       <div class="col"><span class="label">Existing: ${title(s.ref)}</span><div class="shot"><img src="img/${s.ref}-${key}.png" alt=""></div><span class="stats">${gap(s.views[key].old)}</span></div>
@@ -172,8 +180,8 @@ h2 { font-size:19px; font-weight:600; margin:0; }
 <div class="wrap" id="app" data-view="desktop">
   <header>
     <h1>Size Guide Preview</h1>
-    <p class="lede">Each new size guide rendered on the real product page (localhost, 2x), beside an existing product of the same shape. Approved spacing: 31px from the table to the diagram, 39px from the diagram to Add to Cart.</p>
-    <span class="pill${allGood ? '' : ' bad'}">${allGood ? 'All spacing matches the approved 31px / 39px' : 'Some spacing is off: see the red numbers'}</span>
+    <p class="lede">Each new size guide rendered on the real product page (localhost, 2x), beside an existing product of the same shape. Approved spacing: 35px from the table to the diagram and 35px from the diagram to Add to Cart.</p>
+    <span class="pill${allGood ? '' : ' bad'}">${allGood ? 'All spacing matches the approved 35px / 35px' : 'Some spacing is off: see the red numbers'}</span>
     <div class="toggle" role="group" aria-label="Screen size">
       <button type="button" id="btn-desktop" aria-pressed="true">Desktop 1440px</button>
       <button type="button" id="btn-mobile" aria-pressed="false">Mobile 390px</button>

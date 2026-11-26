@@ -136,8 +136,9 @@ match the existing ones exactly with no measuring or nudging.
 For each product, two exports named after the product title:
 - `<Product Name> Chart <year>.png`: the full chart (diagram + table). This is
   where the numbers are read from.
-- `<Product Name> Chart <year> 2.png` (or a second file with the same name):
-  the diagram alone, no table. This becomes the `sizePhoto`.
+- Optionally a diagram-only export. Not needed: `diagram` takes the full chart
+  (or a rough screenshot of it, dark edges and all) and cuts the drawing out
+  itself. Prefer the designer's own export over a screenshot for sharpness.
 Chart rules to check before building, and to send back to the designer if broken:
 - Sizes are S/M/L, S/M/L/XL or ONE SIZE (the table supports 1, 3 or 4 sizes).
 - 1 to 6 rows, values in cm, numbers only (half sizes like 22.5 are fine).
@@ -160,12 +161,16 @@ bottoms WAIST / RISE / THIGH / INSEAM / LENGTH / LEG OPENING.
 
 ### B2. Prepare the diagram
 ```bash
-python3 scripts/size-guide.py diagram "<designer's diagram-only file>" "<Product Name> Chart <year>"
+python3 scripts/size-guide.py diagram "<full chart or screenshot>" "<Product Name> Chart <year>"
 ```
-It crops to the drawing (the approved spacing assumes zero blank margin),
-saves the PNG and prints the shape bucket (wide / square / tall) the page will
-use and the `sizePhoto` path to paste. Diagram height on the page comes from
-the bucket, so no CSS is ever needed.
+It finds the white page (dropping a screenshot's dark edges), cuts away the size
+table (found by its long black lines), removes stray specks, crops tight to the
+ink, saves the PNG and prints the shape bucket (wide / square / tall) and the
+`sizePhoto` path to paste. The even 35px / 35px spacing depends on that tight
+crop, and diagram height comes from the bucket, so no CSS is ever needed. Open
+the saved PNG once: it must be the drawing and its labels only (if the chart's
+table had grey lines instead of black, the tool keeps the whole page; then cut
+the table off roughly and run it again).
 
 ### B3. Wire it
 Add an entry keyed by the **exact** handle (a mismatch = silently no guide):
@@ -179,9 +184,14 @@ Confirm the handle in Shopify (A1 audit) rather than guessing it from the title.
 
 ### B4. Check
 ```bash
-python3 scripts/size-guide.py check   # every entry: files exist, house format, tight crop
+python3 scripts/size-guide.py check   # every entry: files exist, house format, tight crop, no specks
 npm run typecheck
+npm run check:size-guides -- --base http://localhost:<dev port>   # dev server running
 ```
+`check:size-guides` measures the gap above and below every live product's
+drawing at 6 screen sizes and fails if any is off by more than 1px. Drafts are
+not live yet, so for new handles the B4b preview is the gap check. The pre-push
+hook runs `size-guide.py check` on any push that touches size guides.
 ### B4b. Always finish with a preview link (the user expects this every time)
 With the dev server running, build the comparison page. Pair each new handle
 with a live product of the same kind (tee → `afterparty-x-megahertz-logo-t-shirt`,
@@ -194,7 +204,7 @@ node scripts/size-guide-preview.mjs --out <scratchpad>/size-guide-preview \
 ```
 It renders the real product page at desktop 1440 and mobile 390 (drafts work,
 because the new files are swapped into the reference product's page), measures
-the gaps, and exits non-zero if any gap isn't 31px / 39px. Then publish
+the gaps, and exits non-zero if either gap isn't 35px (±1). Then publish
 `<out>/index.html` with the Artifact tool, passing every file in `<out>/img` as
 `files` (root = `<out>`), and give the user the private link. Look at the
 screenshots before publishing; fix anything that looks off first.

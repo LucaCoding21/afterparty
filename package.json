@@ -10,7 +10,10 @@
     "preview": "shopify hydrogen preview --build",
     "lint": "eslint --no-error-on-unmatched-pattern .",
     "typecheck": "react-router typegen && tsc --noEmit",
-    "codegen": "shopify hydrogen codegen && react-router typegen"
+    "codegen": "shopify hydrogen codegen && react-router typegen",
+    "check:size-guides": "python3 scripts/size-guide.py check && node scripts/check-size-guide-gaps.cjs",
+    "check:size-guide-files": "python3 scripts/size-guide.py check",
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {
@@ -52,6 +55,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "globals": "^15.14.0",
     "graphql-config": "^5.0.3",
+    "playwright": "^1.62.0",
     "prettier": "^3.4.2",
     "typescript": "^5.9.2",
     "vite": "^6.2.4",
