@@ -36,7 +36,7 @@ ROUTE = ROOT / 'app/routes/products.$handle.tsx'
 LINES = [0.5, 41, 92, 144, 195.5, 246.5, 297.5, 347.5]
 BASELINES = [70, 121.5, 173.3, 224.5, 275.5, 326]
 VIEWBOX_H = {1: 92, 2: 144, 3: 196, 4: 247, 5: 298, 6: 348}
-COLUMNS = {1: [275], 3: [141, 261, 381], 4: [161, 241, 321, 401]}
+COLUMNS = {1: [275], 3: [191, 296, 401], 4: [161, 241, 321, 401]}
 # Tables made before this script existed that differ slightly from the house
 # format. They are live and fine; the checker skips them. Never add to this.
 LEGACY_TABLES = {'dragon-jersey.svg'}
