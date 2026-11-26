@@ -4,6 +4,7 @@
     "target": "cart.lines.discounts.generate.run",
     "input": {
       "cart": {
+        "bfPreview": null,
         "cost": {
           "subtotalAmount": {
             "currencyCode": "USD"
@@ -60,13 +61,33 @@
               }
             }
           }
-        ]
+        ],
+        "deliveryGroups": []
+      },
+      "shop": {
+        "localTime": {
+          "bfUtc7": false,
+          "bfUtc8": false,
+          "bfUtc9": false,
+          "bfIndonesia": false,
+          "bfAustralia": false,
+          "bfNewZealand": false,
+          "bfCet": false,
+          "bfUk": false,
+          "bfCanada": false,
+          "bfUnitedStates": false
+        }
       },
       "discount": {
         "discountClasses": [
           "PRODUCT"
         ],
         "metafield": null
+      },
+      "localization": {
+        "country": {
+          "isoCode": "US"
+        }
       }
     },
     "output": {

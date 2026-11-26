@@ -550,6 +550,7 @@ function useOptimisticCartCount(originalCart: CartApiQueryFragment | null) {
   const cart = withOptimisticKeycapGift(
     useOptimisticCart(originalCart),
     rootData?.keycapVariant,
+    rootData?.blackFriday.on,
   );
   return cart?.totalQuantity ?? 0;
 }

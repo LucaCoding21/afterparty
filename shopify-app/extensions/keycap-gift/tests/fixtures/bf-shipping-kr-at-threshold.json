@@ -1,0 +1,96 @@
+{
+  "payload": {
+    "export": "cart-delivery-options-discounts-generate-run",
+    "target": "cart.delivery-options.discounts.generate.run",
+    "input": {
+      "cart": {
+        "bfPreview": null,
+        "cost": {
+          "subtotalAmount": {
+            "currencyCode": "KRW"
+          }
+        },
+        "lines": [
+          {
+            "quantity": 1,
+            "cost": {
+              "subtotalAmount": {
+                "amount": "100000.0"
+              }
+            },
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "product": {
+                "handle": "nhim-short-sleeve-tee"
+              }
+            }
+          }
+        ],
+        "deliveryGroups": [
+          {
+            "id": "gid://shopify/CartDeliveryGroup/1",
+            "deliveryAddress": null
+          }
+        ]
+      },
+      "shop": {
+        "localTime": {
+          "bfUtc7": false,
+          "bfUtc8": false,
+          "bfUtc9": true,
+          "bfIndonesia": false,
+          "bfAustralia": false,
+          "bfNewZealand": false,
+          "bfCet": false,
+          "bfUk": false,
+          "bfCanada": false,
+          "bfUnitedStates": false
+        }
+      },
+      "discount": {
+        "discountClasses": [
+          "PRODUCT",
+          "SHIPPING"
+        ],
+        "metafield": {
+          "jsonValue": {
+            "promo": {
+              "previewToken": "test-preview-token"
+            }
+          }
+        }
+      },
+      "localization": {
+        "country": {
+          "isoCode": "KR"
+        }
+      }
+    },
+    "output": {
+      "operations": [
+        {
+          "deliveryDiscountsAdd": {
+            "selectionStrategy": "ALL",
+            "candidates": [
+              {
+                "message": "Free shipping",
+                "targets": [
+                  {
+                    "deliveryGroup": {
+                      "id": "gid://shopify/CartDeliveryGroup/1"
+                    }
+                  }
+                ],
+                "value": {
+                  "percentage": {
+                    "value": 100
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

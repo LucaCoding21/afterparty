@@ -2,6 +2,7 @@ import {
   DiscountClass,
   ProductDiscountSelectionStrategy,
 } from '../generated/api';
+import {isGiftLine, promoActive, qualifyingAmount, readConfig} from './config';
 
 /**
  * Free Nhím Keycap Clicker.
@@ -15,14 +16,10 @@ import {
  * The storefront (app/lib/keycapGift.ts in the Hydrogen repo) adds the
  * keycap line to the cart with a hidden `_gift` attribute and mirrors the
  * same threshold in its cart note; keep the two in step.
+ *
+ * With a `promo` config (see ./config.js) there is no minimum while the
+ * sale runs or for a preview cart; the everyday rule applies otherwise.
  */
-
-/** Overridable through the discount's `$app.function-configuration` metafield. */
-const DEFAULT_CONFIG = {
-  giftProductHandle: 'nhim-keycap-clicker',
-  /** Qualifying subtotal needed, per cart currency. Any amount above zero elsewhere. */
-  minimumByCurrency: {VND: 800000},
-};
 
 /**
  * @typedef {import("../generated/api").CartInput} RunInput
@@ -38,26 +35,25 @@ export function cartLinesDiscountsGenerateRun(input) {
     return {operations: []};
   }
 
-  const config = {
-    ...DEFAULT_CONFIG,
-    ...(input.discount.metafield?.jsonValue ?? {}),
-  };
+  const config = readConfig(input);
+  // Everyday minimums, swapped for the sale's while it runs (or for a
+  // preview cart) when the discount carries a `promo` config.
+  const minimumByCurrency =
+    config.promo && promoActive(input, config.promo)
+      ? config.promo.giftMinimumByCurrency
+      : config.minimumByCurrency;
 
-  const isKeycap = (line) =>
-    line.merchandise.__typename === 'ProductVariant' &&
-    line.merchandise.product.handle === config.giftProductHandle;
-
-  const keycapLines = input.cart.lines.filter(isKeycap);
+  const keycapLines = input.cart.lines.filter((line) =>
+    isGiftLine(line, config),
+  );
   if (!keycapLines.length) {
     return {operations: []};
   }
 
   // Shopify measures the gift against everything except the gift itself.
-  const qualifying = input.cart.lines
-    .filter((line) => !isKeycap(line))
-    .reduce((sum, line) => sum + Number(line.cost.subtotalAmount.amount), 0);
+  const qualifying = qualifyingAmount(input.cart.lines, config);
   const currency = input.cart.cost.subtotalAmount.currencyCode;
-  const minimum = config.minimumByCurrency[currency] ?? 0;
+  const minimum = minimumByCurrency[currency] ?? 0;
   if (qualifying <= 0 || qualifying < minimum) {
     return {operations: []};
   }

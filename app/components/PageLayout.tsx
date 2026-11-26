@@ -8,10 +8,16 @@ import {Aside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
 import {Header, ShopSubnav} from '~/components/Header';
 import {CartMain} from '~/components/CartMain';
+import {
+  BlackFridayPopup,
+  showsBlackFridayPopup,
+} from '~/components/BlackFridayPopup';
+import type {BlackFriday} from '~/lib/blackFriday';
 
 type SearchCatalogItem = {handle: string; title: string; image: string; price?: {amount: string; currencyCode: string}};
 
 interface PageLayoutProps {
+  blackFriday?: BlackFriday;
   cart: Promise<CartApiQueryFragment | null>;
   footer?: unknown;
   header: HeaderQuery;
@@ -22,6 +28,7 @@ interface PageLayoutProps {
 }
 
 export function PageLayout({
+  blackFriday,
   cart,
   children = null,
   header,
@@ -47,6 +54,10 @@ export function PageLayout({
       {isCollectionPage && <ShopSubnav />}
       <main>{children}</main>
       <Footer />
+      {/* Only while the sale is on (or previewed), see app/lib/blackFriday.ts. */}
+      {showsBlackFridayPopup(blackFriday, location.pathname) && (
+        <BlackFridayPopup />
+      )}
     </Aside.Provider>
   );
 }

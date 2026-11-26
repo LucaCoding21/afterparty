@@ -1,0 +1,114 @@
+{
+  "payload": {
+    "export": "cart-lines-discounts-generate-run",
+    "target": "cart.lines.discounts.generate.run",
+    "input": {
+      "cart": {
+        "bfPreview": {
+          "value": "test-preview-token"
+        },
+        "cost": {
+          "subtotalAmount": {
+            "currencyCode": "VND"
+          }
+        },
+        "lines": [
+          {
+            "id": "gid://shopify/CartLine/1",
+            "quantity": 1,
+            "cost": {
+              "subtotalAmount": {
+                "amount": "300000.0"
+              }
+            },
+            "gift": null,
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "product": {
+                "handle": "nhim-short-sleeve-tee"
+              }
+            }
+          },
+          {
+            "id": "gid://shopify/CartLine/2",
+            "quantity": 1,
+            "cost": {
+              "subtotalAmount": {
+                "amount": "120000.0"
+              }
+            },
+            "gift": {
+              "value": "keycap"
+            },
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "product": {
+                "handle": "nhim-keycap-clicker"
+              }
+            }
+          }
+        ],
+        "deliveryGroups": []
+      },
+      "shop": {
+        "localTime": {
+          "bfUtc7": false,
+          "bfUtc8": false,
+          "bfUtc9": false,
+          "bfIndonesia": false,
+          "bfAustralia": false,
+          "bfNewZealand": false,
+          "bfCet": false,
+          "bfUk": false,
+          "bfCanada": false,
+          "bfUnitedStates": false
+        }
+      },
+      "discount": {
+        "discountClasses": [
+          "PRODUCT",
+          "SHIPPING"
+        ],
+        "metafield": {
+          "jsonValue": {
+            "promo": {
+              "previewToken": "test-preview-token"
+            }
+          }
+        }
+      },
+      "localization": {
+        "country": {
+          "isoCode": "VN"
+        }
+      }
+    },
+    "output": {
+      "operations": [
+        {
+          "productDiscountsAdd": {
+            "selectionStrategy": "FIRST",
+            "candidates": [
+              {
+                "message": "Free Nhím Keycap Clicker",
+                "targets": [
+                  {
+                    "cartLine": {
+                      "id": "gid://shopify/CartLine/2",
+                      "quantity": 1
+                    }
+                  }
+                ],
+                "value": {
+                  "percentage": {
+                    "value": 100
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -4562,3 +4562,244 @@ body.home-page footer {
   display: none;
 }
 
+
+/*
+* --------------------------------------------------
+* Black Friday popup
+* Sizes are in cqw of the card so the layout matches the
+* designer's artboards at every screen size: 1080x1920 on
+* mobile, 1377x1737 on desktop (socialpost.ai).
+* --------------------------------------------------
+*/
+@font-face {
+  font-family: 'Biortec';
+  src: url('/fonts/biortec-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Inter Tight';
+  /* Medium only, Latin + Vietnamese + currency signs: 23 KB instead of the
+     233 KB variable font. Preloaded in <head> with Biortec, so both arrive
+     early and the card paints in one go instead of swapping fonts. */
+  src: url('/fonts/inter-tight-medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+}
+
+.bf-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.55);
+  touch-action: manipulation;
+}
+
+.bf-popup-card {
+  position: relative;
+  container-type: inline-size;
+  width: min(82vw, 360px, calc(78dvh * 1080 / 1920));
+  aspect-ratio: 1080 / 1920;
+  overflow: hidden;
+  background: var(--color-light);
+  color: #111;
+}
+
+.bf-popup-close {
+  position: absolute;
+  top: 3cqw;
+  right: 3cqw;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max(8cqw, 32px);
+  height: max(8cqw, 32px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111;
+  cursor: pointer;
+}
+
+.bf-popup-close svg {
+  width: 70%;
+  height: 70%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.bf-popup-art {
+  position: absolute;
+  top: 8.75cqw;
+  left: 0;
+  z-index: 1;
+  width: 100cqw;
+  height: auto;
+  pointer-events: none;
+}
+
+.bf-popup-head,
+.bf-popup-body {
+  position: absolute;
+  left: 7.9cqw;
+  right: 4cqw;
+  z-index: 2;
+}
+
+.bf-popup-head {
+  top: 15.392cqw;
+}
+
+.bf-popup-body {
+  top: 115.99cqw;
+}
+
+.bf-popup-title,
+.bf-popup-subtitle,
+.bf-popup-dates,
+.bf-popup-heading {
+  margin: 0;
+  font-family: 'Biortec', var(--font-sans);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* White outline so the poster lines stay readable where they cross the
+   illustration. Stroke is painted under the fill, so only half shows. */
+.bf-popup-title,
+.bf-popup-subtitle,
+.bf-popup-dates {
+  -webkit-text-stroke: 0.3em var(--color-light);
+  paint-order: stroke fill;
+}
+
+.bf-popup-title {
+  margin-top: -0.269cqw;
+  margin-left: -0.556cqw;
+  font-size: 11.76cqw;
+  word-spacing: 0.063em;
+  color: #11190c;
+}
+
+.bf-popup-subtitle {
+  margin-top: 0;
+  margin-left: 0;
+  font-size: 5.983cqw;
+  color: #11190c;
+}
+
+.bf-popup-dates {
+  margin-top: 0.4cqw;
+  font-size: 5.983cqw;
+  color: #808080;
+}
+
+.bf-popup-heading {
+  font-size: 4.6135cqw;
+  color: #11190c;
+}
+
+.bf-popup-heading--spaced {
+  margin-top: 6.012cqw;
+}
+
+.bf-popup-text {
+  margin: 0.551cqw 0 0;
+  font-family: 'Inter Tight', var(--font-sans);
+  font-weight: 500;
+  font-size: 4.166cqw;
+  line-height: 1.243;
+  letter-spacing: -0.01em;
+  color: #808080;
+  white-space: nowrap;
+}
+
+.bf-popup-body > .bf-popup-heading:first-child {
+  margin-left: 0.093cqw;
+}
+
+/* Both body blocks are 44pt on the artboard; the list has its own leading */
+.bf-popup-heading--spaced + .bf-popup-text {
+  margin-top: 0.416cqw;
+  line-height: 1.3079;
+}
+
+/* Desktop: the designer's 1377x1737 artboard. Headlines keep their
+   mobile pixel sizes (x 1080/1377 in cqw), body copy is a step smaller. */
+@media (min-width: 48em) {
+  .bf-popup-card {
+    width: calc(min(82dvh, 720px) * 1377 / 1737);
+    aspect-ratio: 1377 / 1737;
+  }
+
+  .bf-popup-close {
+    top: 2.4cqw;
+    right: 2.4cqw;
+    width: max(6.3cqw, 32px);
+    height: max(6.3cqw, 32px);
+  }
+
+  .bf-popup-art {
+    top: 0;
+  }
+
+  .bf-popup-head {
+    left: 8.74cqw;
+    top: 8.67cqw;
+  }
+
+  .bf-popup-body {
+    left: 9cqw;
+    top: 83.595cqw;
+  }
+
+  .bf-popup-title {
+    margin-top: 0.102cqw;
+    margin-left: -0.218cqw;
+    font-size: 9.22cqw;
+  }
+
+  .bf-popup-subtitle {
+    margin-top: -0.175cqw;
+    margin-left: 0.145cqw;
+    font-size: 4.684cqw;
+  }
+
+  .bf-popup-dates {
+    margin-top: 0.44cqw;
+    font-size: 4.73cqw;
+  }
+
+  .bf-popup-heading {
+    font-size: 3.63cqw;
+  }
+
+  .bf-popup-body > .bf-popup-heading:first-child {
+    margin-left: 0;
+  }
+
+  .bf-popup-heading--spaced {
+    margin-top: 3.343cqw;
+  }
+
+  .bf-popup-heading--spaced + .bf-popup-text {
+    margin-top: 0.52cqw;
+    font-size: 2.97cqw;
+    line-height: 1.3069;
+  }
+
+  .bf-popup-text {
+    margin-top: 0.496cqw;
+    font-size: 2.97cqw;
+  }
+}

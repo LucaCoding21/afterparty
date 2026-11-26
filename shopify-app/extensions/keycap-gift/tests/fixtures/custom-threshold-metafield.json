@@ -4,6 +4,7 @@
     "target": "cart.lines.discounts.generate.run",
     "input": {
       "cart": {
+        "bfPreview": null,
         "cost": {
           "subtotalAmount": {
             "currencyCode": "VND"
@@ -44,7 +45,22 @@
               }
             }
           }
-        ]
+        ],
+        "deliveryGroups": []
+      },
+      "shop": {
+        "localTime": {
+          "bfUtc7": false,
+          "bfUtc8": false,
+          "bfUtc9": false,
+          "bfIndonesia": false,
+          "bfAustralia": false,
+          "bfNewZealand": false,
+          "bfCet": false,
+          "bfUk": false,
+          "bfCanada": false,
+          "bfUnitedStates": false
+        }
       },
       "discount": {
         "discountClasses": [
@@ -56,6 +72,11 @@
               "VND": 400000
             }
           }
+        }
+      },
+      "localization": {
+        "country": {
+          "isoCode": "VN"
         }
       }
     },
