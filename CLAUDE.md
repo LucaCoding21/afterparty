@@ -83,6 +83,18 @@ line's inset (`100% / 441`) and the add-to-cart area's own 20px, so both visible
 gaps equal the variable. Diagram height comes from its shape bucket
 (`.product-size-guide-photo--wide/--square/--tall`).
 
+**When the user sends a new chart (usually a rough screenshot of the
+designer's chart), do the whole job without being asked step by step:**
+1. Run `size-guide.py diagram` on the screenshot, then show the user the saved
+   PNG (only the garment and its labels, no table, no edges).
+2. Build the SVG table from the chart's numbers with `size-guide.py table`.
+3. Add the `SIZE_GUIDE_MAP` entry. No CSS.
+4. Run both checks below and build the preview. Report the gaps (35/35 at all
+   6 sizes) and give the user the preview link.
+If something blocks a clean result (blurry or small screenshot, grey table lines
+the tool can't detect, numbers that are hard to read), say so instead of
+guessing.
+
 The gap is only even if the diagram PNG has no blank margin and no stray
 specks, because the page measures from the image's edges. That is why every
 diagram goes through the tool. Adding a size guide means adding files only,
