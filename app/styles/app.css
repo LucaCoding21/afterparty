@@ -2062,38 +2062,20 @@ aside main {
 
 /* Long pants fill almost the whole photo top to bottom, so the default
    square crop cuts off the waistband and hems and makes them look bigger
-   than the other bottoms. Show the whole photo instead. Scope new entries
-   to `.product-item`: the product page carries the same data-handle, and
-   its photo sizing is approved (see CLAUDE.md). */
-[data-handle="leopard-flared-pants"] .product-item-img,
-[data-handle="velour-track-pants"] .product-item-img,
-.product-item[data-handle="glitter-straight-fit-jeans"] .product-item-img,
-.product-item[data-handle="star-studded-flared-jeans"] .product-item-img {
+   than the other bottoms. Show the whole photo instead, at every width.
+   The class comes from the product name (productItemClass in
+   app/lib/productCard.ts), so new pants need no change here. Don't go
+   back to per-product [data-handle] rules: the product page carries the
+   same data-handle, and its photo sizing is approved (see CLAUDE.md). */
+.product-item--full-length .product-item-img {
   background: #fff;
 }
 
-[data-handle="leopard-flared-pants"] img,
-[data-handle="velour-track-pants"] img,
-.product-item[data-handle="glitter-straight-fit-jeans"] img,
-.product-item[data-handle="star-studded-flared-jeans"] img {
+.product-item--full-length img {
   width: 95%;
   height: 95%;
   object-fit: contain;
   margin: auto;
-}
-
-/* Desktop only: mobile keeps the default full-bleed crop */
-@media (min-width: 45em) {
-  [data-handle="classic-logo-sweatpants"] .product-item-img {
-    background: #fff;
-  }
-
-  [data-handle="classic-logo-sweatpants"] img {
-    width: 95%;
-    height: 95%;
-    object-fit: contain;
-    margin: auto;
-  }
 }
 
 .product-item h4 {

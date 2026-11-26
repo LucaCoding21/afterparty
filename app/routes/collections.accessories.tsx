@@ -4,6 +4,7 @@ import {Link, useLoaderData} from 'react-router';
 import {Price} from '~/components/Price';
 import {flattenToColorVariants, buildProductUrl} from '~/lib/collections';
 import {shopifyImg, shopifySrcSet} from '~/lib/images';
+import {productItemClass} from '~/lib/productCard';
 
 export async function loader({context}: Route.LoaderArgs) {
   const {collection} = await context.storefront.query(COLLECTION_QUERY, {
@@ -55,7 +56,7 @@ export default function Accessories() {
         {items.map((item, index) => (
           <Link
             key={item.id}
-            className="product-item"
+            className={productItemClass(item.title)}
             prefetch="intent"
             to={buildProductUrl(item)}
             data-handle={item.handle}

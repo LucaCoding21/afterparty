@@ -3,6 +3,7 @@ import {Image} from '@shopify/hydrogen';
 import {Price} from '~/components/Price';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
+import {productItemClass} from '~/lib/productCard';
 
 export function ProductItem({
   product,
@@ -15,7 +16,7 @@ export function ProductItem({
   const image = product.featuredImage;
   return (
     <Link
-      className="product-item"
+      className={productItemClass(product.title)}
       key={product.id}
       prefetch="intent"
       to={variantUrl}

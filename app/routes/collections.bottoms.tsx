@@ -4,6 +4,7 @@ import {Link, useLoaderData} from 'react-router';
 import {Price} from '~/components/Price';
 import {flattenToColorVariants, buildProductUrl} from '~/lib/collections';
 import {shopifyImg, shopifySrcSet} from '~/lib/images';
+import {productItemClass} from '~/lib/productCard';
 
 // The Shopify collection is being renamed from handle "pants" to "bottoms".
 // Ask for both so the page keeps its products whichever one exists in admin.
@@ -64,7 +65,7 @@ export default function Bottoms() {
         {items.map((item, index) => (
           <Link
             key={item.id}
-            className="product-item"
+            className={productItemClass(item.title)}
             prefetch="intent"
             to={buildProductUrl(item)}
             data-handle={item.handle}

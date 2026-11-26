@@ -17,6 +17,7 @@ import {
 import {fuzzySearch, type CatalogProduct} from '~/lib/fuzzySearch';
 import {shopifyImg} from '~/lib/images';
 import type {RegularSearchQuery, PredictiveSearchQuery} from 'storefrontapi.generated';
+import {productItemClass} from '~/lib/productCard';
 
 export const meta: Route.MetaFunction = () => {
   return [{title: `afterparty | Search`}];
@@ -139,7 +140,7 @@ export default function SearchPage() {
               key={product.handle}
               prefetch="intent"
               to={`/products/${product.handle}`}
-              className="product-item"
+              className={productItemClass(product.title)}
               data-handle={product.handle}
             >
               <div className="product-item-img">
