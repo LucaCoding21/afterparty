@@ -578,15 +578,16 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
       '(?:\\s|&nbsp;|&shy;|&zwnj;|&zwj;|&#160;|&#173;|&#8203;|&#8204;|&#8205;|&#65279;|&#x200B;|&#x200C;|&#x200D;|&#xFEFF;|\\u00A0|\\u00AD|\\u200B|\\u200C|\\u200D|\\u2028|\\u2029|\\uFEFF|<br\\s*\\/?\\s*>)';
     // Repeat block-level emptiness stripping until stable, since stripping an
     // empty inner element can leave its parent empty too. Inline wrappers
-    // (<span>, <strong>, <em>) are stripped first so their parent <p>/<li>
-    // collapses on the next pass.
+    // (<span>, <strong>, <em>) holding only filler are unwrapped, not deleted:
+    // Shopify's editor sometimes puts a line's <br> alone in its own <span>,
+    // and deleting it ran two lines together ("straight legCustom branded").
+    // A parent <p>/<li> left holding only filler still collapses next pass.
     for (let i = 0; i < 6; i++) {
       const before = html;
-      html = html.replace(new RegExp(`<span>${FILLER}*<\\/span>`, 'gi'), '');
-      html = html.replace(new RegExp(`<strong>${FILLER}*<\\/strong>`, 'gi'), '');
-      html = html.replace(new RegExp(`<em>${FILLER}*<\\/em>`, 'gi'), '');
-      html = html.replace(new RegExp(`<b>${FILLER}*<\\/b>`, 'gi'), '');
-      html = html.replace(new RegExp(`<i>${FILLER}*<\\/i>`, 'gi'), '');
+      html = html.replace(
+        new RegExp(`<(span|strong|em|b|i)>(${FILLER}*)<\\/\\1>`, 'gi'),
+        '$2',
+      );
       html = html.replace(new RegExp(`<p>${FILLER}*<\\/p>`, 'gi'), '');
       html = html.replace(new RegExp(`<li>${FILLER}*<\\/li>`, 'gi'), '');
       html = html.replace(new RegExp(`<div>${FILLER}*<\\/div>`, 'gi'), '');
