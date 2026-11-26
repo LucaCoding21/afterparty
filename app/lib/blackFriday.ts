@@ -21,21 +21,26 @@ function saleWindow(starts: string, ends: string): SaleWindow {
 /**
  * Sale window per country, as UTC instants. Checkout uses the shipping
  * country; the storefront only knows the visitor's country (from their IP),
- * which is the same for nearly everyone. Countries spanning several time
- * zones start at midnight in their easternmost zone and end at midnight in
- * their westernmost, so nobody loses sale hours. Mirrors WINDOW_BY_COUNTRY
- * in shopify-app/extensions/keycap-gift/src/config.js.
+ * which is the same for nearly everyone. Mirrors WINDOW_BY_COUNTRY in
+ * shopify-app/extensions/keycap-gift/src/config.js.
+ *
+ * The client started the sale early, everywhere at once, on 27/11 (Vietnam
+ * time), so every start is in the past. Each country still ends at its own
+ * local midnight after 30/11 (countries spanning several time zones end at
+ * midnight in their westernmost).
  */
-const UTC7 = saleWindow('2026-11-26T17:00:00Z', '2026-11-30T17:00:00Z');
-const UTC8 = saleWindow('2026-11-26T16:00:00Z', '2026-11-30T16:00:00Z');
-const UTC9 = saleWindow('2026-11-26T15:00:00Z', '2026-11-30T15:00:00Z');
-const INDONESIA = saleWindow('2026-11-26T15:00:00Z', '2026-11-30T17:00:00Z');
-const AUSTRALIA = saleWindow('2026-11-26T13:00:00Z', '2026-11-30T16:00:00Z');
-const NEW_ZEALAND = saleWindow('2026-11-26T11:00:00Z', '2026-11-30T11:00:00Z');
-const CET = saleWindow('2026-11-26T23:00:00Z', '2026-11-30T23:00:00Z');
-const UK = saleWindow('2026-11-27T00:00:00Z', '2026-12-01T00:00:00Z');
-const CANADA = saleWindow('2026-11-27T03:30:00Z', '2026-12-01T08:00:00Z');
-const UNITED_STATES = saleWindow('2026-11-27T05:00:00Z', '2026-12-01T10:00:00Z');
+const EARLY_START = '2026-11-25T17:00:00Z';
+
+const UTC7 = saleWindow(EARLY_START, '2026-11-30T17:00:00Z');
+const UTC8 = saleWindow(EARLY_START, '2026-11-30T16:00:00Z');
+const UTC9 = saleWindow(EARLY_START, '2026-11-30T15:00:00Z');
+const INDONESIA = saleWindow(EARLY_START, '2026-11-30T17:00:00Z');
+const AUSTRALIA = saleWindow(EARLY_START, '2026-11-30T16:00:00Z');
+const NEW_ZEALAND = saleWindow(EARLY_START, '2026-11-30T11:00:00Z');
+const CET = saleWindow(EARLY_START, '2026-11-30T23:00:00Z');
+const UK = saleWindow(EARLY_START, '2026-12-01T00:00:00Z');
+const CANADA = saleWindow(EARLY_START, '2026-12-01T08:00:00Z');
+const UNITED_STATES = saleWindow(EARLY_START, '2026-12-01T10:00:00Z');
 
 const WINDOW_BY_COUNTRY: Record<string, SaleWindow> = {
   VN: UTC7,
