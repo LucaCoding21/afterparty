@@ -2096,6 +2096,24 @@ aside main {
   }
 }
 
+/* Automatic, desktop only: any card whose product name says pants, jeans,
+   trousers or joggers (not shorts) gets `product-item--full-length` from
+   productItemClass() in app/lib/productCard.ts. New pants need no entry
+   here. Phones keep their current look, so the per-product rules above
+   stay for the phone layout. */
+@media (min-width: 45em) {
+  .product-item--full-length .product-item-img {
+    background: #fff;
+  }
+
+  .product-item--full-length img {
+    width: 95%;
+    height: 95%;
+    object-fit: contain;
+    margin: auto;
+  }
+}
+
 .product-item h4 {
   font-size: 0.75rem;
   font-weight: 500;

@@ -128,6 +128,21 @@ Known and separate: at 1100 and 1240 wide the product column is narrower than
 the drawing, so drawings shrink and the (still even) gaps grow to 55-100px.
 That is the photo sizing, not the gap; leave it unless asked.
 
+### Long pants on catalog cards (desktop)
+Catalog cards are square on desktop and zoom each photo to fill (`object-fit:
+cover`), which crops long pants and makes them look oversized. Cards whose
+product name contains pants, jeans, trousers or joggers (not shorts) get
+`product-item--full-length` from `productItemClass()` in
+`app/lib/productCard.ts`, and a desktop-only rule in `app.css` shows the whole
+photo. Every card renderer uses `productItemClass()`; a new one must too.
+- New pants need no CSS. Never add a per-product `[data-handle]` rule for this.
+  If long pants have a name the rule misses, add the word to `FULL_LENGTH`.
+- Whenever the user brings measurements or a size guide for new pants, check
+  the title matches and look at the card on desktop (launch-prep step B4c).
+- Phones: leave as is. The old per-product rules (Leopard, Velour, the two
+  jeans) still set the phone look, and Classic Logo Sweatpants stays cropped on
+  phones. The user approved this on 2026-11-26; don't "clean up" those rules.
+
 ### If a change seems to need these rules
 Ask first. Then measure before and after, live site vs local, at several
 desktop window sizes (for example 1240x880, 1440x900, 1920x1080, 1100x700) plus

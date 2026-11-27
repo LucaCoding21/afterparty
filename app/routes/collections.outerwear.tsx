@@ -1,4 +1,5 @@
 import {useEffect} from 'react';
+import {productItemClass} from '~/lib/productCard';
 import type {Route} from './+types/collections.outerwear';
 import {Link, useLoaderData} from 'react-router';
 import {Price} from '~/components/Price';
@@ -55,7 +56,7 @@ export default function Outerwear() {
         {items.map((item, index) => (
           <Link
             key={item.id}
-            className="product-item"
+            className={productItemClass(item.title)}
             prefetch="intent"
             to={buildProductUrl(item)}
             data-handle={item.handle}

@@ -209,6 +209,23 @@ the gaps, and exits non-zero if either gap isn't 35px (±1). Then publish
 `files` (root = `<out>`), and give the user the private link. Look at the
 screenshots before publishing; fix anything that looks off first.
 
+### B4c. Pants: check the catalog card isn't zoomed in (desktop)
+For any bottoms that are long pants (not shorts), check the catalog card too.
+On desktop the square card zooms the photo in until it fills the card, which
+cuts off the waistband and hems and makes long pants look oversized. The site
+fixes this automatically by name: `productItemClass()` in
+`app/lib/productCard.ts` shows the whole photo on desktop when the title
+contains pants, jeans, trousers or joggers (Sweatpants and Trackpants count)
+and not shorts.
+- Confirm the product title matches. If it's long pants but the name doesn't
+  match (e.g. "Cargo Flares"), tell the user and add the word to
+  `FULL_LENGTH` in `productCard.ts`. Never add a per-product
+  `[data-handle]` CSS rule.
+- Look at its card on `/collections/bottoms` at desktop width (1440): the whole
+  pair is visible on white, waistband to hems.
+- Phones are left as they are (the user approved the current phone look on
+  2026-11-26). Don't change phone card styling.
+
 ### B5. Tee front/back ordering
 Tees whose variant image is the **back/graphic** (logo on front) should show the
 front first on the PDP — add the handle to `FRONT_FIRST_HANDLES` in
@@ -224,6 +241,6 @@ graphic on the front (single flat-lay per color) and don't need it.
 4. **Variants** (A3) → build Color × Size, verify.
 5. **Size guide** (B) → `scripts/size-guide.py table` + `diagram`, wire
    `SIZE_GUIDE_MAP`, then `size-guide.py check`, typecheck, and the preview
-   link (B4b).
+   link (B4b). Long pants: also check the desktop catalog card (B4c).
 6. Hand back the launch checklist (stock, set Active, publish to headless) — the
    owner does those.

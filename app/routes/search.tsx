@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {productItemClass} from '~/lib/productCard';
 import {
   Link,
   useLoaderData,
@@ -139,7 +140,7 @@ export default function SearchPage() {
               key={product.handle}
               prefetch="intent"
               to={`/products/${product.handle}`}
-              className="product-item"
+              className={productItemClass(product.title)}
               data-handle={product.handle}
             >
               <div className="product-item-img">

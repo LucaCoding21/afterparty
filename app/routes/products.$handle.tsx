@@ -1,4 +1,5 @@
 import {useState, useEffect, useLayoutEffect, useRef, useMemo} from 'react';
+import {productItemClass} from '~/lib/productCard';
 import {createPortal} from 'react-dom';
 import {
   useLoaderData,
@@ -1016,7 +1017,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
           <h2 className="product-related-heading">Recently Viewed</h2>
           <div className="product-related-grid">
             {recentlyViewed.map((item) => (
-              <Link key={item.handle} className="product-item" prefetch="intent" to={`/products/${item.handle}`} data-handle={item.handle}>
+              <Link key={item.handle} className={productItemClass(item.title)} prefetch="intent" to={`/products/${item.handle}`} data-handle={item.handle}>
                 <div className="product-item-img">
                   {item.image && <img src={shopifyImg(item.image, {width: 800, format: 'webp'})} alt={item.title} loading="lazy" />}
                 </div>
@@ -1038,7 +1039,7 @@ function DynamicProductPage({product, sizeGuideInfo}: {product: NonNullable<any>
           <h2 className="product-related-heading">Shop Others</h2>
           <div className="product-related-grid">
             {shopOthers.map((item) => (
-              <Link key={item.handle} className="product-item" prefetch="intent" to={`/products/${item.handle}`} data-handle={item.handle}>
+              <Link key={item.handle} className={productItemClass(item.title)} prefetch="intent" to={`/products/${item.handle}`} data-handle={item.handle}>
                 <div className="product-item-img">
                   {item.image && <img src={shopifyImg(item.image, {width: 800, format: 'webp'})} alt={item.title} loading="lazy" />}
                 </div>

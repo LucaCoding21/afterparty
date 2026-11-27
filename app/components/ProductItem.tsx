@@ -1,4 +1,5 @@
 import {Link} from 'react-router';
+import {productItemClass} from '~/lib/productCard';
 import {Image} from '@shopify/hydrogen';
 import {Price} from '~/components/Price';
 import type {ProductItemFragment} from 'storefrontapi.generated';
@@ -15,7 +16,7 @@ export function ProductItem({
   const image = product.featuredImage;
   return (
     <Link
-      className="product-item"
+      className={productItemClass(product.title)}
       key={product.id}
       prefetch="intent"
       to={variantUrl}

@@ -1,4 +1,5 @@
 import {Link} from 'react-router';
+import {productItemClass} from '~/lib/productCard';
 import {Pagination} from '@shopify/hydrogen';
 import {Price} from '~/components/Price';
 import {urlWithTrackingParams, type RegularSearchReturn} from '~/lib/search';
@@ -126,7 +127,7 @@ function SearchResultsProducts({
                 const optionQs = optionParams.toString();
                 const productUrl = optionQs ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${optionQs}` : baseUrl;
                 return (
-                  <Link key={item.id} prefetch="intent" to={productUrl} className="product-item" data-handle={item.handle}>
+                  <Link key={item.id} prefetch="intent" to={productUrl} className={productItemClass(item.title)} data-handle={item.handle}>
                     <div className="product-item-img">
                       {item.image && <img src={shopifyImg(item.image, {width: 800, format: 'webp'})} alt={item.title} loading="lazy" />}
                     </div>
